@@ -2,16 +2,13 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-21 14:34:35
- * @LastEditTime: 2021-07-06 14:01:56
+ * @LastEditTime: 2021-07-07 12:20:13
  * @LastEditors: Kenzi
  */
 
-import { extractSpecificKeyValueInObjectsOfArray } from "../../library/utils/utils";
 import { store } from "../store";
-import chatActionType from "./chat.type";
 import { fetchConversationsByRoomId } from "./../../chat_api/chat";
 import { fetchChatRoom } from "./../../chat_api/chat";
-import * as mime from "react-native-mime-types";
 
 //讯息array
 export const createGiftChatData = async (data) => {
@@ -33,7 +30,7 @@ export const createGiftChatData = async (data) => {
       _id: _id,
       text: message,
       createdAt: createdAt,
-      files: [],
+      file: [],
       user: {
         _id: postedByUser,
         name: name,
@@ -48,7 +45,7 @@ export const createGiftChatData = async (data) => {
         const baseURL = __DEV__
           ? process.env.REACT_APP_API_URL_DEVELOPMENT
           : process.env.REACT_APP_API_URL_PRODUCTION;
-        msg.files.push({
+        msg.file.push({
           name: item.name,
           url:
             baseURL +
