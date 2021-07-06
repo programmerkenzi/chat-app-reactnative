@@ -2,21 +2,12 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:57
- * @LastEditTime: 2021-07-05 18:46:51
+ * @LastEditTime: 2021-07-06 18:00:57
  * @LastEditors: Kenzi
  */
 
-import {
-  all,
-  fork,
-  take,
-  put,
-  select,
-  takeLatest,
-  call,
-} from "redux-saga/effects";
+import { all, fork, take, put, select, takeLatest } from "redux-saga/effects";
 
-import { loginChatServerApi } from "./../../api/chat";
 import {
   loginChatServerSuccess,
   loginChatServerFailure,
@@ -26,22 +17,14 @@ import {
   initializeChatRoomSuccess,
   initializeChatRoomFailure,
   getChatRoomSuccess,
-  onSocketIoConnected,
-  onSocketIoDisConnected,
   getConversationSuccess,
-  gotNewMessages,
-  messageRenderTrigger,
-  getChatRoomStart,
-  updateChatRoomListStart,
   updateChatRoomStateStart,
   updateChatRoomStateFailure,
   updateConversation,
   onClearSelectedMessage,
 } from "./chat.actions";
-import webSocketActionType from "./../websocket/websocket.type";
 import { takeEvery } from "redux-saga/effects";
 import chatActionType from "./chat.type";
-import { gotNewIssueMessage } from "./../issue/issue.actions";
 import authActionType from "./../auth/auth.type";
 import {
   fetchConversationsByRoomId,
@@ -49,24 +32,17 @@ import {
   initializeChatRoom,
   markReadByRoomId,
 } from "../../chat_api/chat";
-import { fetchChatRoom } from "./../../chat_api/chat";
 import { getChatRoomFailure } from "./chat.actions";
 import { toMessagesPage } from "../../pages/chat/utils";
-import { io } from "socket.io-client";
-import { eventChannel } from "redux-saga";
-import * as Device from "expo-device";
 import { getConversationFailure } from "./chat.actions";
 import {
-  arrayClone,
   createGiftChatData,
   getChatRooms,
-  getConversations,
   handelRecipientMarkedRead,
   readAll,
   updateLastMessage,
   updateUnreadAndLastMessage,
 } from "./utils";
-import { onRecipientMarkRead } from "./chat.actions";
 import { updateChatRoomStateSuccess } from "./chat.actions";
 
 function* gotNewMessage({ payload }) {
@@ -128,8 +104,8 @@ function* onGotNewMessage() {
 }
 
 function* deleteMessage({ payload }) {
-  const { room_id, message_ids } = payload;
-
+  const { room_id, message_ids, clearSelected } = payload;
+  console.log("payload :>> ", payload);
   try {
     const chat = yield (state) => state.chat;
 
@@ -150,9 +126,19 @@ function* deleteMessage({ payload }) {
       });
 
       newConversations[room_id] = theRoomNewConversations;
+      const messageLength = newConversations[room_id].length;
+      //排序是倒序所以最后讯息都是第0个
+      const lastMessage =
+        messageLength > 0 ? [newConversations[room_id][0]] : [];
 
+      lastMessage[0].message = lastMessage[0].text;
+      yield put(
+        updateChatRoomStateStart(room_id, lastMessage, "new_message_read")
+      );
       yield put(updateConversation(newConversations));
-      yield put(onClearSelectedMessage());
+      if (clearSelected) {
+        yield put(onClearSelectedMessage());
+      }
     }
   } catch (error) {
     throw error;
@@ -383,17 +369,13 @@ function* onLoginChatServer() {
 
 function* onGotWsClientId() {
   while (true) {
-    yield take([
-      authActionType.LOGIN_SUCCESS,
-      webSocketActionType.GOT_WEBSOCKET_CLIENT_ID,
-    ]);
-    const task = yield fork(onLoginChatServer);
+    yield take([authActionType.LOGIN_SUCCESS]);
+    // const task = yield fork(onLoginChatServer);
   }
 }
 
 export default function* chatSagas() {
   yield all([
-    fork(onGotWsClientId),
     fork(onGotNewMessage),
     fork(onGetUserContactList),
     fork(onInitChatRoom),

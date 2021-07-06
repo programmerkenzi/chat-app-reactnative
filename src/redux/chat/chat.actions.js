@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:41
- * @LastEditTime: 2021-07-05 18:45:41
+ * @LastEditTime: 2021-07-06 16:43:54
  * @LastEditors: Kenzi
  */
 
@@ -137,7 +137,15 @@ export const onClearSelectedMessage = () => ({
  * @param {Array} message_ids 已經刪除的訊息id
  * @returns
  */
-export const onDeleteConversation = (room_id, message_ids) => ({
+export const onDeleteConversation = (
+  room_id,
+  message_ids,
+  clearSelected = false
+) => ({
   type: chatActionType.DELETE_CONVERSATION,
-  payload: { room_id: room_id, message_ids: message_ids },
+  payload: {
+    room_id: room_id,
+    message_ids: message_ids,
+    clearSelected: clearSelected,
+  },
 });

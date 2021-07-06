@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-21 14:34:35
- * @LastEditTime: 2021-07-01 14:16:58
+ * @LastEditTime: 2021-07-06 14:01:56
  * @LastEditors: Kenzi
  */
 
@@ -46,8 +46,8 @@ export const createGiftChatData = async (data) => {
         const mime_type = item.mime_type;
 
         const baseURL = __DEV__
-          ? process.env.REACT_APP_CHAT_API_URL_DEVELOPMENT
-          : process.env.REACT_APP_CHAT_API_URL_PRODUCTION;
+          ? process.env.REACT_APP_API_URL_DEVELOPMENT
+          : process.env.REACT_APP_API_URL_PRODUCTION;
         msg.files.push({
           name: item.name,
           url:

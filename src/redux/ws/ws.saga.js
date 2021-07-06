@@ -2,10 +2,19 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:33:46
- * @LastEditTime: 2021-07-05 18:44:14
+ * @LastEditTime: 2021-07-06 16:38:59
  * @LastEditors: Kenzi
  */
 import { all, fork, take, put, call } from "redux-saga/effects";
+import { eventChannel } from "redux-saga";
+import { io } from "socket.io-client";
+import * as Device from "expo-device";
+import { onSocketIoConnected, onSocketIoDisConnected } from "./ws.action";
+import {
+  gotNewMessages,
+  onDeleteConversation,
+  onRecipientMarkRead,
+} from "../chat/chat.actions";
 
 function initSocketIo() {
   return eventChannel((emitter) => {
@@ -36,7 +45,8 @@ function initSocketIo() {
     });
 
     socket.on("delete_message", (data) => {
-      console.log("socket  delete_message:>> ", data);
+      const { chat_room_id, message_ids } = data.data;
+      emitter(onDeleteConversation(chat_room_id, message_ids));
     });
 
     socket.on("disconnect", (reason) => {

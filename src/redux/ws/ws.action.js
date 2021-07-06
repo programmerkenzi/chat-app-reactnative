@@ -2,11 +2,11 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:35:43
- * @LastEditTime: 2021-07-05 18:38:44
+ * @LastEditTime: 2021-07-06 11:48:26
  * @LastEditors: Kenzi
  */
 
-import wsActionType from "./wsActionType";
+import wsActionType from "./ws.type";
 
 /**
  *

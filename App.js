@@ -1,21 +1,33 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+/*
+ * @Description:
+ * @Author: Kenzi
+ * @Date: 2021-07-05 18:17:21
+ * @LastEditTime: 2021-07-06 12:58:39
+ * @LastEditors: Kenzi
+ */
+import React, { useEffect } from "react";
+import { store } from "./src/redux/store";
+import { Provider } from "react-redux";
+import { MenuProvider } from "react-native-popup-menu";
+import MainStackNavigation from "./src/navigation/MainStackNavigation";
+import CustomSpinner from "./src/components/spinner/Spinner";
+import { getLanguage } from "./src/i18n/index";
+import Notification from "./src/components/notification/Notification";
+const App = () => {
+  useEffect(() => {
+    //语言初始设定
+    getLanguage();
+  }, []);
 
-export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <MenuProvider>
+        <MainStackNavigation />
+        <Notification />
+        <CustomSpinner />
+      </MenuProvider>
+    </Provider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;

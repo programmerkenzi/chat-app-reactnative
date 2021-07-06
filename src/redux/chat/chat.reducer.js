@@ -2,13 +2,10 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:48
- * @LastEditTime: 2021-07-05 18:46:05
+ * @LastEditTime: 2021-07-06 13:02:01
  * @LastEditors: Kenzi
  */
 import chatActionType from "./chat.type";
-import privateChatRoomList from "./../../data/privateChatRoomList";
-import conversations from "./../../data/conversations";
-import contactList from "./../../data/contactList";
 import { RecipientMarkedRead } from "./utils";
 
 const initialState = {

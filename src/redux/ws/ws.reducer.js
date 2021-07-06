@@ -6,7 +6,7 @@
  * @LastEditors: Kenzi
  */
 
-import wsActionType from "./wsActionType";
+import wsActionType from "./ws.type";
 
 const initialState = {
   socketIoClientId: null,

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:26:51
- * @LastEditTime: 2021-07-05 18:41:46
+ * @LastEditTime: 2021-07-06 13:00:30
  * @LastEditors: Kenzi
  */
 
@@ -10,18 +10,23 @@ import { combineReducers } from "redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { persistReducer } from "redux-persist";
 import routerReducer from "./router/router.reducer";
-import authActionType from "./auth/auth.type";
 import wsReducer from "./ws/ws.reducer";
+import authReducer from "./auth/auth.reducer";
+import settingReducer from "./setting/setting.reducer";
+import chatReducer from "./chat/chat.reducer";
 
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
-  whitelist: ["router", "ws"],
+  whitelist: ["router", "ws", "setting", "auth", "chat"],
 };
 
 const appReducer = combineReducers({
   router: routerReducer,
   ws: wsReducer,
+  auth: authReducer,
+  setting: settingReducer,
+  chat: chatReducer,
 });
 
 const rootReducer = (state, action) => {
