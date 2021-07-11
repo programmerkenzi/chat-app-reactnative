@@ -2,7 +2,7 @@
  * @Description: 聊天列表
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:24
- * @LastEditTime: 2021-07-07 12:36:51
+ * @LastEditTime: 2021-07-09 15:29:27
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -25,9 +25,14 @@ import {
 import PrimarySearchBar from "../../../components/searchBar/PrimarySearchBar";
 import { ContainerWithBgColor } from "./../../../styles/layout";
 import { getChatRoomStart } from "../../../redux/chat/chat.actions";
-import { selectUserInfo } from "./../../../redux/chat/chat.selector";
 import { toMessagesPage } from "../utils";
 import * as mime from "react-native-mime-types";
+import {
+  selectUserInfo,
+  selectUserToken,
+} from "./../../../redux/auth/auth.selector";
+import { getUserInfoStart } from "../../../redux/auth/auth.actions";
+import { createFileUrl } from "./../../../library/utils/utils";
 
 const ChatHistoryPage = ({
   navigation,
@@ -35,6 +40,8 @@ const ChatHistoryPage = ({
   getChatRoom,
   userInfo,
   renderTrigger,
+  getUserInfo,
+  userToken,
 }) => {
   //搜尋
   const [searchString, setSearchString] = useState("");
@@ -44,9 +51,11 @@ const ChatHistoryPage = ({
   //所有對話列表
   const [chatId, setChatId] = useState(null);
 
-  useEffect(() => {
-    getChatRoom();
-  }, []);
+  // useEffect(() => {
+  //   if (userToken) {
+  //     getChatRoom();
+  //   }
+  // }, [userToken]);
 
   const creatListItemData = () => {
     let data = [];
@@ -61,15 +70,23 @@ const ChatHistoryPage = ({
       const name =
         props.name || users.filter((u) => u._id !== currentUserId)[0].name; //群組 || 私人
 
-      const lastMessageInfo =
-        props.last_message.length > 0
-          ? props.last_message[0]
+      const hasLastMessage = props.last_message;
+
+      const lastMessageInfo = hasLastMessage
+        ? hasLastMessage.length > 0
+          ? hasLastMessage[0]
           : {
               type: "null",
               createdAt: props.createdAt,
               message: "",
               file: [],
-            };
+            }
+        : {
+            type: "null",
+            createdAt: props.createdAt,
+            message: "",
+            file: [],
+          };
 
       let lastTextMessage = "";
 
@@ -111,7 +128,7 @@ const ChatHistoryPage = ({
 
       data.push({
         _id: props._id,
-        avatar: avatar,
+        avatar: avatar ? createFileUrl(avatar) : null,
         name: name,
         lastMessage: lastTextMessage,
         dateTime: dateTime,
@@ -126,7 +143,9 @@ const ChatHistoryPage = ({
   };
 
   useEffect(() => {
-    creatListItemData();
+    if (chatRoomList.length > 0) {
+      creatListItemData();
+    }
   }, [chatRoomList]);
 
   //合併私人對話跟群組對話列表資料並按照最後訊息時間新到舊排序
@@ -214,7 +233,7 @@ const ChatHistoryPage = ({
     <ContainerWithBgColor bgColor="#fff">
       <PrimarySearchBar
         data={listItemData}
-        currentUserId={userInfo._id}
+        currentUserId={userInfo ? userInfo._id : ""}
         type="room"
         searchString={searchString}
         setSearchString={setSearchString}
@@ -235,7 +254,7 @@ const ChatHistoryPage = ({
             backgroundColor={"#fff"}
           >
             <TouchableOpacity onPress={() => handleGetMessages(item)}>
-              <ListItem props={item} userId={userInfo._id} />
+              <ListItem props={item} />
             </TouchableOpacity>
           </Swipeout>
         )}
@@ -249,6 +268,7 @@ const mapStateToProps = createStructuredSelector({
   chatRoomList: selectChatRoomList,
   userInfo: selectUserInfo,
   renderTrigger: selectChatRoomListRendererTrigger,
+  userToken: selectUserToken,
 });
 
 const mapDispatchToProps = (dispatch) => ({

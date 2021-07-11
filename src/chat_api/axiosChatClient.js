@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-14 17:54:54
- * @LastEditTime: 2021-07-06 14:10:32
+ * @LastEditTime: 2021-07-08 17:46:47
  * @LastEditors: Kenzi
  */
 
@@ -25,22 +25,17 @@ const axiosChatClient = axios.create({
 // request interceptor
 axiosChatClient.interceptors.request.use(
   async (config) => {
-    // do something before request is sent
-    // console.log("config :>> ", config);
-    // store.dispatch(startLoading());
     const state = store.getState();
-    // const userToken = state.auth.userToken;
-    // if (userToken) {
-    //   config.headers["Authorization"] = userToken;
-    // }
+    const userToken = state.auth.userToken;
+    console.log(" axios userToken :>> ", userToken);
+    config.headers["Authorization"] = userToken;
     const { socketIoClientId } = state.ws;
 
-    config.headers["Authorization"] =
-      "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOGRmY2UyZTRmNGYzNDE3YWI3YTY5ZjY2MjQwMGY3N2YiLCJpYXQiOjE2MjU1NDk5OTh9.e5bZSlCilZw1uvH3f5nVlVDq7BzJG5ymtTBErgClBp8";
     config.headers["socket_id"] = socketIoClientId;
     return config;
   },
   (error) => {
+    123;
     store.dispatch(stopLoading());
     // do something with request error
     Alert.alert("axios发生错误!", `${error}`);
@@ -53,8 +48,12 @@ axiosChatClient.interceptors.response.use(
     console.log("response :>> ", response);
     store.dispatch(stopLoading());
     // console.log(`response`, response);
+
     const res = response.data;
     const url = response.config.url;
+    if (!res.success) {
+      Alert.alert(response.status, res.data.message);
+    }
     return res;
   },
   (error) => {

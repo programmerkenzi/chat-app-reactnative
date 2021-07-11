@@ -2,7 +2,7 @@
  * @Description: 用户在线
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:53
- * @LastEditTime: 2021-07-07 11:56:52
+ * @LastEditTime: 2021-07-09 11:00:08
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -13,7 +13,6 @@ import { createStructuredSelector } from "reselect";
 import {
   selectChatRoomList,
   selectContactList,
-  selectUserInfo,
 } from "../../../redux/chat/chat.selector";
 
 import PrimarySearchBar from "../../../components/searchBar/PrimarySearchBar";
@@ -26,7 +25,7 @@ import {
 import { toMessagesPage } from "../utils";
 import { ContainerWithBgColor } from "../../../styles/layout";
 import { searchUserByPublicId } from "./../../../chat_api/chat";
-
+import { selectUserInfo } from "./../../../redux/auth/auth.selector";
 const ContactPage = ({
   userInfo,
   navigation,
@@ -48,18 +47,19 @@ const ContactPage = ({
    *@param {String} user_id 联络人的用户id
    */
   const toChatRoom = async (user_id) => {
-    const currentUserId = userInfo._id;
-    const roomUserIds = [currentUserId, user_id];
+    const roomUserIds = [userInfo._id, user_id];
     let isExistRoom = null;
     //确认该房间使否已经在列表
     chatRoomList.some((room) => {
       const users = room.users;
       let users_id = users.map((user) => user._id);
+      console.log("users_id :>> ", users_id);
       if (checkIsSameArray(roomUserIds, users_id)) {
         isExistRoom = room;
         return false;
       }
     });
+    console.log("isExistRoom :>> ", isExistRoom);
     if (isExistRoom) {
       return toMessagesPage(navigation, isExistRoom);
     } else {
@@ -85,7 +85,7 @@ const ContactPage = ({
             onPressChevron={toChatRoom}
           />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
       />
     </ContainerWithBgColor>
   );

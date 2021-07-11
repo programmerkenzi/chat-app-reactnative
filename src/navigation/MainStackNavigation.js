@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-06 11:09:28
- * @LastEditTime: 2021-07-06 11:39:03
+ * @LastEditTime: 2021-07-09 15:13:02
  * @LastEditors: Kenzi
  */
 
@@ -27,15 +27,23 @@ import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import ChatTabNavigation from "./chat/ChatTabNavigation";
+import LoginPage from "./../pages/user/login/index";
+import { updateNetworkConnectionStatus } from "./../redux/network/network.action";
 
 const Stack = createStackNavigator();
 
-const MainStackNavigation = ({ userToken, updateCurrentPageInfo }) => {
+const MainStackNavigation = ({
+  userToken,
+  updateCurrentPageInfo,
+  locale,
+  updateNetworkConnectionStatus,
+}) => {
   //检查网路连接
 
   useEffect(() => {
     const netWorkListener = NetInfo.addEventListener((state) => {
       const isInternetReachable = state.isInternetReachable;
+      updateNetworkConnectionStatus(isInternetReachable);
     });
     return () => {
       netWorkListener();
@@ -90,10 +98,10 @@ const MainStackNavigation = ({ userToken, updateCurrentPageInfo }) => {
       }}
     >
       <Stack.Navigator>
-        {userToken === null ? (
+        {!userToken ? (
           <Stack.Screen
-            name="Chat"
-            component={ChatTabNavigation}
+            name="Login"
+            component={LoginPage}
             options={{ headerShown: false }}
           />
         ) : (
@@ -112,6 +120,8 @@ const mapDispatchToProps = (dispatch) => ({
   getUserInfo: () => dispatch(getUserInfoStart()),
   updateCurrentPageInfo: (previous_name, name, params) =>
     dispatch(updateCurrentPageInfo({ previous_name, name, params })),
+  updateNetworkConnectionStatus: (status) =>
+    dispatch(updateNetworkConnectionStatus(status)),
 });
 
 const mapStateToProps = createStructuredSelector({

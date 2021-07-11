@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-11 17:53:42
- * @LastEditTime: 2021-06-17 14:08:57
+ * @LastEditTime: 2021-07-09 15:28:09
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { toGroupInfoPage } from "./../../utils";
 import { toUserInfoPage } from "./../../utils";
+import { createFileUrl } from "./../../../../library/utils/utils";
 
 const ChatHeader = ({ roomInfo, currentUserId }) => {
   const navigation = useNavigation();
@@ -20,6 +21,8 @@ const ChatHeader = ({ roomInfo, currentUserId }) => {
     roomInfo.type === "private"
       ? users.filter((u) => u._id !== currentUserId)[0].avatar
       : roomInfo.avatar; // 私人||群组
+  console.log("header avatar :>> ", avatar);
+  const avatarUrl = avatar ? createFileUrl(avatar) : null;
   const name =
     roomInfo.type === "private"
       ? users.filter((u) => u._id !== currentUserId)[0].name
@@ -48,7 +51,7 @@ const ChatHeader = ({ roomInfo, currentUserId }) => {
             title={name.toUpperCase().substring(0, 2)}
             rounded
             size="medium"
-            source={{ uri: avatar }}
+            source={{ uri: avatarUrl }}
           />
           <Text style={styles.name}>{name}</Text>
         </View>

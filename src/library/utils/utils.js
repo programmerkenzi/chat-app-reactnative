@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-05-21 14:59:28
- * @LastEditTime: 2021-07-01 14:26:14
+ * @LastEditTime: 2021-07-09 14:38:31
  * @LastEditors: Kenzi
  */
 
@@ -12,6 +12,7 @@ import * as Notifications from "expo-notifications";
 import { Alert } from "react-native";
 import { t } from "../../i18n";
 import axios from "axios";
+import { store } from "../../redux/store";
 
 //樹狀數據搜索
 export const searchTree = (element, matchingName) => {
@@ -93,14 +94,13 @@ export const onUpdateObjState = (name, value, setState) => {
 };
 
 export const checkIsSameArray = (array1, array2) => {
-  const array_1 = JSON.stringify(array1);
-  const array_2 = JSON.stringify(array2);
+  const checkAllIncludes = array2.every((item) => array1.includes(item));
+  console.log("checkAllIncludes :>> ", checkAllIncludes);
+  const checkIsSameLength = array2.length === array1.length;
+  console.log("checkIsSameLength :>> ", checkIsSameLength);
 
-  if (array_1 === array_2) {
-    return true;
-  } else {
-    return false;
-  }
+  if (checkAllIncludes && checkIsSameLength) return true;
+  return false;
 };
 
 //選取項目
@@ -132,7 +132,6 @@ export const handleOnSelect = (
   const isExist = newSelected.findIndex(
     (element) => element[key] === item[key]
   );
-  console.log("isExist :>> ", isExist);
 
   if (
     isExist !== -1 &&
@@ -145,13 +144,11 @@ export const handleOnSelect = (
   if (multiple) {
     if (isExist !== -1) {
       if (removeWhenSelectSameItem || type === "remove") {
-        console.log("remove :>> ");
         newSelected.splice(isExist, 1);
       }
     } else {
       newSelected.push(item);
     }
-    console.log("newSelected :>> ", newSelected);
     setSelected(newSelected);
   } else {
     if (isExist !== -1) {
@@ -160,4 +157,20 @@ export const handleOnSelect = (
       setSelected([item]);
     }
   }
+};
+
+export const createFileUrl = (filename) => {
+  const state = store.getState();
+  const token = state.auth.userToken;
+  const baseUrl = __DEV__
+    ? process.env.REACT_APP_API_URL_DEVELOPMENT
+    : process.env.REACT_APP_API_URL_PRODUCTION;
+
+  const fileBasePath = "/fs/download/";
+
+  const filePath = `${baseUrl}${fileBasePath}${filename}/${
+    token.split(" ")[1]
+  }`;
+
+  return filePath;
 };

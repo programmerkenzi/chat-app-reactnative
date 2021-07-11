@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-14 14:39:34
- * @LastEditTime: 2021-06-07 14:26:27
+ * @LastEditTime: 2021-07-07 18:02:13
  * @LastEditors: Kenzi
  */
 
@@ -72,6 +72,7 @@ export default {
     desc: "description",
     image_f: "images fail to load",
     fill_all: "please fill all fields",
+    f_password: "忘记密码",
   },
   user: {
     pf: "profile",

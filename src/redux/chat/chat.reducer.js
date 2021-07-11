@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:48
- * @LastEditTime: 2021-07-06 13:02:01
+ * @LastEditTime: 2021-07-09 14:55:47
  * @LastEditors: Kenzi
  */
 import chatActionType from "./chat.type";
@@ -12,13 +12,6 @@ const initialState = {
   chatRoomList: [],
   conversations: [],
   contactList: [],
-  userInfo: {
-    _id: "8dfce2e4f4f3417ab7a69f662400f77f",
-    status: "Hello there, how are you",
-    username: "u1",
-    avatar: "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/1.jpg",
-    name: "Vadim",
-  },
   error: null,
   websocketClientId: null,
   messageReRendererTrigger: false,
@@ -53,21 +46,6 @@ const chatReducer = (state = initialState, action) => {
         ...state,
         conversations: action.payload,
         messageReRendererTrigger: !state.messageReRendererTrigger,
-      };
-
-    case chatActionType.RECIPIENT_MARK_READ:
-      let newConversation = conversations;
-      const theRoom = state.conversations[action.payload];
-      if (theRoom) {
-        const newMessages = RecipientMarkedRead(theRoom);
-        newConversation[action.payload] = newMessages;
-      }
-      return {
-        ...state,
-        conversations: theRoom ? newConversation : state.conversations,
-        messageReRendererTrigger: theRoom
-          ? !state.messageReRendererTrigger
-          : state.messageReRendererTrigger,
       };
 
     case chatActionType.UPDATE_SELECTED_MESSAGE:

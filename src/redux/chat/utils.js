@@ -2,66 +2,14 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-21 14:34:35
- * @LastEditTime: 2021-07-07 12:20:13
+ * @LastEditTime: 2021-07-09 13:37:17
  * @LastEditors: Kenzi
  */
 
+import { createFileUrl } from "../../library/utils/utils";
 import { store } from "../store";
 import { fetchConversationsByRoomId } from "./../../chat_api/chat";
 import { fetchChatRoom } from "./../../chat_api/chat";
-
-//讯息array
-export const createGiftChatData = async (data) => {
-  let messages = [];
-
-  const state = store.getState();
-  const userInfo = state.chat.userInfo;
-  await data.forEach((item) => {
-    const { _id, createdAt, message, type, user, read_by_recipients, file } =
-      item;
-    const postedByUser = user[0]._id;
-    const currentUser = userInfo._id;
-    const isRead = read_by_recipients.findIndex(
-      (user) => user.read_by_user_id !== currentUser
-    );
-    const { name, avatar } = user[0];
-    //gift chat用的obj
-    let msg = {
-      _id: _id,
-      text: message,
-      createdAt: createdAt,
-      file: [],
-      user: {
-        _id: postedByUser,
-        name: name,
-        avatar: avatar,
-      },
-      received: isRead === -1 ? false : true,
-    };
-    if (file.length > 0) {
-      file.forEach((item) => {
-        const mime_type = item.mime_type;
-
-        const baseURL = __DEV__
-          ? process.env.REACT_APP_API_URL_DEVELOPMENT
-          : process.env.REACT_APP_API_URL_PRODUCTION;
-        msg.file.push({
-          name: item.name,
-          url:
-            baseURL +
-            "/fs/download/" +
-            item.filename +
-            "/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOGRmY2UyZTRmNGYzNDE3YWI3YTY5ZjY2MjQwMGY3N2YiLCJpYXQiOjE2MjQ0MTc0NTF9.m71cj9brGgfGnIaPnCHNenndYOcGWlH_09DBIUJ7zWo",
-          mime_type: mime_type,
-        });
-      });
-    }
-
-    messages.push(msg);
-  });
-
-  return messages;
-};
 
 //更新最後訊息
 /**

@@ -2,7 +2,7 @@
  * @Description: 聊天记录
  * @Author: Lewis
  * @Date: 2021-01-20 16:32:48
- * @LastEditTime: 2021-06-22 15:09:29
+ * @LastEditTime: 2021-07-09 15:39:08
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -15,11 +15,12 @@ import { toUserInfoPage } from "../utils";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { Toast } from "native-base";
+import { createFileUrl } from "./../../../library/utils/utils";
 
 // const avatar_url= 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
 
 const ContactItem = ({ props, routeName, onPressChevron }) => {
-  const info = props.status || props.description;
+  const info = props.status;
 
   const navigation = useNavigation();
 
@@ -48,7 +49,7 @@ const ContactItem = ({ props, routeName, onPressChevron }) => {
           rounded
           size="medium"
           title={props.name.toUpperCase().substring(0, 2)}
-          source={{ uri: props.avatar }}
+          source={{ uri: props.avatar ? createFileUrl(props.avatar) : null }}
         />
       </TouchableOpacity>
       <ListItem.Content>

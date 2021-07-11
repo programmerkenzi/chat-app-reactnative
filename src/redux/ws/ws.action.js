@@ -27,3 +27,10 @@ export const onSocketIoDisConnected = (reason) => ({
   type: wsActionType.SOCKET_IO_DISCONNECTED,
   payload: reason,
 });
+
+export const onSocketIoReConnect = () => ({
+  type: wsActionType.SOCKET_IO_RECONNECT,
+});
+export const onConnectToSocketIo = () => ({
+  type: wsActionType.CONNECT_TO_SOCKET_IO,
+});

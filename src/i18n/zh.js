@@ -71,6 +71,7 @@ export default {
     desc: "描述",
     image_f: "图片加载失败",
     fill_all: "请填写所有栏位",
+    f_password: "忘记帐号或密码",
   },
 
   user: {

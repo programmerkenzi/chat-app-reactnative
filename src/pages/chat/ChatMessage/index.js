@@ -2,7 +2,7 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-07-07 12:43:38
+ * @LastEditTime: 2021-07-09 15:34:20
  * @LastEditors: Kenzi
  */
 import React, { useState, useCallback } from "react";
@@ -20,7 +20,6 @@ import {
 import { createStructuredSelector } from "reselect";
 import {
   selectMessagesReRenderTrigger,
-  selectUserInfo,
   selectSelectedMessage,
 } from "../../../redux/chat/chat.selector";
 import { selectConversations } from "../../../redux/chat/chat.selector";
@@ -47,6 +46,8 @@ import { darkGary, red } from "../../../styles/color";
 import * as Animatable from "react-native-animatable";
 import { deleteMessage } from "./../../../chat_api/chat";
 import { onDeleteConversation } from "./../../../redux/chat/chat.actions";
+import { selectUserInfo } from "./../../../redux/auth/auth.selector";
+import { createFileUrl } from "./../../../library/utils/utils";
 
 const ChatMessagePage = ({
   userInfo,
@@ -76,9 +77,64 @@ const ChatMessagePage = ({
   const [searchString, setSearchString] = useState("");
   const [searchResults, setSearchResults] = useState("");
 
+  //讯息array
+  const createGiftChatData = () => {
+    const room_messages = conversations[room_id];
+    let giftedChatMessagesData = [];
+    if (room_messages) {
+      room_messages.forEach((item) => {
+        const {
+          _id,
+          createdAt,
+          message,
+          type,
+          user,
+          read_by_recipients,
+          file,
+        } = item;
+        const postedByUser = user[0]._id;
+        const isRead = read_by_recipients.findIndex(
+          (user) => user.read_by_user_id !== user_id
+        );
+        console.log("isRead :>> ", isRead);
+        const { name, avatar } = user[0];
+        //gift chat用的obj
+        let msg = {
+          _id: _id,
+          text: message,
+          createdAt: createdAt,
+          file: [],
+          user: {
+            _id: postedByUser,
+            name: name,
+            avatar: avatar ? createFileUrl(avatar) : null,
+          },
+          received: isRead === -1 ? false : true,
+        };
+        if (file.length > 0) {
+          file.forEach((item) => {
+            msg.file.push({
+              name: item.name,
+              url: createFileUrl(item.filename),
+              mime_type: item.mime_type,
+            });
+          });
+        }
+
+        giftedChatMessagesData.push(msg);
+      });
+    }
+
+    setMessages(giftedChatMessagesData);
+  };
+
   useEffect(() => {
     getConversations(room_id);
   }, []);
+
+  useEffect(() => {
+    createGiftChatData();
+  }, [messageReRenderTrigger, conversations[room_id]]);
 
   const markRead = async () => {
     const { success } = await markReadByRoomId(room_id);
@@ -87,10 +143,6 @@ const ChatMessagePage = ({
       updateChatRoomState(room_id);
     }
   };
-
-  useEffect(() => {
-    setMessages(conversations[room_id]);
-  }, [messageReRenderTrigger, room_id]);
 
   useEffect(() => {
     //标记已读
