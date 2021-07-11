@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:57
- * @LastEditTime: 2021-07-09 15:08:12
+ * @LastEditTime: 2021-07-09 18:04:55
  * @LastEditors: Kenzi
  */
 
@@ -51,6 +51,7 @@ import {
   updateUnreadAndLastMessage,
 } from "./utils";
 import { updateChatRoomStateSuccess } from "./chat.actions";
+import { schedulePushNotification } from "../../library/utils/utils";
 
 function* gotNewMessage({ payload }) {
   console.log("gotNewMessage payload:>> ", payload);
@@ -103,6 +104,28 @@ function* gotNewMessage({ payload }) {
     yield put(
       updateChatRoomStateStart(chat_room_id, data, "new_message_unread")
     );
+  }
+
+  //推拨
+
+  if (posted_by_user !== userInfo._id) {
+    //先确认目前的router
+    console.log(" saga push :>> ");
+    console.log("data[0].user[0] :>> ", data[0].user[0]);
+    const date = new Date(data[0].createdAt);
+    const chat = yield (state) => state.chat;
+    const { chatRoomList } = yield select(chat);
+    const room_info = chatRoomList.filter((room) => room._id === chat_room_id);
+    console.log("room_info :>> ", room_info);
+    if (name !== "Messages") {
+      yield schedulePushNotification(
+        data[0].user[0].name,
+        date.toLocaleString(),
+        data[0].message,
+        "Messages",
+        { room_info: room_info[0] }
+      );
+    }
   }
 }
 

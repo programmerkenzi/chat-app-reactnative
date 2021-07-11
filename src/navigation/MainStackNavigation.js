@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-06 11:09:28
- * @LastEditTime: 2021-07-09 15:13:02
+ * @LastEditTime: 2021-07-09 17:18:55
  * @LastEditors: Kenzi
  */
 
@@ -55,16 +55,7 @@ const MainStackNavigation = ({
     const subscription = Notifications.addNotificationResponseReceivedListener(
       (response) => {
         const data = response.notification.request.content.data;
-        const currentRouteName = navigationRef.current.getCurrentRoute().name;
-        //如果是现在的页面是同一个root就不用指定root
-        if (currentRouteName.includes(data.root)) {
-          navigationRef.current?.navigate(data.page, { id: data.params });
-        } else {
-          navigationRef.current?.navigate(data.root, {
-            screen: data.page,
-            params: { id: data.params },
-          });
-        }
+        return navigationRef.current?.navigate(data.page, data.params);
       }
     );
 

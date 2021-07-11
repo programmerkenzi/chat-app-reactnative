@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-28 15:11:05
- * @LastEditTime: 2021-07-06 15:08:49
+ * @LastEditTime: 2021-07-09 18:51:44
  * @LastEditors: Kenzi
  */
 
@@ -17,6 +17,7 @@ import {
 import { Icon } from "react-native-elements";
 import { filePicker } from "./../../library/utils/resources";
 import * as FileSystem from "expo-file-system";
+import * as DocumentPicker from "expo-document-picker";
 
 const FunctionsBar = ({
   props,
@@ -81,7 +82,9 @@ const FunctionsBar = ({
 
       //选取照片
     } else if (type === "folder") {
-      resources = await filePicker();
+      let result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
+      console.log("result :>> ", result);
+      resources = result;
     }
 
     //送出档案;

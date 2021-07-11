@@ -2,7 +2,7 @@
  * @Description: 公用使用函数
  * @Author: Lewis
  * @Date: 2021-01-19 09:45:36
- * @LastEditTime: 2021-07-07 10:11:49
+ * @LastEditTime: 2021-07-09 18:49:33
  * @LastEditors: Kenzi
  */
 import * as ImagePicker from "expo-image-picker";
@@ -16,11 +16,11 @@ import { checkCameraPermission } from "./permissions";
 
 //获取档案
 export const filePicker = async () => {
-  const picker = await DocumentPicker.getDocumentAsync({ type: "*/*" });
-  console.log("picker :>> ", picker);
-  const type = picker.type;
+  const result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
+  console.log("result :>> ", result);
+  const type = result.type;
   if (type === "success") {
-    return picker;
+    return result;
   } else {
     return false;
   }

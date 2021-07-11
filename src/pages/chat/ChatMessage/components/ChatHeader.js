@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-11 17:53:42
- * @LastEditTime: 2021-07-09 15:28:09
+ * @LastEditTime: 2021-07-09 16:33:51
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -17,29 +17,26 @@ import { createFileUrl } from "./../../../../library/utils/utils";
 const ChatHeader = ({ roomInfo, currentUserId }) => {
   const navigation = useNavigation();
   const users = roomInfo.users;
+  const receiver = users.filter((u) => u._id !== currentUserId)[0];
   const avatar =
-    roomInfo.type === "private"
-      ? users.filter((u) => u._id !== currentUserId)[0].avatar
-      : roomInfo.avatar; // 私人||群组
+    roomInfo.type === "private" ? receiver.avatar : roomInfo.avatar; // 私人||群组
   console.log("header avatar :>> ", avatar);
   const avatarUrl = avatar ? createFileUrl(avatar) : null;
-  const name =
-    roomInfo.type === "private"
-      ? users.filter((u) => u._id !== currentUserId)[0].name
-      : roomInfo.name; //群組 || 私人
+  const name = roomInfo.type === "private" ? receiver.name : roomInfo.name; //群組 || 私人
 
   const handleOnPress = () => {
-    //判斷聊天內容是否為group
-    if (item.name) {
-      return toGroupInfoPage(item, navigation);
-    }
+    // //判斷聊天內容是否為group
+    // if (roomInfo.name) {
+    //   return toGroupInfoPage(roomInfo, navigation);
+    // }
 
-    //判斷是上個頁面是否為為group
-    if (routeName === "Groups") {
-      return toGroupInfoPage(item, navigation);
-    } else {
-      return toUserInfoPage(receiver, navigation);
-    }
+    // //判斷是上個頁面是否為為group
+    // if (routeName === "Groups") {
+    //   return toGroupInfoPage(item, navigation);
+    // } else {
+    //   return toUserInfoPage(receiver, navigation);
+    // }
+    toUserInfoPage(receiver, navigation);
   };
 
   return (

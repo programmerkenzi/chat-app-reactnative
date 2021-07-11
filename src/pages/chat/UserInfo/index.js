@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-08 15:40:44
- * @LastEditTime: 2021-03-28 11:35:49
+ * @LastEditTime: 2021-07-09 17:06:29
  * @LastEditors: Kenzi
  */
 /*
@@ -28,21 +28,52 @@ import bg from "../../../../assets/bg.jpg";
 import Icon from "react-native-vector-icons/Ionicons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Toast } from "native-base";
+import { createFileUrl } from "./../../../library/utils/utils";
+import { connect } from "react-redux";
+import { selectUserInfo } from "./../../../redux/auth/auth.selector";
+import { checkIsSameArray } from "./../../../library/utils/utils";
+import { toMessagesPage } from "../utils";
+import { initializeChatRoomStart } from "../../../redux/chat/chat.actions";
+import { selectChatRoomList } from "../../../redux/chat/chat.selector";
+import { createStructuredSelector } from "reselect";
 
-const UserInfoPage = ({ navigation }) => {
+const UserInfoPage = ({ navigation, userInfo, initChatRoom, chatRoomList }) => {
   const item = useRoute().params.item;
   const inContact = useRoute().params.inContact;
-
-// console.log(`userInfoItem`, item)
+  console.log("item :>> ", item);
+  // console.log(`userInfoItem`, item)
+  const toChatRoom = async () => {
+    const roomUserIds = [userInfo._id, item._id];
+    let isExistRoom = null;
+    //确认该房间使否已经在列表
+    chatRoomList.some((room) => {
+      const users = room.users;
+      let users_id = users.map((user) => user._id);
+      console.log("users_id :>> ", users_id);
+      if (checkIsSameArray(roomUserIds, users_id)) {
+        isExistRoom = room;
+        return false;
+      }
+    });
+    if (isExistRoom) {
+      return toMessagesPage(navigation, isExistRoom);
+    } else {
+      const initRoom = await initChatRoom(navigation, [item._id], "private");
+    }
+  };
 
   const onPressChat = () => {
-    return navigation.navigate("Messages", { userId: item.id, item: item });
-  };
-  const onPressCall = () => {
-    return alert("Call")
-    // return navigation.navigate("Messages", { userId: item.id, item: item });
+    if (item.unread) {
+      return navigation.navigate("Messages", { userId: item._id, item: item });
+    } else {
+      return toChatRoom();
+    }
   };
 
+  const onPressCall = () => {
+    return alert("Call");
+    // return navigation.navigate("Messages", { userId: item.id, item: item });
+  };
 
   const onPressAdd = () => {
     Toast.show({
@@ -67,7 +98,7 @@ const UserInfoPage = ({ navigation }) => {
             rounded
             size="xlarge"
             title={item.name.toUpperCase().substring(0, 2)}
-            source={{ uri: item.avatar || item.imageUri }}
+            source={{ uri: item.avatar ? createFileUrl(item.avatar) : null }}
             containerStyle={{
               marginTop: "35%",
               borderWidth: 2,
@@ -91,7 +122,6 @@ const UserInfoPage = ({ navigation }) => {
             <Icon style={style.iconButton} name="call" />
           </TouchableOpacity>
         </View>
-
       </ImageBackground>
 
       {inContact ? (
@@ -149,14 +179,13 @@ const style = StyleSheet.create({
     justifyContent: "space-evenly",
     resizeMode: "cover",
     alignItems: "center",
-    
   },
 
-  avatarContainer:{
-    position:"absolute",
-    top:"5%",
-    justifyContent:"center",
-    alignItems:"center",
+  avatarContainer: {
+    position: "absolute",
+    top: "5%",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   title: {
@@ -199,8 +228,8 @@ const style = StyleSheet.create({
     fontSize: 25,
   },
   iconButtonRow: {
-    position:"absolute",
-    bottom:"5%",
+    position: "absolute",
+    bottom: "5%",
     display: "flex",
     width: "100%",
     flexDirection: "row",
@@ -214,4 +243,14 @@ const style = StyleSheet.create({
   },
 });
 
-export default UserInfoPage;
+const mapStateToProps = createStructuredSelector({
+  userInfo: selectUserInfo,
+  chatRoomList: selectChatRoomList,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  initChatRoom: (navigation, user_ids, room_type) =>
+    dispatch(initializeChatRoomStart(navigation, user_ids, room_type)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserInfoPage);

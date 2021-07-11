@@ -21,6 +21,7 @@
     "expo-av": "~9.2.3",
     "expo-barcode-scanner": "~10.2.2",
     "expo-camera": "~11.2.1",
+    "expo-constants": "^11.0.1",
     "expo-device": "~3.3.0",
     "expo-document-picker": "~9.2.4",
     "expo-file-dl": "^2.0.0",

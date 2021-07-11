@@ -2,7 +2,7 @@
  * @Description: 聊天记录
  * @Author: Lewis
  * @Date: 2021-01-20 16:32:48
- * @LastEditTime: 2021-07-09 15:39:08
+ * @LastEditTime: 2021-07-09 16:44:44
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -19,17 +19,18 @@ import { createFileUrl } from "./../../../library/utils/utils";
 
 // const avatar_url= 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
 
-const ContactItem = ({ props, routeName, onPressChevron }) => {
+const ContactItem = ({ props, routeName, onPressChevron, toChatRoom }) => {
   const info = props.status;
 
   const navigation = useNavigation();
 
   const onPressAvatar = () => {
-    if (routeName === "Groups") {
-      return toGroupInfoPage(props, navigation);
-    } else {
-      return toUserInfoPage(props, navigation);
-    }
+    // if (routeName === "Groups") {
+    //   return toGroupInfoPage(props, navigation);
+    // } else {
+    //   return toUserInfoPage(props, navigation);
+    // }
+    toUserInfoPage(props, navigation, toChatRoom);
   };
 
   const onPressAdd = () => {

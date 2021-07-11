@@ -118,6 +118,7 @@ export default {
     contacts: "联络人",
     pf: "个人信息",
     type: "输入讯息...",
+    new_msg: "新讯息",
   },
 
   assets: {

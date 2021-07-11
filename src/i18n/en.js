@@ -119,6 +119,7 @@ export default {
     contacts: "contacts",
     pf: "my profile",
     type: "Type a message...",
+    new_msg: "new message",
   },
 
   assets: {

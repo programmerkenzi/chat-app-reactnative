@@ -47,7 +47,6 @@ const Notification = () => {
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
-
   return <View style={{ display: "none" }}></View>;
 };
 

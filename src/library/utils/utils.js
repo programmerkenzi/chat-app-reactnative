@@ -68,16 +68,15 @@ export const schedulePushNotification = async (
   title,
   subtitle,
   body,
-  page_root,
   page,
   params
 ) => {
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: t(title),
+      title: title,
       subtitle: subtitle,
       body: body,
-      data: { root: page_root, page: page, params: params },
+      data: { page: page, params: params },
     },
     trigger: { seconds: 1 },
   });

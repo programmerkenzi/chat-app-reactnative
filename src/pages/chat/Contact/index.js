@@ -2,7 +2,7 @@
  * @Description: 用户在线
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:53
- * @LastEditTime: 2021-07-09 11:00:08
+ * @LastEditTime: 2021-07-09 16:32:06
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -59,7 +59,6 @@ const ContactPage = ({
         return false;
       }
     });
-    console.log("isExistRoom :>> ", isExistRoom);
     if (isExistRoom) {
       return toMessagesPage(navigation, isExistRoom);
     } else {
@@ -83,6 +82,7 @@ const ContactPage = ({
             props={item}
             routeName={routeName}
             onPressChevron={toChatRoom}
+            toChatRoom={toChatRoom}
           />
         )}
         keyExtractor={(item) => item._id}
