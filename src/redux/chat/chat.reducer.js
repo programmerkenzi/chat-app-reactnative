@@ -2,15 +2,15 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:48
- * @LastEditTime: 2021-07-09 14:55:47
+ * @LastEditTime: 2021-07-14 12:21:23
  * @LastEditors: Kenzi
  */
 import chatActionType from "./chat.type";
 import { RecipientMarkedRead } from "./utils";
 
 const initialState = {
-  chatRoomList: [],
-  conversations: [],
+  chatRoomList: {},
+  conversations: {},
   contactList: [],
   error: null,
   websocketClientId: null,
@@ -30,24 +30,34 @@ const chatReducer = (state = initialState, action) => {
     case chatActionType.INITIALIZE_CHAT_ROOM_SUCCESS:
       return {
         ...state,
-        chatRoomList: action.payload.chatRoomList,
+        chatRoomList: {
+          ...state.chatRoomList,
+          [action.payload.room_id]: action.payload.new_room_info,
+        },
       };
 
     case chatActionType.GET_CHAT_ROOM_SUCCESS:
-    case chatActionType.UPDATE_CHAT_ROOM_STATE_SUCCESS:
       return {
         ...state,
-        chatRoomList: action.payload,
-        chatRoomListRendererTrigger: !state.chatRoomListRendererTrigger,
+        chatRoomList: { ...state.chatRoomList, ...action.payload },
       };
-    case chatActionType.GET_CONVERSATION_SUCCESS:
-    case chatActionType.UPDATE_CONVERSATION:
+    case chatActionType.UPDATE_CHAT_ROOM_STATE_SUCCESS:
+      const { new_room_info } = action.payload;
       return {
         ...state,
-        conversations: action.payload,
-        messageReRendererTrigger: !state.messageReRendererTrigger,
+        chatRoomList: {
+          ...state.chatRoomList,
+          [action.payload.room_id]: new_room_info,
+        },
       };
 
+    case chatActionType.GET_CONVERSATION_SUCCESS:
+    case chatActionType.UPDATE_CONVERSATION:
+      const { new_conversation, room_id } = action.payload;
+      return {
+        ...state,
+        conversations: { ...state.conversations, [room_id]: new_conversation },
+      };
     case chatActionType.UPDATE_SELECTED_MESSAGE:
       let newSelectedMessage = [...state.selectedMessage];
       const isExist = newSelectedMessage.findIndex(

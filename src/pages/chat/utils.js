@@ -85,7 +85,6 @@ const styles = StyleSheet.create({});
 //上传资源
 export const handleUploadFile = async (file) => {
   //判断资源类型
-  console.log("file :>> ", file);
   const modifiedFile = file;
   const mine_type = mime.lookup(modifiedFile.uri);
   modifiedFile.type = mine_type;

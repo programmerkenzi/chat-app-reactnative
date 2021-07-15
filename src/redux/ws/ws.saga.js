@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:33:46
- * @LastEditTime: 2021-07-09 14:51:15
+ * @LastEditTime: 2021-07-15 18:52:37
  * @LastEditors: Kenzi
  */
 import {
@@ -31,6 +31,8 @@ import {
   networkDisconnected,
 } from "../network/network.action";
 import { store } from "../store";
+import { onSocketIoReConnect } from "./ws.action";
+import { getToken } from "../../library/utils/secureStore";
 
 function initSocketIo(user_id) {
   return eventChannel((emitter) => {
@@ -39,7 +41,6 @@ function initSocketIo(user_id) {
       : process.env.REACT_APP_API_URL_PRODUCTION;
 
     const socket = io(baseUrl);
-    console.log("socket user_id :>> ", user_id);
     socket.on("connect", () => {
       const device_id = Device.osBuildFingerprint;
       emitter(onSocketIoConnected(socket.id));
@@ -110,15 +111,14 @@ function* handleWebSocket() {
   }
 }
 
+//断线后重新连线时
 function* updateNetworkConnectionStatus({ payload }) {
   if (payload) {
-    const auth = yield (state) => state.auth;
-    const { userToken } = yield select(auth);
-    console.log("updateNetworkConnectionStatus userToken :>> ", userToken);
+    const token = yield getToken();
 
-    if (userToken) {
+    if (token) {
       yield put(networkConnected());
-      yield fork(() => handleWebSocket(userToken));
+      yield fork(() => handleWebSocket(token));
     }
   } else {
     yield put(networkDisconnected());
@@ -131,20 +131,22 @@ function* onUpdateNetworkStatus() {
     updateNetworkConnectionStatus
   );
 }
-function* loginSuccess({ payload }) {
-  if (payload) {
-    const auth = yield (state) => state.auth;
-    const { userToken } = yield select(auth);
-    if (userToken) {
-      yield fork(() => handleWebSocket(userToken));
-    }
+
+function* handleConnectWs() {
+  const token = yield getToken();
+
+  if (token) {
+    yield fork(() => handleWebSocket(token));
   }
 }
 
-function* onLoginSuccess() {
-  yield takeLatest(authActionType.LOGIN_SUCCESS, loginSuccess);
+function* onHandleConnectWs() {
+  yield takeLatest(
+    [authActionType.LOGIN_SUCCESS, wsActionType.SOCKET_IO_DISCONNECTED],
+    handleConnectWs
+  );
 }
 
 export default function* wsSagas() {
-  yield all([fork(onUpdateNetworkStatus), fork(onLoginSuccess)]);
+  yield all([fork(onUpdateNetworkStatus), fork(onHandleConnectWs)]);
 }

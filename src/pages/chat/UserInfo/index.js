@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-08 15:40:44
- * @LastEditTime: 2021-07-09 17:06:29
+ * @LastEditTime: 2021-07-14 12:51:41
  * @LastEditors: Kenzi
  */
 /*
@@ -40,20 +40,21 @@ import { createStructuredSelector } from "reselect";
 const UserInfoPage = ({ navigation, userInfo, initChatRoom, chatRoomList }) => {
   const item = useRoute().params.item;
   const inContact = useRoute().params.inContact;
-  console.log("item :>> ", item);
-  // console.log(`userInfoItem`, item)
   const toChatRoom = async () => {
+    const chatRoomArray = Object.values(chatRoomList);
     const roomUserIds = [userInfo._id, item._id];
     let isExistRoom = null;
     //确认该房间使否已经在列表
-    chatRoomList.some((room) => {
-      const users = room.users;
-      let users_id = users.map((user) => user._id);
-      console.log("users_id :>> ", users_id);
-      if (checkIsSameArray(roomUserIds, users_id)) {
-        isExistRoom = room;
-        return false;
+    chatRoomArray.some((room) => {
+      if (typeof room === "object") {
+        const users = room.users;
+        let users_id = users.map((user) => user._id);
+        if (checkIsSameArray(roomUserIds, users_id)) {
+          isExistRoom = room;
+          return false;
+        }
       }
+      return true;
     });
     if (isExistRoom) {
       return toMessagesPage(navigation, isExistRoom);
@@ -98,7 +99,9 @@ const UserInfoPage = ({ navigation, userInfo, initChatRoom, chatRoomList }) => {
             rounded
             size="xlarge"
             title={item.name.toUpperCase().substring(0, 2)}
-            source={{ uri: item.avatar ? createFileUrl(item.avatar) : null }}
+            source={{
+              uri: item.avatar.length ? createFileUrl(item.avatar) : "http://",
+            }}
             containerStyle={{
               marginTop: "35%",
               borderWidth: 2,

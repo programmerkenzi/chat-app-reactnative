@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-11 12:42:04
- * @LastEditTime: 2021-07-06 12:39:18
+ * @LastEditTime: 2021-07-14 17:22:46
  * @LastEditors: Kenzi
  */
 
@@ -39,7 +39,7 @@ const CheckedItemBox = ({
         contentContainerStyle={{ margin: 4, width: "100%" }}
         data={checkedItem}
         extraData={reRenderTrigger}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         horizontal={false}
         numColumns={4}
         renderItem={({ item }) => <AvatarWithNameTag item={item} />}
@@ -53,7 +53,7 @@ const CheckedItemBox = ({
             onPress={() => onSubmitEditMembers()}
           />
         ) : (
-          <Button title="Next" type="Clear" onPress={() => onPressNext()} />
+          <Button title="下一步" type="Clear" onPress={() => onPressNext()} />
         )}
       </View>
     </Animatable.View>

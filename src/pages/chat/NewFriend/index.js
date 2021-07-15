@@ -2,7 +2,7 @@
  * @Description: 聊天加好友
  * @Author: Lewis
  * @Date: 2021-02-10 15:02:01
- * @LastEditTime: 2021-07-06 12:36:20
+ * @LastEditTime: 2021-07-14 13:52:53
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -34,7 +34,7 @@ const NewFriendPage = ({ navigation }) => {
       <ScrollView>
         {searchString.length
           ? searchResults.map((item) => (
-              <ContactItem props={item} routeName={routeName} />
+              <ContactItem props={item} routeName={routeName} key={item._id} />
             ))
           : null}
       </ScrollView>

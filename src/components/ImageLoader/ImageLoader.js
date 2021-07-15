@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-02 10:07:25
- * @LastEditTime: 2021-07-02 16:36:03
+ * @LastEditTime: 2021-07-14 15:35:40
  * @LastEditors: Kenzi
  */
 
@@ -101,7 +101,7 @@ const ImageLoader = ({ url, index }) => {
       style={{
         height: imgHeight,
         width: imgWidth,
-        resizeMode: "stretch",
+        resizeMode: "contain",
         overflow: "hidden",
       }}
     />

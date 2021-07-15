@@ -83,13 +83,11 @@ const FunctionsBar = ({
       //选取照片
     } else if (type === "folder") {
       let result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
-      console.log("result :>> ", result);
       resources = result;
     }
 
     //送出档案;
     if (resources) {
-      console.log("handleSelectFile :>> ", handleSelectFile);
       if (handleSelectFile) {
         handleSelectFile(resources);
       } else {

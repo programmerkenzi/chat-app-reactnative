@@ -2,24 +2,35 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-02-28 15:47:34
- * @LastEditTime: 2021-07-09 10:23:28
+ * @LastEditTime: 2021-07-15 18:39:00
  * @LastEditors: Kenzi
  */
 
-import { takeLatest, put, all, fork, take } from "redux-saga/effects";
+import { takeLatest, put, all, fork, take, select } from "redux-saga/effects";
+
 import {
   getUserInfoFailure,
   getUserInfoStart,
   loginSuccess,
   logoutFailure,
+  onRefreshTokenSuccess,
 } from "./auth.actions";
 import authActionType from "./auth.type";
 import { loginFailure } from "./auth.actions";
 import { Alert } from "react-native";
-import { onFetchUserInfo, onLogin } from "./../../chat_api/auth";
+import {
+  onFetchUserInfo,
+  onLogin,
+  onRefreshToken,
+} from "./../../chat_api/auth";
 import { createFileUrl } from "./../../library/utils/utils";
 import { getUserInfoSuccess } from "./auth.actions";
 import { logoutSuccess } from "./auth.actions";
+import { onLogout } from "./../../chat_api/auth";
+import { store } from "./../store";
+import { refreshTokenWhenTimeout } from "./utils";
+import { onRefreshTokenFailure } from "./auth.actions";
+import { saveToken } from "./../../library/utils/secureStore";
 
 function* login({ payload }) {
   try {
@@ -27,20 +38,21 @@ function* login({ payload }) {
     const data = res;
     const username = payload.username;
     const password = payload.password;
-
+    const { authorization, expires_in, userInfo } = data;
     if (data.success) {
-      console.log("data.authorization :>> ", data.authorization);
+      yield saveToken(authorization);
+
       yield put(
         loginSuccess({
-          userToken: data.authorization,
-          tokenExpiration: data.expires_in,
-          userInfo: data.userInfo,
+          userToken: authorization,
+          tokenExpiration: expires_in,
+          userInfo: userInfo,
           username: username,
           password: password,
         })
       );
-    } else {
-      yield put(loginFailure(data.message));
+
+      yield refreshTokenWhenTimeout(expires_in);
     }
   } catch (error) {
     yield put(loginFailure(error));
@@ -49,8 +61,13 @@ function* login({ payload }) {
 
 function* logout() {
   try {
-    yield put(logoutSuccess());
+    const res = yield onLogout();
+    if (res) {
+      yield removeToken();
+      yield put(logoutSuccess());
+    }
   } catch (error) {
+    yield removeToken();
     yield put(logoutFailure(error));
   }
 }
@@ -72,7 +89,7 @@ function* getUserInfo() {
     const { avatar } = yield data;
     const userInfo = {
       ...data,
-      avatar: avatar ? createFileUrl(avatar) : null,
+      avatar: avatar.length > 0 ? createFileUrl(avatar) : "http://",
     };
     yield put(getUserInfoSuccess(userInfo));
   } catch (error) {
@@ -107,6 +124,30 @@ function* onLoginStart() {
 //   yield takeLatest(authActionType.USER_TOKEN_EXPIRED, autoReLogin);
 // }
 
+function* refreshToken() {
+  try {
+    const auth = yield (state) => state.auth;
+    const { userToken, tokenExpiration } = yield select(auth);
+    if (userToken) {
+      const res = yield onRefreshToken();
+      if (res.success) {
+        yield put(onRefreshTokenSuccess(res.refreshToken, res.expires_in));
+        yield refreshTokenWhenTimeout(tokenExpiration);
+      }
+    } else {
+      yield put(onRefreshTokenFailure("no token"));
+      yield removeToken();
+    }
+  } catch (error) {
+    yield put(onRefreshTokenFailure(error));
+    yield removeToken();
+  }
+}
+
+function* onRefreshTokenStart() {
+  yield takeLatest(authActionType.REFRESH_TOKEN_START, refreshToken);
+}
+
 export default function* authSagas() {
   yield all([
     fork(onLoginStart),
@@ -115,5 +156,6 @@ export default function* authSagas() {
     // fork(onStopLoading),
     fork(onGetUserInfo),
     // fork(onUserTokenExpired),
+    fork(onRefreshTokenStart),
   ]);
 }

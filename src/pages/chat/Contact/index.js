@@ -2,7 +2,7 @@
  * @Description: 用户在线
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:53
- * @LastEditTime: 2021-07-09 16:32:06
+ * @LastEditTime: 2021-07-14 13:49:58
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -37,7 +37,6 @@ const ContactPage = ({
   const routeName = useRoute().name;
   const [searchString, setSearchString] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  console.log("contactList :>> ", contactList);
 
   useEffect(() => {
     getMyContactList();
@@ -49,15 +48,18 @@ const ContactPage = ({
   const toChatRoom = async (user_id) => {
     const roomUserIds = [userInfo._id, user_id];
     let isExistRoom = null;
+    let chatRoomArray = Object.values(chatRoomList);
     //确认该房间使否已经在列表
-    chatRoomList.some((room) => {
-      const users = room.users;
-      let users_id = users.map((user) => user._id);
-      console.log("users_id :>> ", users_id);
-      if (checkIsSameArray(roomUserIds, users_id)) {
-        isExistRoom = room;
-        return false;
+    chatRoomArray.some((room) => {
+      if (typeof props === "object") {
+        const users = room.users;
+        let users_id = users.map((user) => user._id);
+        if (checkIsSameArray(roomUserIds, users_id)) {
+          isExistRoom = room;
+          return false;
+        }
       }
+      return true;
     });
     if (isExistRoom) {
       return toMessagesPage(navigation, isExistRoom);

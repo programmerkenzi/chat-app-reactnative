@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-21 14:34:35
- * @LastEditTime: 2021-07-09 13:37:17
+ * @LastEditTime: 2021-07-14 12:43:31
  * @LastEditors: Kenzi
  */
 
@@ -10,7 +10,7 @@ import { createFileUrl } from "../../library/utils/utils";
 import { store } from "../store";
 import { fetchConversationsByRoomId } from "./../../chat_api/chat";
 import { fetchChatRoom } from "./../../chat_api/chat";
-
+import produce from "immer";
 //更新最後訊息
 /**
  *
@@ -21,15 +21,9 @@ import { fetchChatRoom } from "./../../chat_api/chat";
  */
 
 export const updateLastMessage = (chatRoomList, room_id, message) => {
-  let newList = [...chatRoomList];
-  newList.some((room, index) => {
-    if (room._id === room_id) {
-      newList[index].last_message = message;
-      return false;
-    }
-  });
-
-  return newList;
+  const room_info = chatRoomList[room_id];
+  const new_room_info = { ...room_info, last_message: message };
+  return new_room_info;
 };
 
 //標記自己房間已讀
@@ -40,14 +34,9 @@ export const updateLastMessage = (chatRoomList, room_id, message) => {
  * @returns
  */
 export const readAll = (chatRoomList, room_id) => {
-  let newList = [...chatRoomList];
-  newList.some((room, index) => {
-    if (room._id === room_id) {
-      newList[index].unread = [];
-      return false;
-    }
-  });
-  return newList;
+  const room_info = chatRoomList[room_id];
+  const new_room_info = { ...room_info, unread: [] };
+  return new_room_info;
 };
 
 /**
@@ -58,17 +47,19 @@ export const readAll = (chatRoomList, room_id) => {
  * @returns
  */
 //更新最後訊息與未讀訊息
-export const updateUnreadAndLastMessage = (chatRoomList, room_id, message) => {
-  let newList = [...chatRoomList];
-  newList.some((room, index) => {
-    if (room._id === room_id) {
-      const old_unread = newList[index].unread;
-      newList[index].unread = [...old_unread, ...message];
-      newList[index].last_message = message;
-      return false;
-    }
-  });
-  return newList;
+export const updateUnreadAndLastMessage = async (
+  chatRoomList,
+  room_id,
+  message
+) => {
+  const room_info = chatRoomList[room_id];
+  const new_room_info = {
+    ...room_info,
+    unread: [...room_info.unread, ...message],
+    last_message: message,
+  };
+  console.log("new_room_info :>> ", new_room_info);
+  return new_room_info;
 };
 
 /**
@@ -84,15 +75,28 @@ export const handelRecipientMarkedRead = (
   room_id,
   read_by_recipients
 ) => {
-  let newConversations = conversations;
-  newConversations[room_id].forEach((message) => {
-    const wasReceived = message.received;
-    if (!wasReceived) {
-      message.received = true;
-      message._id = message._id + "-read";
+  const roomConversations = conversations[room_id];
+  const newRoomConversations = [];
+  roomConversations.forEach((message) => {
+    const readTime = new Date();
+    const readByRecipients = message.read_by_recipients;
+    const wasRead = readByRecipients.findIndex(
+      (user) => user.read_by_user_id === read_by_recipients
+    );
+    if (wasRead === -1) {
+      newRoomConversations.push({
+        ...message,
+        read_by_recipients: [
+          ...readByRecipients,
+          { read_at: readTime, read_by_user_id: read_by_recipients },
+        ],
+      });
+    } else {
+      newRoomConversations.push({ ...message });
     }
   });
-  return newConversations;
+
+  return newRoomConversations;
 };
 
 //獲取聊天記錄
@@ -126,14 +130,17 @@ export const getConversations = async (fetchPage, conversations, room_id) => {
  */
 
 export const getChatRooms = async (fetchPage, chatRoomList) => {
-  let newList = [...chatRoomList];
   const res = await fetchChatRoom(fetchPage);
   const { success, data } = res;
+  const newList = {};
   if (!success) return;
-  if (!data) return [];
+  if (!data) return {};
   const list = data.data;
+  list.forEach((room) => {
+    const room_id = room._id;
+    newList[room_id] = room;
+  });
   const { limit, page, pages, total } = data.meta;
-  newList = [...newList, ...list];
   newList.total = total;
   newList.page = page;
   newList.pages = pages;

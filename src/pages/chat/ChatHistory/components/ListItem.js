@@ -2,7 +2,7 @@
  * @Description: 聊天记录
  * @Author: Lewis
  * @Date: 2021-01-20 16:32:48
- * @LastEditTime: 2021-06-24 12:38:02
+ * @LastEditTime: 2021-07-12 17:25:06
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -24,6 +24,7 @@ const ListItem = ({ props }) => {
           <Avatar
             style={styles.avatar}
             source={{ uri: avatar }}
+            title={name.toUpperCase().substring(0, 2)}
             resizeMode="contain"
           />
           {unread > 0 ? (

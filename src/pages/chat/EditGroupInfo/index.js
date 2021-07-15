@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-14 09:25:12
- * @LastEditTime: 2021-07-06 12:39:40
+ * @LastEditTime: 2021-07-14 17:21:45
  * @LastEditors: Kenzi
  */
 
@@ -15,7 +15,7 @@ import {
   FlatList,
   TextInput,
 } from "react-native";
-import { Textarea } from "native-base";
+import { TextArea, Stack, useToast } from "native-base";
 import {
   Button,
   Overlay,
@@ -50,7 +50,18 @@ const EditGroupInfoPage = ({ navigation }) => {
 
     return;
   };
+  const toast = useToast();
 
+  const onPressSubmit = () => {
+    toast.show({
+      title: "测试",
+      description: "新增群组",
+      duration: 2000,
+      isClosable: true,
+      placement: "top",
+      status: "success",
+    });
+  };
   return (
     <View style={styles.container}>
       <View styles={{ flex: 1 }}>
@@ -66,19 +77,21 @@ const EditGroupInfoPage = ({ navigation }) => {
           ></Avatar>
           <Input
             containerStyle={styles.input}
-            placeholder="Group Name"
+            placeholder="群组名称"
             onChangeText={(value) => setGroupName(value)}
             errorMessage={errorMessage}
           />
         </View>
-        <Text style={styles.text}>Description</Text>
-        <Textarea
-          rowSpan={2}
-          bordered
-          style={styles.Textarea}
-          onTextInput={(value) => setDescription(value)}
-        />
-        <Text style={styles.text}>Members</Text>
+        <Text style={styles.text}>描述</Text>
+
+        <Stack space={4} w="90%">
+          <TextArea
+            h={20}
+            placeholder="请输入"
+            onChange={(value) => setDescription(value)}
+          />
+        </Stack>
+        <Text style={styles.text}>会员</Text>
       </View>
       <FlatList
         contentContainerStyle={{ margin: 4, width: "100%", flex: 1 }}
@@ -89,7 +102,7 @@ const EditGroupInfoPage = ({ navigation }) => {
         renderItem={({ item }) => <AvatarWithNameTag item={item} />}
       />
       <View style={styles.ButtonRow}>
-        <Button title="Submit" type="Clear" />
+        <Button title="确定" type="Clear" onPress={() => onPressSubmit()} />
       </View>
     </View>
   );

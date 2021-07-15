@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-09 10:54:16
- * @LastEditTime: 2021-07-06 18:38:47
+ * @LastEditTime: 2021-07-14 16:51:49
  * @LastEditors: Kenzi
  */
 
@@ -48,7 +48,12 @@ const FileRender = ({ file }) => {
       onPress={() => downloadAndOpenFile(url, name, mime_type)}
       style={styles.container}
     >
-      <Icon name={icon_name} color="white" size={35} type="font-awesome-5" />
+      <Icon
+        name={icon_name}
+        color="rgba(0,0,0,0.8)"
+        size={35}
+        type="font-awesome-5"
+      />
       <Text style={styles.text}>{name}</Text>
     </TouchableOpacity>
   );
@@ -64,5 +69,5 @@ const styles = StyleSheet.create({
   container: {
     margin: 10,
   },
-  text: { fontSize: 16, color: "white", marginTop: 5 },
+  text: { fontSize: 16, color: "black", marginTop: 5 },
 });

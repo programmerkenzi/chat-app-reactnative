@@ -62,7 +62,6 @@ const PrimarySearchBar = ({
           const data = await res.data;
           results = data;
         } else {
-          console.log("data :>> ", data);
           results = data.filter((u) =>
             u.name.toLowerCase().includes(text.trim().toLowerCase())
           );

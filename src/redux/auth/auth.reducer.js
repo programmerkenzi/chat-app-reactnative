@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-01 11:33:03
- * @LastEditTime: 2021-07-08 18:14:53
+ * @LastEditTime: 2021-07-15 18:42:09
  * @LastEditors: Kenzi
  */
 
@@ -26,7 +26,7 @@ const authReducer = (state = initState, action) => {
     case authActionType.LOGIN_SUCCESS:
       return {
         ...state,
-        userToken: action.payload.userToken,
+        userToken: true,
         tokenExpiration: action.payload.tokenExpiration,
         username: action.payload.username,
         password: action.payload.password,
@@ -35,7 +35,7 @@ const authReducer = (state = initState, action) => {
     case authActionType.LOGOUT_SUCCESS:
       return {
         ...state,
-        userToken: null,
+        userToken: false,
         expoPushToken: null,
         userInfo: null,
         username: null,
@@ -67,8 +67,16 @@ const authReducer = (state = initState, action) => {
         ...state,
         expoPushToken: action.payload,
       };
+
+    case authActionType.REFRESH_TOKEN_SUCCESS:
+      return {
+        ...state,
+        userToken: action.payload.new_token,
+        tokenExpiration: action.payload.expires_in,
+      };
     case authActionType.LOGOUT_FAILURE:
     case authActionType.GET_USER_INFO_FAILURE:
+    case authActionType.REFRESH_TOKEN_FAILURE:
       return {
         ...state,
         isLoading: false,

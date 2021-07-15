@@ -17,7 +17,6 @@ import { checkCameraPermission } from "./permissions";
 //获取档案
 export const filePicker = async () => {
   const result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
-  console.log("result :>> ", result);
   const type = result.type;
   if (type === "success") {
     return result;

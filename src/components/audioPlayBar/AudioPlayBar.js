@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-16 18:18:14
- * @LastEditTime: 2021-06-02 18:30:25
+ * @LastEditTime: 2021-07-14 16:35:10
  * @LastEditors: Kenzi
  */
 
@@ -18,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import { useEffect } from "react";
 import * as FileSystem from "expo-file-system";
+import { Icon } from "react-native-elements";
 
 const AudioPlayBar = ({ id, audio }) => {
   const [uri, setUri] = useState(null);
@@ -74,9 +75,21 @@ const AudioPlayBar = ({ id, audio }) => {
     <View style={styles.playButtonContainer}>
       <TouchableOpacity onPress={() => playSound()}>
         {isPlaying ? (
-          <Ionicons name="ios-pause" style={styles.icon} />
+          <Icon
+            name="pause-circle"
+            color="rgba(0,0,0,0.8)"
+            size={50}
+            style={styles.icon}
+            type="font-awesome-5"
+          />
         ) : (
-          <Ionicons name="ios-play-circle" style={styles.icon} />
+          <Icon
+            name="play-circle"
+            color="rgba(0,0,0,0.8)"
+            size={50}
+            style={styles.icon}
+            type="font-awesome-5"
+          />
         )}
       </TouchableOpacity>
     </View>

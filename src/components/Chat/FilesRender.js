@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-29 14:02:09
- * @LastEditTime: 2021-07-06 12:48:47
+ * @LastEditTime: 2021-07-14 16:36:26
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     height: 100,
-    borderColor: lightGary.primary,
+    borderColor: "rgba(0,0,0,0.5)",
   },
   list: {},
 });

@@ -2,13 +2,14 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-20 10:55:50
- * @LastEditTime: 2021-04-13 11:02:52
+ * @LastEditTime: 2021-07-14 17:05:03
  * @LastEditors: Kenzi
  */
 
 import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Avatar } from "react-native-elements";
+import { createFileUrl } from "./../../library/utils/utils";
 
 const AvatarWithNameTag = ({ item }) => {
   return (
@@ -17,7 +18,9 @@ const AvatarWithNameTag = ({ item }) => {
         rounded
         size={"small"}
         title={item.name.toUpperCase().substring(0, 2)}
-        source={{ uri: item.avatar || item.imageUri }}
+        source={{
+          uri: item.avatar.length > 0 ? createFileUrl(item.avatar) : "http://",
+        }}
       />
       <Text style={styles.itemText}>{item.name}</Text>
     </TouchableOpacity>

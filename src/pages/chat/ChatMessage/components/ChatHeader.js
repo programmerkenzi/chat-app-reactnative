@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-11 17:53:42
- * @LastEditTime: 2021-07-09 16:33:51
+ * @LastEditTime: 2021-07-13 15:50:16
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -20,8 +20,7 @@ const ChatHeader = ({ roomInfo, currentUserId }) => {
   const receiver = users.filter((u) => u._id !== currentUserId)[0];
   const avatar =
     roomInfo.type === "private" ? receiver.avatar : roomInfo.avatar; // 私人||群组
-  console.log("header avatar :>> ", avatar);
-  const avatarUrl = avatar ? createFileUrl(avatar) : null;
+  const avatarUrl = avatar.length > 0 ? createFileUrl(avatar) : "http://";
   const name = roomInfo.type === "private" ? receiver.name : roomInfo.name; //群組 || 私人
 
   const handleOnPress = () => {

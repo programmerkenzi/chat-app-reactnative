@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2021-02-10 15:02:13
- * @LastEditTime: 2021-03-21 14:40:10
+ * @LastEditTime: 2021-07-14 17:08:35
  * @LastEditors: Kenzi
  */
 import React, { useState } from "react";
@@ -13,8 +13,11 @@ import ContactCheckBox from "../components/ContactCheckBox";
 import CheckedItemBox from "../components/CheckedItemBox";
 import { StyleSheet } from "react-native";
 import { useRoute } from "@react-navigation/core";
+import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
+import { selectContactList } from "../../../redux/chat/chat.selector";
 
-const SelectMembersPage = ({ navigation }) => {
+const SelectMembersPage = ({ navigation, contactList }) => {
   const myUserId = "u2";
 
   //上個頁面名稱
@@ -36,7 +39,7 @@ const SelectMembersPage = ({ navigation }) => {
   //增加或刪除到已經選定的列表
   const updateCheckedItemList = (item) => {
     let checked = checkedItem;
-    const itemIndex = checkedItem.findIndex((e) => e.id === item.id);
+    const itemIndex = checkedItem.findIndex((e) => e._id === item._id);
 
     if (itemIndex === -1) {
       checked.push(item);
@@ -65,13 +68,13 @@ const SelectMembersPage = ({ navigation }) => {
   return (
     <View style={style.container}>
       <PrimarySearchBar
-        data={contactListData}
+        data={contactList}
         searchString={searchString}
         setSearchString={setSearchString}
         setSearchResults={setSearchResults}
       />
       <FlatList
-        data={searchString.length ? searchResults : contactListData}
+        data={searchString.length ? searchResults : contactList}
         renderItem={({ item, index }) => (
           <ContactCheckBox
             item={item}
@@ -80,7 +83,7 @@ const SelectMembersPage = ({ navigation }) => {
             checkedItem={checkedItem}
           />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
       />
       <CheckedItemBox
         checkedItem={checkedItem}
@@ -92,11 +95,18 @@ const SelectMembersPage = ({ navigation }) => {
     </View>
   );
 };
-export default SelectMembersPage;
+const mapStateToProps = createStructuredSelector({
+  contactList: selectContactList,
+});
+
+const mapDispatchToProps = {};
+
+export default connect(mapStateToProps)(SelectMembersPage);
 
 const style = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
 
   avatar: {

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-28 17:53:28
- * @LastEditTime: 2021-07-06 14:28:06
+ * @LastEditTime: 2021-07-14 16:11:36
  * @LastEditors: Kenzi
  */
 
@@ -54,7 +54,7 @@ const FileContainer = ({ selectedFile, show, handleRemoveSelectedFile }) => {
 
     return (
       <TouchableOpacity
-        style={[styles.item, { width: screenWidth / 3 - 12.5 }]}
+        style={[styles.item, { width: screenWidth / 3 - 15 }]}
         onPress={() => handleRemoveSelectedFile(file)}
       >
         {mime_type.includes("image") ? (
@@ -92,7 +92,7 @@ const FileContainer = ({ selectedFile, show, handleRemoveSelectedFile }) => {
               type="font-awesome-5"
             />
             <Text style={styles.text}>
-              {file.name.length > 15 ? file.name.substring(0, 15) : file.name}
+              {file.name.length > 10 ? file.name.substring(0, 10) : file.name}
             </Text>
           </>
         )}
@@ -131,10 +131,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
     justifyContent: "center",
-    margin: 5,
     borderRadius: 10,
     borderWidth: 1,
-    height: 75,
+    marginHorizontal: 5,
+    height: 90,
     borderColor: lightGary.secondary,
   },
   close: {},

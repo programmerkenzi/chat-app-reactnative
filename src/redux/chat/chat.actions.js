@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:41
- * @LastEditTime: 2021-07-06 16:43:54
+ * @LastEditTime: 2021-07-14 13:03:27
  * @LastEditors: Kenzi
  */
 
@@ -13,9 +13,15 @@ export const gotNewMessages = (message) => ({
   payload: message,
 });
 
-export const updateConversation = (message) => ({
+/**
+ *
+ * @param {Array} new_conversation 該房間更新後的對話
+ * @param {String} room_id 房間id
+ * @returns
+ */
+export const updateConversation = (new_conversation, room_id) => ({
   type: chatActionType.UPDATE_CONVERSATION,
-  payload: message,
+  payload: { new_conversation, room_id },
 });
 
 export const getMyContactStart = () => ({
@@ -34,9 +40,16 @@ export const getConversationStart = (room_id) => ({
   type: chatActionType.GET_CONVERSATION_START,
   payload: room_id,
 });
-export const getConversationSuccess = (conversation) => ({
+
+/**
+ *
+ * @param {Array} new_conversation 該房間更新後的對話
+ * @param {String} room_id 房間id
+ * @returns
+ */
+export const getConversationSuccess = (new_conversation, room_id) => ({
   type: chatActionType.GET_CONVERSATION_SUCCESS,
-  payload: conversation,
+  payload: { new_conversation, room_id },
 });
 export const getConversationFailure = (error) => ({
   type: chatActionType.GET_CONVERSATION_FAILURE,
@@ -58,12 +71,13 @@ export const updateChatRoomStateStart = (room_id, last_message, type) => ({
 
 /**
  *
- * @param {Array} newChatRoomList 更新後的房間列表
+ * @param {Object} new_room_info 新的房間信息
+ * @param {String} room_id 房間id
  * @returns
  */
-export const updateChatRoomStateSuccess = (newChatRoomList) => ({
+export const updateChatRoomStateSuccess = (new_room_info, room_id) => ({
   type: chatActionType.UPDATE_CHAT_ROOM_STATE_SUCCESS,
-  payload: newChatRoomList,
+  payload: { new_room_info, room_id },
 });
 export const updateChatRoomStateFailure = (error) => ({
   type: chatActionType.UPDATE_CHAT_ROOM_STATE_FAILURE,
@@ -82,16 +96,15 @@ export const initializeChatRoomStart = (navigation, user_ids, type) => ({
 
 /**
  *
- * @param {Boolean} is_new  the room is new or not
- * @param {Array} conversation new conversation list
- * @param {Array} chatRoomList new chat room list
+ * @param {Array} new_room_info 新房間的資訊
+ * @param {String} room_id 房間id
  * @returns
  */
-export const initializeChatRoomSuccess = (is_new, chatRoomList) => ({
+export const initializeChatRoomSuccess = (new_room_info, room_id) => ({
   type: chatActionType.INITIALIZE_CHAT_ROOM_SUCCESS,
   payload: {
-    is_new: is_new,
-    chatRoomList: chatRoomList,
+    new_room_info,
+    room_id,
   },
 });
 export const initializeChatRoomFailure = (error) => ({
@@ -148,4 +161,9 @@ export const onDeleteConversation = (
     message_ids: message_ids,
     clearSelected: clearSelected,
   },
+});
+
+export const onPushNotification = (room_info) => ({
+  type: chatActionType.PUSH_NOTIFICATION,
+  payload: room_info,
 });

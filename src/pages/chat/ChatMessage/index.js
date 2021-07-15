@@ -2,7 +2,7 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-07-09 17:08:01
+ * @LastEditTime: 2021-07-14 16:12:16
  * @LastEditors: Kenzi
  */
 import React, { useState, useCallback } from "react";
@@ -19,6 +19,7 @@ import {
 } from "../../../redux/chat/chat.actions";
 import { createStructuredSelector } from "reselect";
 import {
+  selectChatRoomList,
   selectMessagesReRenderTrigger,
   selectSelectedMessage,
 } from "../../../redux/chat/chat.selector";
@@ -48,6 +49,7 @@ import { deleteMessage } from "./../../../chat_api/chat";
 import { onDeleteConversation } from "./../../../redux/chat/chat.actions";
 import { selectUserInfo } from "./../../../redux/auth/auth.selector";
 import { createFileUrl } from "./../../../library/utils/utils";
+import { SafeAreaView } from "react-native";
 
 const ChatMessagePage = ({
   userInfo,
@@ -61,9 +63,15 @@ const ChatMessagePage = ({
   updateSelectedMessage,
   clearSelectedMessage,
   onDeleteConversation,
+  chatRoomList,
 }) => {
   //聊天记录
-  const roomInfo = useRoute().params.room_info;
+  const chatRoomArray = Object.values(chatRoomList);
+  const roomInfo = useRoute().params.room_info.unread
+    ? useRoute().params.room_info
+    : chatRoomArray.filter(
+        (room) => room._id === useRoute().params.room_info.room_id
+      )[0];
   const unread = roomInfo.unread.length;
   const room_id = roomInfo._id;
   const user_id = userInfo._id;
@@ -96,7 +104,6 @@ const ChatMessagePage = ({
         const isRead = read_by_recipients.findIndex(
           (user) => user.read_by_user_id !== user_id
         );
-        console.log("isRead :>> ", isRead);
         const { name, avatar } = user[0];
         //gift chat用的obj
         let msg = {
@@ -107,9 +114,13 @@ const ChatMessagePage = ({
           user: {
             _id: postedByUser,
             name: name,
-            avatar: avatar ? createFileUrl(avatar) : null,
+            avatar: avatar.length > 0 ? createFileUrl(avatar) : "",
           },
-          received: isRead === -1 ? false : true,
+          received: item.received
+            ? item.received
+            : isRead === -1
+            ? false
+            : true,
         };
         if (file.length > 0) {
           file.forEach((item) => {
@@ -134,7 +145,7 @@ const ChatMessagePage = ({
 
   useEffect(() => {
     createGiftChatData();
-  }, [messageReRenderTrigger, conversations[room_id]]);
+  }, [conversations]);
 
   const markRead = async () => {
     const { success } = await markReadByRoomId(room_id);
@@ -179,7 +190,7 @@ const ChatMessagePage = ({
         file.mime_type = mime_type;
         file.url = file.uri;
       });
-      modifiedMessage[0].files = modifiedFiles;
+      modifiedMessage[0].file = modifiedFiles;
       const res = await handleUploadMultipleFile(selectedFile);
       if (res.success) {
         setSelectedFile([]);
@@ -240,6 +251,7 @@ const ChatMessagePage = ({
             <FilesRender files={props.currentMessage.file} />
           ) : null
         }
+        showAvatarForEveryMessage={false}
         renderActions={(props) => (
           <FunctionsBar
             props={props}
@@ -360,6 +372,7 @@ const mapStateToProp = createStructuredSelector({
   conversations: selectConversations,
   messageReRenderTrigger: selectMessagesReRenderTrigger,
   selectedMessage: selectSelectedMessage,
+  chatRoomList: selectChatRoomList,
 });
 
 export default connect(mapStateToProp, mapDispatchToProp)(ChatMessagePage);

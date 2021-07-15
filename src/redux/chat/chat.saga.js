@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:57
- * @LastEditTime: 2021-07-09 18:04:55
+ * @LastEditTime: 2021-07-14 12:39:23
  * @LastEditors: Kenzi
  */
 
@@ -52,31 +52,29 @@ import {
 } from "./utils";
 import { updateChatRoomStateSuccess } from "./chat.actions";
 import { schedulePushNotification } from "../../library/utils/utils";
+import { onPushNotification } from "./chat.actions";
 
 function* gotNewMessage({ payload }) {
-  console.log("gotNewMessage payload:>> ", payload);
-  const data = payload.data;
-  console.log("gotNewMessage data :>> ", data);
+  const data = yield payload.data;
   const chat_room_id = yield data[0].chat_room_id;
   const posted_by_user = yield data[0].user[0]._id;
   const chat = yield (state) => state.chat;
   const auth = yield (state) => state.auth;
   const { conversations } = yield select(chat);
   const { userInfo } = yield select(auth);
-  let newConversations = yield conversations;
   const conversationsSaved = yield conversations[chat_room_id];
 
   if (conversationsSaved) {
-    yield (newConversations[chat_room_id] = [...data, ...conversationsSaved]);
+    const newConversations = [...data, ...conversationsSaved];
+    yield put(updateConversation(newConversations, chat_room_id));
   } else {
-    yield (newConversations[chat_room_id] = data);
+    const newConversations = data;
+    yield put(updateConversation(newConversations, chat_room_id));
   }
-  yield put(updateConversation(newConversations));
 
   //判断是否要标记已读讯息
   const router = yield (state) => state.router;
   const { name, params } = yield select(router);
-  0;
 
   const currentUser = yield userInfo._id;
   //在聊天室里
@@ -105,37 +103,52 @@ function* gotNewMessage({ payload }) {
       updateChatRoomStateStart(chat_room_id, data, "new_message_unread")
     );
   }
-
-  //推拨
-
-  if (posted_by_user !== userInfo._id) {
-    //先确认目前的router
-    console.log(" saga push :>> ");
-    console.log("data[0].user[0] :>> ", data[0].user[0]);
-    const date = new Date(data[0].createdAt);
-    const chat = yield (state) => state.chat;
-    const { chatRoomList } = yield select(chat);
-    const room_info = chatRoomList.filter((room) => room._id === chat_room_id);
-    console.log("room_info :>> ", room_info);
-    if (name !== "Messages") {
-      yield schedulePushNotification(
-        data[0].user[0].name,
-        date.toLocaleString(),
-        data[0].message,
-        "Messages",
-        { room_info: room_info[0] }
-      );
-    }
-  }
 }
 
 function* onGotNewMessage() {
   yield takeEvery(chatActionType.GOT_NEW_MESSAGE, gotNewMessage);
 }
 
+function* pushNotification({ payload }) {
+  const { room_id, last_message, type } = yield payload;
+  const date = new Date(last_message[0].createdAt);
+
+  const router = yield (state) => state.router;
+  const { name, params } = yield select(router);
+
+  //在聊天室里
+  if (params.room_info) {
+    if (params.room_info._id !== room_id) {
+      yield schedulePushNotification(
+        last_message[0].user[0].name,
+        date.toLocaleString(),
+        last_message[0].message,
+        "Messages",
+        { room_info: payload }
+      );
+    }
+  } else {
+    if (name !== "Chats") {
+      yield schedulePushNotification(
+        last_message[0].user[0].name,
+        date.toLocaleString(),
+        last_message[0].message,
+        "Messages",
+        { room_info: payload }
+      );
+    }
+  }
+}
+
+function* onHandlePushNotification() {
+  while (true) {
+    const payload = yield take(chatActionType.PUSH_NOTIFICATION);
+    yield fork(pushNotification, payload);
+  }
+}
+
 function* deleteMessage({ payload }) {
   const { room_id, message_ids, clearSelected } = payload;
-  console.log("payload :>> ", payload);
   try {
     const chat = yield (state) => state.chat;
 
@@ -180,7 +193,7 @@ function* onDeleteMessage() {
 
 function* updateChatRoomState({ payload }) {
   try {
-    const { room_id, last_message, type } = payload;
+    const { room_id, last_message, type } = yield payload;
     const chat = yield (state) => state.chat;
 
     const { chatRoomList } = yield select(chat);
@@ -199,9 +212,10 @@ function* updateChatRoomState({ payload }) {
         room_id,
         last_message
       );
+      yield put(onPushNotification(payload));
     }
 
-    yield put(updateChatRoomStateSuccess(newChatRoomList));
+    yield put(updateChatRoomStateSuccess(newChatRoomList, room_id));
   } catch (error) {
     yield put(updateChatRoomStateFailure(error));
   }
@@ -262,24 +276,14 @@ function* initChatRoom({ payload }) {
       user_ids: room_user_ids,
       type: type,
     });
-    console.log("room_user_ids :>> ", room_user_ids);
     const { is_new, chat_room_id, room_info } = yield res.data;
-    const chat = yield (state) => state.chat;
-    const { chatRoomList } = yield select(chat);
-    let newChatRoomList = [...chatRoomList];
     if (res.success) {
-      if (is_new) {
-        console.log("is_new :>> ", is_new);
-        let newRoomInfo = room_info[0];
-        newRoomInfo.last_message = [];
-        newRoomInfo.unread = [];
-        newChatRoomList.push(newRoomInfo);
-      } else {
-        newChatRoomList.push(room_info[0]);
-      }
-      yield put(initializeChatRoomSuccess(is_new, newChatRoomList));
-      yield toMessagesPage(navigation, room_info[0]);
+      let newRoomInfo = room_info[0];
+      newRoomInfo.last_message = [];
+      newRoomInfo.unread = [];
+      yield put(initializeChatRoomSuccess(newRoomInfo, chat_room_id));
     }
+    yield toMessagesPage(navigation, room_info[0]);
   } catch (error) {
     yield put(initializeChatRoomFailure(error));
   }
@@ -295,15 +299,13 @@ function* getChatRoom() {
     const chat = (state) => state.chat;
     const { chatRoomList } = yield select(chat);
     const { page, pages, total } = chatRoomList;
-    let newChatRoomList = null;
     if (pages) {
       if (page < pages) {
-        newChatRoomList = yield getChatRooms(page, chatRoomList);
+        const newChatRoomList = yield getChatRooms(page, chatRoomList);
+        yield put(getChatRoomSuccess(newChatRoomList));
       }
     } else {
-      newChatRoomList = yield getChatRooms(0, chatRoomList);
-    }
-    if (newChatRoomList) {
+      const newChatRoomList = yield getChatRooms(0, chatRoomList);
       yield put(getChatRoomSuccess(newChatRoomList));
     }
   } catch (error) {
@@ -326,7 +328,6 @@ function* getConversation({ payload }) {
   try {
     const chat = yield (state) => state.chat;
     const { conversations } = yield select(chat);
-    let newConversations = conversations;
     const conversationsSaved = conversations[payload];
 
     if (conversationsSaved) {
@@ -336,31 +337,33 @@ function* getConversation({ payload }) {
           const res = yield fetchConversationsByRoomId(payload, page);
           const { data, meta } = yield res.data;
           const currentPage = yield meta.page;
-          (newConversations[payload] = [...conversationsSaved, ...data]),
-            (newConversations[payload].page = currentPage);
-          newConversations[payload].total = meta.total;
-          newConversations[payload].pages = meta.pages;
-          yield put(getConversationSuccess(newConversations));
+          const newConversations = [...conversationsSaved, ...data];
+          newConversations.page = currentPage;
+          newConversations.total = meta.total;
+          newConversations.pages = meta.pages;
+          console.log("newConversations :>> ", newConversations);
+          yield put(getConversationSuccess(newConversations, payload));
         }
       } else {
         const res = yield fetchConversationsByRoomId(payload, 0);
         const { data, meta } = yield res.data;
         const { limit, page, pages, total } = yield meta;
-        newConversations[payload] = data;
-        newConversations[payload].total = total;
-        newConversations[payload].pages = pages;
-        newConversations[payload].page = page;
-        yield put(getConversationSuccess(newConversations));
+        const newConversations = data;
+        newConversations.total = total;
+        newConversations.pages = pages;
+        newConversations.page = page;
+        yield put(getConversationSuccess(newConversations, payload));
       }
     } else {
       const res = yield fetchConversationsByRoomId(payload, 0);
       const { data, meta } = yield res.data;
       const { limit, page, pages, total } = yield meta;
-      newConversations[payload] = data;
-      newConversations[payload].total = total;
-      newConversations[payload].pages = pages;
-      newConversations[payload].page = page;
-      yield put(getConversationSuccess(newConversations));
+      const newConversations = data;
+      newConversations.total = total;
+      newConversations.pages = pages;
+      newConversations.page = page;
+      console.log("newConversations :>> ", newConversations);
+      yield put(getConversationSuccess(newConversations, payload));
     }
   } catch (error) {
     getConversationFailure(error);
@@ -382,7 +385,7 @@ function* recipientMarkRead({ payload }) {
       read_by_user
     );
 
-    yield put(updateConversation(newConversations));
+    yield put(updateConversation(newConversations, room_id));
   } catch (error) {
     console.log("error :>> ", error);
   }
@@ -414,5 +417,6 @@ export default function* chatSagas() {
     fork(onUpdateChatRoomState),
     fork(onHandleRecipientMarkRead),
     fork(onDeleteMessage),
+    fork(onHandlePushNotification),
   ]);
 }

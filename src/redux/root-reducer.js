@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:26:51
- * @LastEditTime: 2021-07-09 15:09:25
+ * @LastEditTime: 2021-07-15 18:57:58
  * @LastEditors: Kenzi
  */
 
@@ -16,6 +16,8 @@ import settingReducer from "./setting/setting.reducer";
 import chatReducer from "./chat/chat.reducer";
 import authActionType from "./auth/auth.type";
 import networkReducer from "./network/network.reducer";
+import { clearAllTimers } from "./auth/utils";
+import { removeToken } from "./../library/utils/secureStore";
 
 const persistConfig = {
   key: "root",
@@ -34,8 +36,13 @@ const appReducer = combineReducers({
 
 const rootReducer = (state, action) => {
   // when a logout action is dispatched it will reset redux state
+  state = undefined;
 
-  if (action.type === authActionType.LOGOUT_SUCCESS) {
+  if (
+    action.type === authActionType.LOGOUT_SUCCESS ||
+    action.type === authActionType.LOGOUT_FAILURE ||
+    action.type === authActionType.REFRESH_TOKEN_FAILURE
+  ) {
     state = undefined;
   }
 

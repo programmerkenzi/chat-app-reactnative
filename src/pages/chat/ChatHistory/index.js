@@ -2,7 +2,7 @@
  * @Description: 聊天列表
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:24
- * @LastEditTime: 2021-07-09 15:29:27
+ * @LastEditTime: 2021-07-14 12:19:35
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -58,84 +58,89 @@ const ChatHistoryPage = ({
   // }, [userToken]);
 
   const creatListItemData = () => {
+    let chatRoomArray = Object.values(chatRoomList);
+    //刪除meta data
+
     let data = [];
-    chatRoomList.forEach((props) => {
-      console.log("props.last_message :>> ", props.last_message);
-      const users = props.users;
-      const currentUserId = userInfo._id;
-      const avatar =
-        props.type === "private"
-          ? users.filter((u) => u._id !== currentUserId)[0].avatar
-          : props.avatar; // 私人||群组
-      const name =
-        props.name || users.filter((u) => u._id !== currentUserId)[0].name; //群組 || 私人
+    chatRoomArray.forEach((props) => {
+      if (typeof props === "object") {
+        const users = props.users;
+        const currentUserId = userInfo._id;
+        const avatar =
+          props.type === "private"
+            ? users.filter((u) => u._id !== currentUserId)[0].avatar
+            : props.avatar; // 私人||群组
+        const name =
+          props.name || users.filter((u) => u._id !== currentUserId)[0].name; //群組 || 私人
 
-      const hasLastMessage = props.last_message;
+        const hasLastMessage = props.last_message;
 
-      const lastMessageInfo = hasLastMessage
-        ? hasLastMessage.length > 0
-          ? hasLastMessage[0]
+        const lastMessageInfo = hasLastMessage
+          ? hasLastMessage.length > 0
+            ? hasLastMessage[0]
+            : {
+                type: "null",
+                createdAt: props.createdAt,
+                message: "",
+                file: [],
+              }
           : {
               type: "null",
               createdAt: props.createdAt,
               message: "",
               file: [],
+            };
+
+        let lastTextMessage = "";
+
+        if (lastMessageInfo.message.length > 0) {
+          lastTextMessage =
+            lastMessageInfo.message.length > 20
+              ? lastMessageInfo.message.substring(0, 20) + "..."
+              : lastMessageInfo.message;
+        }
+        if (lastMessageInfo.file.length > 0) {
+          lastMessageInfo.file.forEach((item) => {
+            const mime_type = item.mime_type
+              ? item.mime_type
+              : mime.lookup(item);
+            if (mime_type) {
+              const fileEmoji = mime_type.includes("image")
+                ? "🖼️"
+                : mime_type.includes("video")
+                ? "🎥"
+                : mime_type.includes("audio")
+                ? "🎙️"
+                : "📁";
+
+              lastTextMessage = `${lastTextMessage} ${fileEmoji} `;
             }
-        : {
-            type: "null",
-            createdAt: props.createdAt,
-            message: "",
-            file: [],
-          };
+          });
+        }
 
-      let lastTextMessage = "";
+        //时间显示
+        const dateTime = new Date(lastMessageInfo.createdAt);
+        const localeDate = dateTime.toLocaleDateString();
+        const localeTime = dateTime.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        });
 
-      if (lastMessageInfo.message.length > 0) {
-        lastTextMessage =
-          lastMessageInfo.message.length > 20
-            ? lastMessageInfo.message.substring(0, 20) + "..."
-            : lastMessageInfo.message;
-      }
-      if (lastMessageInfo.file.length > 0) {
-        lastMessageInfo.file.forEach((item) => {
-          const mime_type = item.mime_type ? item.mime_type : mime.lookup(item);
-          console.log("mime_type :>> ", mime_type);
-          if (mime_type) {
-            const fileEmoji = mime_type.includes("image")
-              ? "🖼️"
-              : mime_type.includes("video")
-              ? "🎥"
-              : mime_type.includes("audio")
-              ? "🎙️"
-              : "📁";
+        //未读讯息数量
+        const unread = props.unread.length;
 
-            lastTextMessage = `${lastTextMessage} ${fileEmoji} `;
-          }
+        data.push({
+          _id: props._id,
+          avatar: avatar.length > 0 ? createFileUrl(avatar) : "http://",
+          name: name,
+          lastMessage: lastTextMessage,
+          dateTime: dateTime,
+          date: localeDate,
+          time: localeTime,
+          unread: unread,
         });
       }
-
-      //时间显示
-      const dateTime = new Date(lastMessageInfo.createdAt);
-      const localeDate = dateTime.toLocaleDateString();
-      const localeTime = dateTime.toLocaleString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      });
-
-      //未读讯息数量
-      const unread = props.unread.length;
-
-      data.push({
-        _id: props._id,
-        avatar: avatar ? createFileUrl(avatar) : null,
-        name: name,
-        lastMessage: lastTextMessage,
-        dateTime: dateTime,
-        date: localeDate,
-        time: localeTime,
-        unread: unread,
-      });
     });
     //按照日期由新到舊排序
     data.sort((a, b) => b.dateTime - a.dateTime);
@@ -143,9 +148,7 @@ const ChatHistoryPage = ({
   };
 
   useEffect(() => {
-    if (chatRoomList.length > 0) {
-      creatListItemData();
-    }
+    creatListItemData();
   }, [chatRoomList]);
 
   //合併私人對話跟群組對話列表資料並按照最後訊息時間新到舊排序
@@ -162,10 +165,8 @@ const ChatHistoryPage = ({
 
   const handleGetMessages = (item) => {
     const current_room_id = item._id;
-    const room_info = chatRoomList.filter(
-      (room) => room._id === current_room_id
-    );
-    return toMessagesPage(navigation, room_info[0]);
+    const room_info = chatRoomList[current_room_id];
+    return toMessagesPage(navigation, room_info);
   };
   function onSwipeOpen(index) {
     setTimeout(() => {

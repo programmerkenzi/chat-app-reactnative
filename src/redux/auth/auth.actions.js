@@ -70,3 +70,15 @@ export const gotExpoPushToken = (token) => ({
   type: authActionType.GOT_EXPO_PUSH_TOKEN,
   payload: token,
 });
+
+export const onRefreshTokenStart = () => ({
+  type: authActionType.REFRESH_TOKEN_START,
+});
+export const onRefreshTokenSuccess = (new_token, expires_in) => ({
+  type: authActionType.REFRESH_TOKEN_SUCCESS,
+  payload: { new_token, expires_in },
+});
+export const onRefreshTokenFailure = (error) => ({
+  type: authActionType.REFRESH_TOKEN_FAILURE,
+  payload: error,
+});

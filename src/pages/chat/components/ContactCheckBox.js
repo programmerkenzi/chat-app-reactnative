@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-10 18:33:00
- * @LastEditTime: 2021-03-20 09:35:23
+ * @LastEditTime: 2021-07-14 17:09:27
  * @LastEditors: Kenzi
  */
 /*
@@ -16,10 +16,10 @@ import React, { useState } from "react";
 import { StyleSheet, View, Image } from "react-native";
 // import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
 import { ListItem, Avatar, CheckBox } from "react-native-elements";
+import { createFileUrl } from "./../../../library/utils/utils";
 
 const ContactCheckBox = ({ item, index, onPressCheck, checkedItem }) => {
-
-  const isCheck = checkedItem.findIndex((user) => user.id === item.id);
+  const isCheck = checkedItem.findIndex((user) => user._id === item._id);
 
   return (
     <ListItem bottomDivider>
@@ -27,7 +27,9 @@ const ContactCheckBox = ({ item, index, onPressCheck, checkedItem }) => {
         rounded
         size="medium"
         title={item.name.toUpperCase().substring(0, 2)}
-        source={{ uri: item.avatar }}
+        source={{
+          uri: item.avatar.length > 0 ? createFileUrl(item.avatar) : "http://",
+        }}
       />
       <ListItem.Content>
         <ListItem.Title>{item.name}</ListItem.Title>

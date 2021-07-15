@@ -2,7 +2,7 @@
  * @Description: 聊天记录
  * @Author: Lewis
  * @Date: 2021-01-20 16:32:48
- * @LastEditTime: 2021-07-09 16:44:44
+ * @LastEditTime: 2021-07-14 16:54:43
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -14,7 +14,7 @@ import { toGroupInfoPage, toMessagesPage } from "../utils";
 import { toUserInfoPage } from "../utils";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { Toast } from "native-base";
+import { useToast } from "native-base";
 import { createFileUrl } from "./../../../library/utils/utils";
 
 // const avatar_url= 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
@@ -32,14 +32,16 @@ const ContactItem = ({ props, routeName, onPressChevron, toChatRoom }) => {
     // }
     toUserInfoPage(props, navigation, toChatRoom);
   };
+  const toast = useToast();
 
   const onPressAdd = () => {
-    return Toast.show({
-      position: "top",
-      text: "Added to the contact list",
-      duration: 5000,
-      buttonText: "Okay",
-      style: { width: "80%", marginTop: 50, alignSelf: "center" },
+    toast.show({
+      title: "测试",
+      description: "发送交友请求",
+      duration: 2000,
+      isClosable: true,
+      placement: "top",
+      status: "success",
     });
   };
 
@@ -50,7 +52,10 @@ const ContactItem = ({ props, routeName, onPressChevron, toChatRoom }) => {
           rounded
           size="medium"
           title={props.name.toUpperCase().substring(0, 2)}
-          source={{ uri: props.avatar ? createFileUrl(props.avatar) : null }}
+          source={{
+            uri:
+              props.avatar.length > 0 ? createFileUrl(props.avatar) : "http://",
+          }}
         />
       </TouchableOpacity>
       <ListItem.Content>
