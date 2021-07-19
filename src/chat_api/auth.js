@@ -27,8 +27,9 @@ export const onLogout = () =>
     url: "/logout",
   });
 
-export const onRefreshToken = () =>
+export const onRefreshToken = (data) =>
   axiosChatClient({
     method: "post",
     url: "/refresh-token",
+    data,
   });

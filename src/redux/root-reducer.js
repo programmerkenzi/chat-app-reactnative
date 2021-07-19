@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:26:51
- * @LastEditTime: 2021-07-15 18:57:58
+ * @LastEditTime: 2021-07-16 11:57:45
  * @LastEditors: Kenzi
  */
 
@@ -12,41 +12,68 @@ import { persistReducer } from "redux-persist";
 import routerReducer from "./router/router.reducer";
 import wsReducer from "./ws/ws.reducer";
 import authReducer from "./auth/auth.reducer";
-import settingReducer from "./setting/setting.reducer";
+import appReducer from "./app/app.reducer";
 import chatReducer from "./chat/chat.reducer";
-import authActionType from "./auth/auth.type";
 import networkReducer from "./network/network.reducer";
-import { clearAllTimers } from "./auth/utils";
-import { removeToken } from "./../library/utils/secureStore";
+import createSecureStore from "redux-persist-expo-securestore";
+import userReducer from "./user/user.reducer";
 
-const persistConfig = {
-  key: "root",
+// Secure storage
+const secureStorage = createSecureStore();
+
+const mainPersistConfig = {
+  key: "main",
   storage: AsyncStorage,
-  whitelist: ["router", "ws", "setting", "auth", "chat"],
+  whitelist: ["router", "ws", "app", "chat", "user"],
 };
 
-const appReducer = combineReducers({
+const securePersistConfig = {
+  key: "secure",
+  storage: secureStorage,
+  whitelist: ["auth"],
+};
+
+const mainReducer = combineReducers({
   router: routerReducer,
   ws: wsReducer,
-  auth: authReducer,
-  setting: settingReducer,
+  app: appReducer,
   chat: chatReducer,
   network: networkReducer,
+  user: userReducer,
 });
 
-const rootReducer = (state, action) => {
-  // when a logout action is dispatched it will reset redux state
-  state = undefined;
+const secureReducer = combineReducers({
+  auth: authReducer,
+});
 
-  if (
-    action.type === authActionType.LOGOUT_SUCCESS ||
-    action.type === authActionType.LOGOUT_FAILURE ||
-    action.type === authActionType.REFRESH_TOKEN_FAILURE
-  ) {
-    state = undefined;
-  }
+const rootReducer = combineReducers({
+  main: persistReducer(mainPersistConfig, mainReducer),
+  secure: persistReducer(securePersistConfig, secureReducer),
+});
 
-  return appReducer(state, action);
-};
+// const appReducer = combineReducers({
 
-export default persistReducer(persistConfig, rootReducer);
+//   router: routerReducer,
+//   ws: wsReducer,
+//   auth: authReducer,
+//   setting: appReducer,
+//   chat: chatReducer,
+//   network: networkReducer,
+// });
+
+// const rootReducer = (state, action) => {
+//   // when a logout action is dispatched it will reset redux state
+//   state = undefined;
+
+//   if (
+//     action.type === authActionType.LOGOUT_SUCCESS ||
+//     action.type === authActionType.LOGOUT_FAILURE ||
+//     action.type === authActionType.REFRESH_TOKEN_FAILURE
+//   ) {
+//     state = undefined;
+//   }
+
+//   return appReducer(state, action);
+// };
+
+export default rootReducer;

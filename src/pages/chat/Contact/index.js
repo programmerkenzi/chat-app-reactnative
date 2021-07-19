@@ -25,7 +25,8 @@ import {
 import { toMessagesPage } from "../utils";
 import { ContainerWithBgColor } from "../../../styles/layout";
 import { searchUserByPublicId } from "./../../../chat_api/chat";
-import { selectUserInfo } from "./../../../redux/auth/auth.selector";
+import { selectUserInfo } from "./../../../redux/user/user.selector";
+
 const ContactPage = ({
   userInfo,
   navigation,

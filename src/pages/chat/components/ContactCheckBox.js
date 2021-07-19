@@ -12,11 +12,10 @@
  * @LastEditTime: 2021-03-10 15:11:40
  * @LastEditors: Kenzi
  */
-import React, { useState } from "react";
-import { StyleSheet, View, Image } from "react-native";
+import React from "react";
+import { StyleSheet } from "react-native";
 // import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
 import { ListItem, Avatar, CheckBox } from "react-native-elements";
-import { createFileUrl } from "./../../../library/utils/utils";
 
 const ContactCheckBox = ({ item, index, onPressCheck, checkedItem }) => {
   const isCheck = checkedItem.findIndex((user) => user._id === item._id);
@@ -28,7 +27,7 @@ const ContactCheckBox = ({ item, index, onPressCheck, checkedItem }) => {
         size="medium"
         title={item.name.toUpperCase().substring(0, 2)}
         source={{
-          uri: item.avatar.length > 0 ? createFileUrl(item.avatar) : "http://",
+          uri: item.avatar.length > 0 ? item.avatar : "http://",
         }}
       />
       <ListItem.Content>

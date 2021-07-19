@@ -2,7 +2,7 @@
  * @Description: 登录操作
  * @Author: Lewis
  * @Date: 2021-01-13 14:55:40
- * @LastEditTime: 2021-06-10 10:52:37
+ * @LastEditTime: 2021-07-19 17:31:22
  * @LastEditors: Kenzi
  */
 import authActionType from "./auth.type";
@@ -12,9 +12,9 @@ export const loginStart = (usernameAndPassword) => ({
   payload: usernameAndPassword,
 });
 
-export const loginSuccess = (userInfo) => ({
+export const loginSuccess = (accessToken, refreshToken, userInfo) => ({
   type: authActionType.LOGIN_SUCCESS,
-  payload: userInfo,
+  payload: { accessToken, refreshToken, userInfo },
 });
 
 export const loginFailure = (error) => ({
@@ -48,20 +48,6 @@ export const stopLoading = () => ({
   type: authActionType.STOP_LOADING,
 });
 
-export const getUserInfoStart = () => ({
-  type: authActionType.GET_USER_INFO_START,
-});
-
-export const getUserInfoSuccess = (info) => ({
-  type: authActionType.GET_USER_INFO_SUCCESS,
-  payload: info,
-});
-
-export const getUserInfoFailure = (error) => ({
-  type: authActionType.GET_USER_INFO_FAILURE,
-  payload: error,
-});
-
 export const onUserTokenExpired = () => ({
   type: authActionType.USER_TOKEN_EXPIRED,
 });
@@ -71,12 +57,17 @@ export const gotExpoPushToken = (token) => ({
   payload: token,
 });
 
+/**
+ *
+ * @param {object} config 没有成功的axios request config
+ * @returns
+ */
 export const onRefreshTokenStart = () => ({
   type: authActionType.REFRESH_TOKEN_START,
 });
-export const onRefreshTokenSuccess = (new_token, expires_in) => ({
+export const onRefreshTokenSuccess = (accessToken, refreshToken) => ({
   type: authActionType.REFRESH_TOKEN_SUCCESS,
-  payload: { new_token, expires_in },
+  payload: { accessToken, refreshToken },
 });
 export const onRefreshTokenFailure = (error) => ({
   type: authActionType.REFRESH_TOKEN_FAILURE,

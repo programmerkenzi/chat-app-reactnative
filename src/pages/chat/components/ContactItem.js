@@ -2,20 +2,18 @@
  * @Description: 聊天记录
  * @Author: Lewis
  * @Date: 2021-01-20 16:32:48
- * @LastEditTime: 2021-07-14 16:54:43
+ * @LastEditTime: 2021-07-16 11:56:36
  * @LastEditors: Kenzi
  */
 import React from "react";
-import { StyleSheet, View, Image } from "react-native";
+import { StyleSheet } from "react-native";
 // import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
-import { ListItem, Avatar, CheckBox, Badge } from "react-native-elements";
+import { ListItem, Avatar } from "react-native-elements";
 import { TouchableOpacity } from "react-native";
-import { toGroupInfoPage, toMessagesPage } from "../utils";
 import { toUserInfoPage } from "../utils";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useToast } from "native-base";
-import { createFileUrl } from "./../../../library/utils/utils";
 
 // const avatar_url= 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
 
@@ -53,8 +51,7 @@ const ContactItem = ({ props, routeName, onPressChevron, toChatRoom }) => {
           size="medium"
           title={props.name.toUpperCase().substring(0, 2)}
           source={{
-            uri:
-              props.avatar.length > 0 ? createFileUrl(props.avatar) : "http://",
+            uri: props.avatar,
           }}
         />
       </TouchableOpacity>

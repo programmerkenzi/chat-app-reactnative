@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-15 16:19:03
- * @LastEditTime: 2021-07-15 18:25:55
+ * @LastEditTime: 2021-07-16 18:26:17
  * @LastEditors: Kenzi
  */
 
@@ -17,6 +17,9 @@ export const refreshTokenWhenTimeout = (expires_in) => {
   }, setTime);
 };
 
+export const refreshTokenInBackground = () => {
+  store.dispatch(onRefreshTokenStart());
+};
 export const clearAllTimers = () => {
   let highestTimeoutId = setTimeout(";");
   for (var i = 0; i < highestTimeoutId; i++) {

@@ -2,17 +2,11 @@
  * @Description: 聊天列表
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:24
- * @LastEditTime: 2021-07-14 12:19:35
+ * @LastEditTime: 2021-07-16 16:18:29
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { View, FlatList, TouchableOpacity, Alert } from "react-native";
 import ListItem from "./components/ListItem";
 import Swipeout from "react-native-swipeout";
 import AntDesign from "react-native-vector-icons/AntDesign";
@@ -27,13 +21,9 @@ import { ContainerWithBgColor } from "./../../../styles/layout";
 import { getChatRoomStart } from "../../../redux/chat/chat.actions";
 import { toMessagesPage } from "../utils";
 import * as mime from "react-native-mime-types";
-import {
-  selectUserInfo,
-  selectUserToken,
-} from "./../../../redux/auth/auth.selector";
-import { getUserInfoStart } from "../../../redux/auth/auth.actions";
-import { createFileUrl } from "./../../../library/utils/utils";
-
+import { selectUserToken } from "./../../../redux/auth/auth.selector";
+import { selectUserInfo } from "./../../../redux/user/user.selector";
+selectUserInfo;
 const ChatHistoryPage = ({
   navigation,
   chatRoomList,
@@ -67,12 +57,10 @@ const ChatHistoryPage = ({
         const users = props.users;
         const currentUserId = userInfo._id;
         const avatar =
-          props.type === "private"
-            ? users.filter((u) => u._id !== currentUserId)[0].avatar
-            : props.avatar; // 私人||群组
+          props.avatar ||
+          users.filter((u) => u._id !== currentUserId)[0].avatar;
         const name =
           props.name || users.filter((u) => u._id !== currentUserId)[0].name; //群組 || 私人
-
         const hasLastMessage = props.last_message;
 
         const lastMessageInfo = hasLastMessage
@@ -132,7 +120,7 @@ const ChatHistoryPage = ({
 
         data.push({
           _id: props._id,
-          avatar: avatar.length > 0 ? createFileUrl(avatar) : "http://",
+          avatar: avatar.length > 0 ? avatar : "http://",
           name: name,
           lastMessage: lastTextMessage,
           dateTime: dateTime,

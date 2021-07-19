@@ -7,7 +7,7 @@
  */
 import { createSelector } from "reselect";
 
-const selectAuth = (state) => state.auth;
+const selectAuth = (state) => state.secure.auth;
 
 export const selectUserToken = createSelector(
   [selectAuth],
@@ -17,11 +17,6 @@ export const selectUserToken = createSelector(
 export const selectIsLoading = createSelector(
   [selectAuth],
   (auth) => auth.isLoading
-);
-
-export const selectUserInfo = createSelector(
-  [selectAuth],
-  (auth) => auth.userInfo
 );
 
 export const selectIsLoginFailure = createSelector(
@@ -40,13 +35,4 @@ export const selectUsername = createSelector(
 export const selectExpoPushToken = createSelector(
   [selectAuth],
   (auth) => auth.expoPushToken
-);
-
-export const selectUserPermissions = createSelector(
-  [selectUserInfo],
-  (UserInfo) => UserInfo.permission
-);
-export const selectUserId = createSelector(
-  [selectUserInfo],
-  (UserInfo) => UserInfo.id
 );

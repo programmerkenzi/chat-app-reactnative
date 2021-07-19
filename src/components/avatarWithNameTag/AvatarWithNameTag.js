@@ -7,9 +7,8 @@
  */
 
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Avatar } from "react-native-elements";
-import { createFileUrl } from "./../../library/utils/utils";
 
 const AvatarWithNameTag = ({ item }) => {
   return (
@@ -19,7 +18,7 @@ const AvatarWithNameTag = ({ item }) => {
         size={"small"}
         title={item.name.toUpperCase().substring(0, 2)}
         source={{
-          uri: item.avatar.length > 0 ? createFileUrl(item.avatar) : "http://",
+          uri: item.avatar.length > 0 ? item.avatar : "http://",
         }}
       />
       <Text style={styles.itemText}>{item.name}</Text>

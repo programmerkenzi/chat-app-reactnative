@@ -2,11 +2,13 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:48
- * @LastEditTime: 2021-07-14 12:21:23
+ * @LastEditTime: 2021-07-19 14:52:47
  * @LastEditors: Kenzi
  */
 import chatActionType from "./chat.type";
-import { RecipientMarkedRead } from "./utils";
+import authActionType from "./../auth/auth.type";
+import wsActionType from "./../ws/ws.type";
+import networkActionTypes from "./../network/network.type";
 
 const initialState = {
   chatRoomList: {},
@@ -50,14 +52,16 @@ const chatReducer = (state = initialState, action) => {
           [action.payload.room_id]: new_room_info,
         },
       };
-
-    case chatActionType.GET_CONVERSATION_SUCCESS:
     case chatActionType.UPDATE_CONVERSATION:
-      const { new_conversation, room_id } = action.payload;
+    case chatActionType.GET_CONVERSATION_SUCCESS:
       return {
         ...state,
-        conversations: { ...state.conversations, [room_id]: new_conversation },
+        conversations: {
+          ...state.conversations,
+          [action.payload.room_id]: action.payload.new_conversation,
+        },
       };
+
     case chatActionType.UPDATE_SELECTED_MESSAGE:
       let newSelectedMessage = [...state.selectedMessage];
       const isExist = newSelectedMessage.findIndex(
@@ -76,6 +80,19 @@ const chatReducer = (state = initialState, action) => {
     case chatActionType.CLEAR_SELECTED_MESSAGE:
       return {
         ...state,
+        selectedMessage: [],
+      };
+
+    case authActionType.LOGOUT_SUCCESS:
+    case authActionType.LOGOUT_FAILURE:
+    case authActionType.REFRESH_TOKEN_FAILURE:
+    case wsActionType.SOCKET_IO_DISCONNECTED:
+    case networkActionTypes.NETWORK_DISCONNECTED:
+      return {
+        chatRoomList: {},
+        conversations: {},
+        contactList: [],
+        error: null,
         selectedMessage: [],
       };
 

@@ -10,9 +10,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Avatar } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { toGroupInfoPage } from "./../../utils";
 import { toUserInfoPage } from "./../../utils";
-import { createFileUrl } from "./../../../../library/utils/utils";
 
 const ChatHeader = ({ roomInfo, currentUserId }) => {
   const navigation = useNavigation();
@@ -20,7 +18,7 @@ const ChatHeader = ({ roomInfo, currentUserId }) => {
   const receiver = users.filter((u) => u._id !== currentUserId)[0];
   const avatar =
     roomInfo.type === "private" ? receiver.avatar : roomInfo.avatar; // 私人||群组
-  const avatarUrl = avatar.length > 0 ? createFileUrl(avatar) : "http://";
+  const avatarUrl = avatar.length > 0 ? avatar : "http://";
   const name = roomInfo.type === "private" ? receiver.name : roomInfo.name; //群組 || 私人
 
   const handleOnPress = () => {

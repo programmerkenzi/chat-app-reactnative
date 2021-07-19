@@ -2,13 +2,13 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-05-27 14:08:15
- * @LastEditTime: 2021-06-03 13:40:01
+ * @LastEditTime: 2021-07-16 10:28:42
  * @LastEditors: Kenzi
  */
 
 import { createSelector } from "reselect";
 
-const selectRouter = (state) => state.router;
+const selectRouter = (state) => state.main.router;
 
 export const selectRouterName = createSelector(
   [selectRouter],

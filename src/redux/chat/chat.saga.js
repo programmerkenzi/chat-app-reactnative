@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:57
- * @LastEditTime: 2021-07-14 12:39:23
+ * @LastEditTime: 2021-07-19 15:04:04
  * @LastEditors: Kenzi
  */
 
@@ -45,7 +45,9 @@ import { toMessagesPage } from "../../pages/chat/utils";
 import { getConversationFailure } from "./chat.actions";
 import {
   getChatRooms,
+  getContactList,
   handelRecipientMarkedRead,
+  initRoom,
   readAll,
   updateLastMessage,
   updateUnreadAndLastMessage,
@@ -53,15 +55,16 @@ import {
 import { updateChatRoomStateSuccess } from "./chat.actions";
 import { schedulePushNotification } from "../../library/utils/utils";
 import { onPushNotification } from "./chat.actions";
+import { getConversations } from "./utils";
 
 function* gotNewMessage({ payload }) {
   const data = yield payload.data;
   const chat_room_id = yield data[0].chat_room_id;
   const posted_by_user = yield data[0].user[0]._id;
-  const chat = yield (state) => state.chat;
-  const auth = yield (state) => state.auth;
+  const chat = yield (state) => state.main.chat;
+  const user = yield (state) => state.main.user;
   const { conversations } = yield select(chat);
-  const { userInfo } = yield select(auth);
+  const { userInfo } = yield select(user);
   const conversationsSaved = yield conversations[chat_room_id];
 
   if (conversationsSaved) {
@@ -73,20 +76,21 @@ function* gotNewMessage({ payload }) {
   }
 
   //判断是否要标记已读讯息
-  const router = yield (state) => state.router;
+  const router = yield (state) => state.main.router;
   const { name, params } = yield select(router);
-
   const currentUser = yield userInfo._id;
+  const app = yield (state) => state.main.app;
+  const { appState } = yield select(app);
   //在聊天室里
-  if (name === "Messages") {
+
+  if (name === "Messages" && appState !== "background") {
     const currentRoom = yield params.room_info._id;
     //在同一个聊天室里
     if (chat_room_id === currentRoom) {
       //不是自己发的讯息
       if (posted_by_user !== currentUser) {
         const res = yield markReadByRoomId(chat_room_id);
-        const { success } = res;
-        if (success) {
+        if (res) {
           yield put(
             updateChatRoomStateStart(chat_room_id, data, "new_message_read")
           );
@@ -112,12 +116,21 @@ function* onGotNewMessage() {
 function* pushNotification({ payload }) {
   const { room_id, last_message, type } = yield payload;
   const date = new Date(last_message[0].createdAt);
-
-  const router = yield (state) => state.router;
+  const router = yield (state) => state.main.router;
   const { name, params } = yield select(router);
+  const app = yield (state) => state.main.app;
+  const { appState } = yield select(app);
 
   //在聊天室里
-  if (params.room_info) {
+  if (appState === "background") {
+    yield schedulePushNotification(
+      last_message[0].user[0].name,
+      date.toLocaleString(),
+      last_message[0].message,
+      "Messages",
+      { room_info: payload }
+    );
+  } else if (params.room_info) {
     if (params.room_info._id !== room_id) {
       yield schedulePushNotification(
         last_message[0].user[0].name,
@@ -150,7 +163,7 @@ function* onHandlePushNotification() {
 function* deleteMessage({ payload }) {
   const { room_id, message_ids, clearSelected } = payload;
   try {
-    const chat = yield (state) => state.chat;
+    const chat = yield (state) => state.main.chat;
 
     const { conversations } = yield select(chat);
     let newConversations = conversations;
@@ -194,7 +207,7 @@ function* onDeleteMessage() {
 function* updateChatRoomState({ payload }) {
   try {
     const { room_id, last_message, type } = yield payload;
-    const chat = yield (state) => state.chat;
+    const chat = yield (state) => state.main.chat;
 
     const { chatRoomList } = yield select(chat);
     let newChatRoomList = null;
@@ -229,9 +242,9 @@ function* onUpdateChatRoomState() {
 }
 
 function* loginChatServer() {
-  const auth = yield (state) => state.auth;
+  const auth = yield (state) => state.secure.auth;
   const { userToken } = yield select(auth);
-  const ws = yield (state) => state.ws;
+  const ws = yield (state) => state.main.ws;
   const { clientId } = yield select(ws);
   if (userToken && clientId) {
     try {
@@ -248,11 +261,8 @@ function* loginChatServer() {
 //联络人
 function* getUserContactList() {
   try {
-    const res = yield fetchMyContact();
-    if (res) {
-      const data = res.data;
-      yield put(getMyContactSuccess(data));
-    }
+    const list = yield getContactList();
+    yield put(getMyContactSuccess(list));
   } catch (error) {
     yield put(getMyContactFailure(error));
   }
@@ -264,26 +274,18 @@ function* onGetUserContactList() {
 
 //房间初始化
 function* initChatRoom({ payload }) {
-  const auth = (state) => state.auth;
-  const { userInfo } = yield select(auth);
+  const user = (state) => state.main.user;
+  const { userInfo } = yield select(user);
   const { navigation, user_ids, type } = payload;
   let room_user_ids = user_ids;
   try {
     // insert current user id
     yield room_user_ids.push(userInfo._id);
-    const res = yield initializeChatRoom({
-      creator: userInfo._id,
-      user_ids: room_user_ids,
-      type: type,
-    });
-    const { is_new, chat_room_id, room_info } = yield res.data;
-    if (res.success) {
-      let newRoomInfo = room_info[0];
-      newRoomInfo.last_message = [];
-      newRoomInfo.unread = [];
-      yield put(initializeChatRoomSuccess(newRoomInfo, chat_room_id));
+    const newRoomInfo = yield initRoom(userInfo._id, room_user_ids, type);
+    if (newRoomInfo) {
+      yield put(initializeChatRoomSuccess(newRoomInfo, newRoomInfo._id));
     }
-    yield toMessagesPage(navigation, room_info[0]);
+    yield toMessagesPage(navigation, newRoomInfo);
   } catch (error) {
     yield put(initializeChatRoomFailure(error));
   }
@@ -296,7 +298,7 @@ function* onInitChatRoom() {
 //房间
 function* getChatRoom() {
   try {
-    const chat = (state) => state.chat;
+    const chat = (state) => state.main.chat;
     const { chatRoomList } = yield select(chat);
     const { page, pages, total } = chatRoomList;
     if (pages) {
@@ -326,43 +328,26 @@ function* onGetChatRoom() {
 //聊天记录
 function* getConversation({ payload }) {
   try {
-    const chat = yield (state) => state.chat;
+    const chat = yield (state) => state.main.chat;
     const { conversations } = yield select(chat);
     const conversationsSaved = conversations[payload];
-
     if (conversationsSaved) {
       const { page, pages, total } = conversationsSaved;
       if (pages) {
         if (page < pages) {
-          const res = yield fetchConversationsByRoomId(payload, page);
-          const { data, meta } = yield res.data;
-          const currentPage = yield meta.page;
-          const newConversations = [...conversationsSaved, ...data];
-          newConversations.page = currentPage;
-          newConversations.total = meta.total;
-          newConversations.pages = meta.pages;
-          console.log("newConversations :>> ", newConversations);
+          const newConversations = yield getConversations(
+            payload,
+            page,
+            conversationsSaved
+          );
           yield put(getConversationSuccess(newConversations, payload));
         }
       } else {
-        const res = yield fetchConversationsByRoomId(payload, 0);
-        const { data, meta } = yield res.data;
-        const { limit, page, pages, total } = yield meta;
-        const newConversations = data;
-        newConversations.total = total;
-        newConversations.pages = pages;
-        newConversations.page = page;
+        const newConversations = yield getConversations(payload, 0, []);
         yield put(getConversationSuccess(newConversations, payload));
       }
     } else {
-      const res = yield fetchConversationsByRoomId(payload, 0);
-      const { data, meta } = yield res.data;
-      const { limit, page, pages, total } = yield meta;
-      const newConversations = data;
-      newConversations.total = total;
-      newConversations.pages = pages;
-      newConversations.page = page;
-      console.log("newConversations :>> ", newConversations);
+      const newConversations = yield getConversations(payload, 0, []);
       yield put(getConversationSuccess(newConversations, payload));
     }
   } catch (error) {
@@ -376,7 +361,7 @@ function* onGetConversation() {
 
 function* recipientMarkRead({ payload }) {
   const { room_id, read_by_user } = payload;
-  const chat = yield (state) => state.chat;
+  const chat = yield (state) => state.main.chat;
   const { conversations } = yield select(chat);
   try {
     const newConversations = yield handelRecipientMarkedRead(

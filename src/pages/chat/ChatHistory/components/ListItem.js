@@ -2,7 +2,7 @@
  * @Description: 聊天记录
  * @Author: Lewis
  * @Date: 2021-01-20 16:32:48
- * @LastEditTime: 2021-07-12 17:25:06
+ * @LastEditTime: 2021-07-16 12:15:33
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -10,13 +10,12 @@ import { StyleSheet, Text, View } from "react-native";
 import { Avatar, Badge } from "react-native-elements";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
-import { selectUserInfo } from "../../../../redux/chat/chat.selector";
 import { darkGary, lightGary } from "./../../../../styles/color";
 import { Time } from "react-native-gifted-chat";
-
+import { selectUserInfo } from "./../../../../redux/user/user.selector";
+selectUserInfo;
 const ListItem = ({ props }) => {
   const { avatar, name, lastMessage, date, time, unread } = props;
-
   return (
     <View style={styles.container}>
       <View style={styles.chatContent}>

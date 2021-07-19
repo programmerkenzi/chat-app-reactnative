@@ -15,7 +15,6 @@
 
 import React from "react";
 import {
-  Alert,
   ImageBackground,
   ScrollView,
   StyleSheet,
@@ -28,14 +27,13 @@ import bg from "../../../../assets/bg.jpg";
 import Icon from "react-native-vector-icons/Ionicons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Toast } from "native-base";
-import { createFileUrl } from "./../../../library/utils/utils";
 import { connect } from "react-redux";
-import { selectUserInfo } from "./../../../redux/auth/auth.selector";
 import { checkIsSameArray } from "./../../../library/utils/utils";
 import { toMessagesPage } from "../utils";
 import { initializeChatRoomStart } from "../../../redux/chat/chat.actions";
 import { selectChatRoomList } from "../../../redux/chat/chat.selector";
 import { createStructuredSelector } from "reselect";
+import { selectUserInfo } from "./../../../redux/user/user.selector";
 
 const UserInfoPage = ({ navigation, userInfo, initChatRoom, chatRoomList }) => {
   const item = useRoute().params.item;
@@ -100,7 +98,7 @@ const UserInfoPage = ({ navigation, userInfo, initChatRoom, chatRoomList }) => {
             size="xlarge"
             title={item.name.toUpperCase().substring(0, 2)}
             source={{
-              uri: item.avatar.length ? createFileUrl(item.avatar) : "http://",
+              uri: item.avatar.length ? item.avatar : "http://",
             }}
             containerStyle={{
               marginTop: "35%",

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-14 17:54:54
- * @LastEditTime: 2021-07-15 18:53:11
+ * @LastEditTime: 2021-07-19 18:50:20
  * @LastEditors: Kenzi
  */
 
@@ -10,10 +10,15 @@ import axios from "axios";
 import queryString from "query-string";
 import { store } from "./../redux/store";
 import { Alert } from "react-native";
-import { startLoading } from "../redux/auth/auth.actions";
+import {
+  logoutStart,
+  onRefreshTokenStart,
+  startLoading,
+} from "../redux/auth/auth.actions";
 import { stopLoading } from "./../redux/auth/auth.actions";
 import { onUserTokenExpired } from "./../redux/auth/auth.actions";
-import { getToken } from "../library/utils/secureStore";
+import { onRefreshToken } from "./auth";
+import { onRefreshTokenSuccess } from "./../redux/auth/auth.actions";
 
 const axiosChatClient = axios.create({
   baseURL: __DEV__
@@ -27,8 +32,9 @@ const axiosChatClient = axios.create({
 axiosChatClient.interceptors.request.use(
   async (config) => {
     const state = store.getState();
-    const { socketIoClientId } = state.ws;
-    const userToken = await getToken();
+    const { socketIoClientId } = state.main.ws;
+    const { userToken } = state.secure.auth;
+
     if (userToken) {
       config.headers[
         "Authorization"
@@ -40,7 +46,7 @@ axiosChatClient.interceptors.request.use(
     store.dispatch(stopLoading());
     // do something with request error
     Alert.alert("axios发生错误!", `${error}`);
-    return Promise.reject(error);
+    return;
   }
 );
 // response interceptor
@@ -48,17 +54,33 @@ axiosChatClient.interceptors.response.use(
   (response) => {
     console.log("response :>> ", response);
     store.dispatch(stopLoading());
-
     const res = response.data;
-    const url = response.config.url;
-    if (!res.success) {
-      Alert.alert(response.status, res.data.message);
-    }
+
     return res;
   },
-  (error) => {
+  async function (error) {
     store.dispatch(stopLoading());
-    Alert.alert("发生错误!", `${error}`);
+    const originalRequest = error.config;
+    if (
+      error.response.status === 401 &&
+      originalRequest.url.includes("/refresh-token")
+    ) {
+      await store.dispatch(logoutStart());
+      return Promise.reject(error);
+    } else if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      // await execution of the store async action before
+      // return
+      const state = store.getState();
+      const { refreshToken } = state.secure.auth;
+      const res = await onRefreshToken({ refreshToken: refreshToken });
+      if (res.success) {
+        await store.dispatch(
+          onRefreshTokenSuccess(res.accessToken, res.refreshToken)
+        );
+        return axiosChatClient(originalRequest);
+      }
+    }
     return Promise.reject(error);
   }
 );

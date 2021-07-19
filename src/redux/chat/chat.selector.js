@@ -8,7 +8,7 @@
 
 import { createSelector } from "reselect";
 
-const selectChat = (state) => state.chat;
+const selectChat = (state) => state.main.chat;
 
 export const selectConversations = createSelector(
   [selectChat],

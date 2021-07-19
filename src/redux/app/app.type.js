@@ -2,11 +2,11 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-14 10:43:18
- * @LastEditTime: 2021-04-14 15:15:11
+ * @LastEditTime: 2021-07-16 10:51:35
  * @LastEditors: Kenzi
  */
 
-const settingActionTypes = {
+const appActionTypes = {
   GET_ALL_LANG_TYPE_START: "GET_ALL_LANG_TYPE_START",
   GET_ALL_LANG_TYPE_SUCCESS: "GET_ALL_LANG_TYPE_SUCCESS",
   GET_ALL_LANG_TYPE_FAILURE: "GET_ALL_LANG_TYPE_FAILURE",
@@ -15,6 +15,8 @@ const settingActionTypes = {
   GET_LANG_TRANSLATIONS_FAILURE: "GET_LANG_TRANSLATIONS_FAILURE",
   CHANGE_LANG_START: "CHANGE_LANG_START",
   CHANGE_LANG_SUCCESS: "CHANGE_LANG_SUCCESS",
+  ON_APP_STATE_CHANGE: "ON_APP_STATE_CHANGE",
+  UPDATE_APP_STATE: "UPDATE_APP_STATE",
 };
 
-export default settingActionTypes;
+export default appActionTypes;

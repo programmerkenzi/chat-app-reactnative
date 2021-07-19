@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-05-21 14:59:28
- * @LastEditTime: 2021-07-15 18:56:10
+ * @LastEditTime: 2021-07-16 16:18:03
  * @LastEditors: Kenzi
  */
 
@@ -13,7 +13,6 @@ import { Alert } from "react-native";
 import { t } from "../../i18n";
 import axios from "axios";
 import { store } from "../../redux/store";
-import { getToken } from "./secureStore";
 
 //樹狀數據搜索
 export const searchTree = (element, matchingName) => {
@@ -157,9 +156,9 @@ export const handleOnSelect = (
   }
 };
 
-export const createFileUrl = async (filename) => {
-  const token = await getToken();
-
+export const createFileUrl = (filename) => {
+  const state = store.getState();
+  const token = state.secure.auth.userToken;
   const baseUrl = __DEV__
     ? process.env.REACT_APP_API_URL_DEVELOPMENT
     : process.env.REACT_APP_API_URL_PRODUCTION;
@@ -168,7 +167,6 @@ export const createFileUrl = async (filename) => {
   const filePath = `${baseUrl}${fileBasePath}${filename}/${
     token.split(" ")[1]
   }`;
-  console.log("filePath :>> ", filePath);
 
   return filePath;
 };

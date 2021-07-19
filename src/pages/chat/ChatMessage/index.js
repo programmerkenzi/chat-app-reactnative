@@ -2,7 +2,7 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-07-14 16:12:16
+ * @LastEditTime: 2021-07-19 17:40:25
  * @LastEditors: Kenzi
  */
 import React, { useState, useCallback } from "react";
@@ -47,9 +47,9 @@ import { darkGary, red } from "../../../styles/color";
 import * as Animatable from "react-native-animatable";
 import { deleteMessage } from "./../../../chat_api/chat";
 import { onDeleteConversation } from "./../../../redux/chat/chat.actions";
-import { selectUserInfo } from "./../../../redux/auth/auth.selector";
 import { createFileUrl } from "./../../../library/utils/utils";
 import { SafeAreaView } from "react-native";
+import { selectUserInfo } from "./../../../redux/user/user.selector";
 
 const ChatMessagePage = ({
   userInfo,
@@ -148,9 +148,9 @@ const ChatMessagePage = ({
   }, [conversations]);
 
   const markRead = async () => {
-    const { success } = await markReadByRoomId(room_id);
+    const res = await markReadByRoomId(room_id);
 
-    if (success) {
+    if (res) {
       updateChatRoomState(room_id);
     }
   };
@@ -192,6 +192,7 @@ const ChatMessagePage = ({
       });
       modifiedMessage[0].file = modifiedFiles;
       const res = await handleUploadMultipleFile(selectedFile);
+      console.log("res :>> ", res);
       if (res.success) {
         setSelectedFile([]);
         filesUploaded = res.file;

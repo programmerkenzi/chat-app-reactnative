@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:33:46
- * @LastEditTime: 2021-07-15 18:52:37
+ * @LastEditTime: 2021-07-16 17:45:11
  * @LastEditors: Kenzi
  */
 import {
@@ -32,7 +32,6 @@ import {
 } from "../network/network.action";
 import { store } from "../store";
 import { onSocketIoReConnect } from "./ws.action";
-import { getToken } from "../../library/utils/secureStore";
 
 function initSocketIo(user_id) {
   return eventChannel((emitter) => {
@@ -102,8 +101,8 @@ function initSocketIo(user_id) {
 // }
 
 function* handleWebSocket() {
-  const auth = yield (state) => state.auth;
-  const { userInfo } = yield select(auth);
+  const user = yield (state) => state.main.user;
+  const { userInfo } = yield select(user);
   const channel = yield call(() => initSocketIo(userInfo._id));
   while (true) {
     const action = yield take(channel);
@@ -114,11 +113,11 @@ function* handleWebSocket() {
 //断线后重新连线时
 function* updateNetworkConnectionStatus({ payload }) {
   if (payload) {
-    const token = yield getToken();
-
-    if (token) {
+    const auth = yield (state) => state.secure.auth;
+    const { userToken } = yield select(auth);
+    if (userToken) {
       yield put(networkConnected());
-      yield fork(() => handleWebSocket(token));
+      yield fork(() => handleWebSocket(userToken));
     }
   } else {
     yield put(networkDisconnected());
@@ -133,10 +132,11 @@ function* onUpdateNetworkStatus() {
 }
 
 function* handleConnectWs() {
-  const token = yield getToken();
-
-  if (token) {
-    yield fork(() => handleWebSocket(token));
+  const auth = yield (state) => state.secure.auth;
+  const { userToken } = yield select(auth);
+  console.log("handleConnectWs userToken :>> ", userToken);
+  if (userToken) {
+    yield fork(() => handleWebSocket(userToken));
   }
 }
 

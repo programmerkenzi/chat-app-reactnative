@@ -16,8 +16,8 @@ import { onUpdateObjState } from "../../../library/utils/utils";
 import { connect } from "react-redux";
 import { loginStart } from "./../../../redux/auth/auth.actions";
 import { Alert } from "react-native";
-import { selectLocale } from "./../../../redux/setting/setting.selector";
 import { createStructuredSelector } from "reselect";
+import { selectLocale } from "../../../redux/app/app.selector";
 
 const LoginPage = ({ login, locale }) => {
   const [noUsername, setNoUsername] = useState(false);

@@ -2,15 +2,19 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-21 14:34:35
- * @LastEditTime: 2021-07-14 12:43:31
+ * @LastEditTime: 2021-07-16 17:15:41
  * @LastEditors: Kenzi
  */
 
 import { createFileUrl } from "../../library/utils/utils";
 import { store } from "../store";
-import { fetchConversationsByRoomId } from "./../../chat_api/chat";
-import { fetchChatRoom } from "./../../chat_api/chat";
-import produce from "immer";
+import {
+  fetchConversationsByRoomId,
+  initializeChatRoom,
+  fetchMyContact,
+  fetchChatRoom,
+} from "./../../chat_api/chat";
+
 //更新最後訊息
 /**
  *
@@ -58,7 +62,6 @@ export const updateUnreadAndLastMessage = async (
     unread: [...room_info.unread, ...message],
     last_message: message,
   };
-  console.log("new_room_info :>> ", new_room_info);
   return new_room_info;
 };
 
@@ -102,24 +105,19 @@ export const handelRecipientMarkedRead = (
 //獲取聊天記錄
 /**
  *
- * @param {Number} fetchPage 要fetch第幾頁
- * @param {Array} conversations redux的conversations
  * @param {String} room_id
+ * @param {Number} fetchPage 要fetch第幾頁
+ * @param {Array} conversations 原本房间里的聊天记录
  */
 
-export const getConversations = async (fetchPage, conversations, room_id) => {
-  let newConversations = conversations;
-  const conversationsSaved = conversations[payload];
-
+export const getConversations = async (room_id, fetchPage, conversations) => {
   const res = await fetchConversationsByRoomId(room_id, fetchPage);
   const { data, meta } = await res.data;
-  const messages = await createGiftChatData(data);
-
-  const { limit, page, pages, total } = await meta;
-  newConversations[payload] = [...conversationsSaved, ...messages];
-  newConversations[room_id].total = total;
-  newConversations[room_id].pages = pages;
-  newConversations[room_id].page = page;
+  const currentPage = await meta.page;
+  const newConversations = [...conversations, ...data];
+  newConversations.page = currentPage;
+  newConversations.total = meta.total;
+  newConversations.pages = meta.pages;
   return newConversations;
 };
 
@@ -129,7 +127,7 @@ export const getConversations = async (fetchPage, conversations, room_id) => {
  * @param {*} chatRoomList  redux的chatRoomList
  */
 
-export const getChatRooms = async (fetchPage, chatRoomList) => {
+export const getChatRooms = async (fetchPage) => {
   const res = await fetchChatRoom(fetchPage);
   const { success, data } = res;
   const newList = {};
@@ -138,11 +136,56 @@ export const getChatRooms = async (fetchPage, chatRoomList) => {
   const list = data.data;
   list.forEach((room) => {
     const room_id = room._id;
-    newList[room_id] = room;
+    const avatar = room.avatar.length > 0 ? createFileUrl(avatar) : avatar;
+    const users = room.users.map((user) => {
+      return { ...user, avatar: createFileUrl(user.avatar) };
+    });
+    newList[room_id] = { ...room, avatar: avatar, users: users };
   });
   const { limit, page, pages, total } = data.meta;
   newList.total = total;
   newList.page = page;
   newList.pages = pages;
+
   return newList;
+};
+
+export const getContactList = async () => {
+  const res = await fetchMyContact();
+  const data = await res.data;
+  const list = [];
+  data.forEach((contact) => {
+    const avatar = contact.avatar;
+    list.push({
+      ...contact,
+      avatar: avatar.length > 0 ? createFileUrl(avatar) : avatar,
+    });
+  });
+
+  return list;
+};
+
+export const initRoom = async (creator, user_ids, type) => {
+  const res = await initializeChatRoom({
+    creator,
+    user_ids,
+    type,
+  });
+
+  const room_info = await res.data.room_info[0];
+  const avatar = room_info.avatar
+    ? createFileUrl(room_info.avatar)
+    : room_info.avatar;
+  const users = room_info.users.map((user) => {
+    return { ...user, avatar: createFileUrl(user.avatar) };
+  });
+  const new_room_info = {
+    ...room_info,
+    last_message: [],
+    unread: [],
+    avatar: avatar,
+    users: users,
+  };
+
+  return new_room_info;
 };

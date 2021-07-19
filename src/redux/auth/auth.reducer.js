@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-01 11:33:03
- * @LastEditTime: 2021-07-15 18:42:09
+ * @LastEditTime: 2021-07-19 14:50:44
  * @LastEditors: Kenzi
  */
 
@@ -10,11 +10,10 @@ import authActionType from "./auth.type";
 
 const initState = {
   isLoading: false,
-  userInfo: null,
   username: null,
   password: null,
   userToken: null,
-  tokenExpiration: null,
+  refreshToken: null,
   isLoginFailure: false,
   failureLoginMessage: null,
   expoPushToken: null,
@@ -26,16 +25,13 @@ const authReducer = (state = initState, action) => {
     case authActionType.LOGIN_SUCCESS:
       return {
         ...state,
-        userToken: true,
-        tokenExpiration: action.payload.tokenExpiration,
-        username: action.payload.username,
-        password: action.payload.password,
-        userInfo: action.payload.userInfo,
+        userToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
       };
     case authActionType.LOGOUT_SUCCESS:
       return {
         ...state,
-        userToken: false,
+        userToken: null,
         expoPushToken: null,
         userInfo: null,
         username: null,
@@ -71,16 +67,16 @@ const authReducer = (state = initState, action) => {
     case authActionType.REFRESH_TOKEN_SUCCESS:
       return {
         ...state,
-        userToken: action.payload.new_token,
-        tokenExpiration: action.payload.expires_in,
+        userToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
       };
     case authActionType.LOGOUT_FAILURE:
-    case authActionType.GET_USER_INFO_FAILURE:
     case authActionType.REFRESH_TOKEN_FAILURE:
       return {
         ...state,
         isLoading: false,
         error: action.payload,
+        userToken: null,
       };
     default:
       return state;
