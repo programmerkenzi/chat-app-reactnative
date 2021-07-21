@@ -2,18 +2,11 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-14 17:57:36
- * @LastEditTime: 2021-07-06 16:06:37
+ * @LastEditTime: 2021-07-21 14:11:34
  * @LastEditors: Kenzi
  */
 
 import axiosChatClient from "./axiosChatClient";
-
-//获取我的联络人
-export const fetchMyContact = () =>
-  axiosChatClient({
-    url: `users/friends`,
-    method: "get",
-  });
 
 //初始化聊天室
 export const initializeChatRoom = (data) =>
@@ -50,18 +43,6 @@ export const postMessage = (room_id, file, message) =>
     },
   });
 
-//搜索用户
-/**
- *
- * @param {String} user_public_id
- * @returns
- */
-export const searchUserByPublicId = (user_public_id) =>
-  axiosChatClient({
-    url: `users/public-id/${user_public_id}`,
-    method: "get",
-  });
-
 //标记已读
 /**
  *
@@ -88,33 +69,9 @@ export const fetchConversationsByRoomId = (room_id, page, limit) =>
     method: "get",
   });
 
-//檔案
-export const uploadFile = (file) =>
-  axiosChatClient({
-    url: "/fs",
-    method: "post",
-    contentType: "multipart/form-data",
-    accept: "application/json",
-    data: file,
-  });
-
-export const getFile = (filename) =>
-  axiosChatClient({
-    url: `/fs/${filename}`,
-    method: "get",
-    responseType: "blob",
-  });
-
-export const downloadFile = (filename) =>
-  axiosChatClient({
-    url: `/fs/download/${filename}`,
-    method: "get",
-    responseType: "blob",
-  });
-
 export const deleteMessage = (room_id, message_ids) =>
   axiosChatClient({
-    url: `/delete/${room_id}/messages`,
+    url: `delete/${room_id}/messages`,
     method: "delete",
-    data: { message_ids: message_ids },
+    data: { message_ids },
   });

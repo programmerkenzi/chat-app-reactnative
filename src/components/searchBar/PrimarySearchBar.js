@@ -2,13 +2,14 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-09 13:05:04
- * @LastEditTime: 2021-07-07 11:59:30
+ * @LastEditTime: 2021-07-21 16:34:09
  * @LastEditors: Kenzi
  */
 
 import React from "react";
 import { SearchBar } from "react-native-elements";
 import { StyleSheet } from "react-native";
+import { createFileUrl } from "./../../library/utils/utils";
 
 const PrimarySearchBar = ({
   searchString,
@@ -60,7 +61,16 @@ const PrimarySearchBar = ({
           setSearchResults([]);
           const res = await searchByServer(text);
           const data = await res.data;
-          results = data;
+          const addAvatarData = data.map((user) => {
+            return {
+              ...user,
+              avatar:
+                user.avatar.length > 0
+                  ? createFileUrl(user.avatar)
+                  : user.avatar,
+            };
+          });
+          results = addAvatarData;
         } else {
           results = data.filter((u) =>
             u.name.toLowerCase().includes(text.trim().toLowerCase())

@@ -2,17 +2,24 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-07 18:32:28
- * @LastEditTime: 2021-07-12 11:29:37
+ * @LastEditTime: 2021-07-21 13:51:37
  * @LastEditors: Kenzi
  */
 
 import axiosChatClient from "./axiosChatClient";
 
-export const onLogin = (data) =>
+/**
+ *
+ * @param {String} username
+ * @param {String} password
+ * @param {String} drive_id
+ * @returns
+ */
+export const onLogin = (username, password, drive_id) =>
   axiosChatClient({
     method: "post",
     url: "/login",
-    data,
+    data: { username, password, drive_id },
   });
 
 export const onFetchUserInfo = () =>

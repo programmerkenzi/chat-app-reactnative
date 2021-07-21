@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:57
- * @LastEditTime: 2021-07-19 15:04:04
+ * @LastEditTime: 2021-07-21 12:55:31
  * @LastEditors: Kenzi
  */
 
@@ -20,8 +20,8 @@ import {
   loginChatServerSuccess,
   loginChatServerFailure,
   loginChatServerStart,
-  getMyContactSuccess,
-  getMyContactFailure,
+  getMyFriendSuccess,
+  getMyFriendFailure,
   initializeChatRoomSuccess,
   initializeChatRoomFailure,
   getChatRoomSuccess,
@@ -30,22 +30,18 @@ import {
   updateChatRoomStateFailure,
   updateConversation,
   onClearSelectedMessage,
+  onUpdateFriendList,
 } from "./chat.actions";
 import { takeEvery } from "redux-saga/effects";
 import chatActionType from "./chat.type";
 import authActionType from "./../auth/auth.type";
-import {
-  fetchConversationsByRoomId,
-  fetchMyContact,
-  initializeChatRoom,
-  markReadByRoomId,
-} from "../../chat_api/chat";
+import { markReadByRoomId } from "../../chat_api/chat";
 import { getChatRoomFailure } from "./chat.actions";
 import { toMessagesPage } from "../../pages/chat/utils";
 import { getConversationFailure } from "./chat.actions";
 import {
   getChatRooms,
-  getContactList,
+  getFriendList,
   handelRecipientMarkedRead,
   initRoom,
   readAll,
@@ -56,6 +52,7 @@ import { updateChatRoomStateSuccess } from "./chat.actions";
 import { schedulePushNotification } from "../../library/utils/utils";
 import { onPushNotification } from "./chat.actions";
 import { getConversations } from "./utils";
+import { createFileUrl } from "./../../library/utils/utils";
 
 function* gotNewMessage({ payload }) {
   const data = yield payload.data;
@@ -259,17 +256,17 @@ function* loginChatServer() {
 }
 
 //联络人
-function* getUserContactList() {
+function* getUserFriendList() {
   try {
-    const list = yield getContactList();
-    yield put(getMyContactSuccess(list));
+    const list = yield getFriendList();
+    yield put(getMyFriendSuccess(list));
   } catch (error) {
-    yield put(getMyContactFailure(error));
+    yield put(getMyFriendFailure(error));
   }
 }
 
-function* onGetUserContactList() {
-  yield takeLatest(chatActionType.GET_MY_CONTACT_START, getUserContactList);
+function* onGetUserFriendList() {
+  yield takeLatest(chatActionType.GET_MY_FRIEND_START, getUserFriendList);
 }
 
 //房间初始化
@@ -392,10 +389,26 @@ function* onGotWsClientId() {
   }
 }
 
+//好友
+function* addFriend({ payload }) {
+  const chat = (state) => state.main.chat;
+  const { friendList } = yield select(chat);
+  const friend_info = payload;
+  (friend_info.avatar =
+    friend_info.avatar.length > 0
+      ? createFileUrl(friend_info.avatar)
+      : friend_info.avatar),
+    yield put(onUpdateFriendList([...friendList, friend_info]));
+}
+
+function* onAddFriend() {
+  yield takeLatest(chatActionType.ADD_FRIEND, addFriend);
+}
+
 export default function* chatSagas() {
   yield all([
     fork(onGotNewMessage),
-    fork(onGetUserContactList),
+    fork(onGetUserFriendList),
     fork(onInitChatRoom),
     fork(onGetChatRoom),
     fork(onGetConversation),
@@ -403,5 +416,6 @@ export default function* chatSagas() {
     fork(onHandleRecipientMarkRead),
     fork(onDeleteMessage),
     fork(onHandlePushNotification),
+    fork(onAddFriend),
   ]);
 }

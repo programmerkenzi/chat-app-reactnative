@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-19 12:36:22
- * @LastEditTime: 2021-07-06 12:43:28
+ * @LastEditTime: 2021-07-21 16:27:08
  * @LastEditors: Kenzi
  */
 
@@ -11,6 +11,8 @@ import { t } from "../../i18n";
 import { View } from "react-native";
 import ChatMenuButton from "./Buttons/ChatMenu";
 import ChatGroupEditMenu from "./Buttons/ChatGroupEditMenu";
+import AddGroupChat from "./Buttons/AddGroupChat";
+import AddFriend from "./Buttons/AddFriend";
 
 export const GeneralHeaderOptions = (title) => {
   return {
@@ -41,8 +43,12 @@ export const HeaderOptionsWithRightButton = (title, rightButton) => {
       fontWeight: "bold",
     },
     headerRight: () => (
-      <View style={{ paddingRight: 5 }}>
-        {rightButton === "chat" ? <ChatMenuButton /> : null}
+      <View style={{ paddingRight: 10 }}>
+        {rightButton === "chat" ? (
+          <AddGroupChat />
+        ) : rightButton === "addNewFriend" ? (
+          <AddFriend />
+        ) : null}
       </View>
     ),
   };

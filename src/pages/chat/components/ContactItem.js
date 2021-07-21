@@ -2,22 +2,31 @@
  * @Description: 聊天记录
  * @Author: Lewis
  * @Date: 2021-01-20 16:32:48
- * @LastEditTime: 2021-07-16 11:56:36
+ * @LastEditTime: 2021-07-20 18:10:17
  * @LastEditors: Kenzi
  */
 import React from "react";
 import { StyleSheet } from "react-native";
 // import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
-import { ListItem, Avatar } from "react-native-elements";
-import { TouchableOpacity } from "react-native";
+import { ListItem, Avatar, Icon } from "react-native-elements";
+import { TouchableOpacity, View } from "react-native";
 import { toUserInfoPage } from "../utils";
 import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/Ionicons";
 import { useToast } from "native-base";
+import { tw } from "react-native-tailwindcss";
+import { postNotification } from "../../../chat_api/notification";
 
 // const avatar_url= 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
 
-const ContactItem = ({ props, routeName, onPressChevron, toChatRoom }) => {
+const ContactItem = ({
+  props,
+  routeName,
+  onPressChevron,
+  toChatRoom,
+  btnType,
+  submitAddFriendRequest,
+  deleteAddFriendRequest,
+}) => {
   const info = props.status;
 
   const navigation = useNavigation();
@@ -32,15 +41,19 @@ const ContactItem = ({ props, routeName, onPressChevron, toChatRoom }) => {
   };
   const toast = useToast();
 
-  const onPressAdd = () => {
-    toast.show({
-      title: "测试",
-      description: "发送交友请求",
-      duration: 2000,
-      isClosable: true,
-      placement: "top",
-      status: "success",
-    });
+  const sentAddFriendRequest = async () => {
+    const res = await postNotification("add_friend", { user_id: props._id });
+
+    if (res.success) {
+      toast.show({
+        title: "测试",
+        description: "发送交友请求",
+        duration: 2000,
+        isClosable: true,
+        placement: "top",
+        status: "success",
+      });
+    }
   };
 
   return (
@@ -57,18 +70,41 @@ const ContactItem = ({ props, routeName, onPressChevron, toChatRoom }) => {
       </TouchableOpacity>
       <ListItem.Content>
         <ListItem.Title>{props.name}</ListItem.Title>
+
         <ListItem.Subtitle>
           {info.length > 25 ? info.substring(0, 25) + "..." : info}
         </ListItem.Subtitle>
       </ListItem.Content>
 
-      {routeName === "AddNewFriend" ? (
-        <TouchableOpacity onPress={() => onPressAdd()}>
+      {btnType === "addNewFriend" ? (
+        <TouchableOpacity onPress={() => sentAddFriendRequest()}>
           <Icon
-            name="person-add"
-            style={{ color: "#c0c0c0", fontSize: 15 }}
-          ></Icon>
+            name="user-plus"
+            type="font-awesome-5"
+            size={15}
+            color="#57534e"
+          />
         </TouchableOpacity>
+      ) : btnType === "submitFriendRequest" ? (
+        <View style={[tw.flexRow]}>
+          <TouchableOpacity onPress={() => submitAddFriendRequest(props._id)}>
+            <Icon
+              name="user-plus"
+              type="font-awesome-5"
+              size={15}
+              color="#a3e635"
+              style={{ marginRight: 20 }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => deleteAddFriendRequest(props._id)}>
+            <Icon
+              name="user-times"
+              type="font-awesome-5"
+              size={15}
+              color="#f87171"
+            />
+          </TouchableOpacity>
+        </View>
       ) : (
         <TouchableOpacity onPress={() => onPressChevron(props._id)}>
           <ListItem.Chevron />

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:41
- * @LastEditTime: 2021-07-16 16:46:24
+ * @LastEditTime: 2021-07-21 15:14:38
  * @LastEditors: Kenzi
  */
 
@@ -24,15 +24,15 @@ export const updateConversation = (new_conversation, room_id) => ({
   payload: { new_conversation, room_id },
 });
 
-export const getMyContactStart = () => ({
-  type: chatActionType.GET_MY_CONTACT_START,
+export const getMyFriendStart = () => ({
+  type: chatActionType.GET_MY_FRIEND_START,
 });
-export const getMyContactSuccess = (users) => ({
-  type: chatActionType.GET_MY_CONTACT_SUCCESS,
+export const getMyFriendSuccess = (users) => ({
+  type: chatActionType.GET_MY_FRIEND_SUCCESS,
   payload: users,
 });
-export const getMyContactFailure = (error) => ({
-  type: chatActionType.GET_MY_CONTACT_FAILURE,
+export const getMyFriendFailure = (error) => ({
+  type: chatActionType.GET_MY_FRIEND_FAILURE,
   payload: error,
 });
 
@@ -166,4 +166,14 @@ export const onDeleteConversation = (
 export const onPushNotification = (room_info) => ({
   type: chatActionType.PUSH_NOTIFICATION,
   payload: room_info,
+});
+
+export const onAddFriend = (friend_info) => ({
+  type: chatActionType.ADD_FRIEND,
+  payload: friend_info,
+});
+
+export const onUpdateFriendList = (new_friend_list) => ({
+  type: chatActionType.UPDATE_FRIEND_LIST,
+  payload: new_friend_list,
 });

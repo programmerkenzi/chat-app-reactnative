@@ -2,7 +2,7 @@
  * @Description: 用户在线
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:53
- * @LastEditTime: 2021-07-14 13:49:58
+ * @LastEditTime: 2021-07-21 12:00:36
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -12,26 +12,25 @@ import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import {
   selectChatRoomList,
-  selectContactList,
+  selectFriendList,
 } from "../../../redux/chat/chat.selector";
 
 import PrimarySearchBar from "../../../components/searchBar/PrimarySearchBar";
 import { useRoute } from "@react-navigation/native";
-import { checkIsSameArray } from "./../../../library/utils/utils";
+import { checkIsSameArray } from "../../../library/utils/utils";
 import {
-  getMyContactStart,
+  getMyFriendStart,
   initializeChatRoomStart,
 } from "../../../redux/chat/chat.actions";
 import { toMessagesPage } from "../utils";
 import { ContainerWithBgColor } from "../../../styles/layout";
-import { searchUserByPublicId } from "./../../../chat_api/chat";
-import { selectUserInfo } from "./../../../redux/user/user.selector";
+import { selectUserInfo } from "../../../redux/user/user.selector";
 
-const ContactPage = ({
+const FriendsPage = ({
   userInfo,
   navigation,
-  getMyContactList,
-  contactList,
+  getMyFriendList,
+  friendList,
   initChatRoom,
   chatRoomList,
 }) => {
@@ -40,7 +39,7 @@ const ContactPage = ({
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
-    getMyContactList();
+    getMyFriendList();
   }, []);
 
   /**
@@ -72,14 +71,14 @@ const ContactPage = ({
   return (
     <ContainerWithBgColor bgColor="#fff">
       <PrimarySearchBar
-        data={contactList}
+        data={friendList}
         searchString={searchString}
         setSearchString={setSearchString}
         setSearchResults={setSearchResults}
         type="user"
       />
       <FlatList
-        data={searchString.length ? searchResults : contactList}
+        data={searchString.length ? searchResults : friendList}
         renderItem={({ item, index }) => (
           <ContactItem
             props={item}
@@ -95,18 +94,18 @@ const ContactPage = ({
 };
 
 const mapStateToProps = createStructuredSelector({
-  contactList: selectContactList,
+  friendList: selectFriendList,
   userInfo: selectUserInfo,
   chatRoomList: selectChatRoomList,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  getMyContactList: () => dispatch(getMyContactStart()),
+  getMyFriendList: () => dispatch(getMyFriendStart()),
   initChatRoom: (navigation, user_ids, room_type) =>
     dispatch(initializeChatRoomStart(navigation, user_ids, room_type)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ContactPage);
+export default connect(mapStateToProps, mapDispatchToProps)(FriendsPage);
 
 const styles = StyleSheet.create({
   container: {

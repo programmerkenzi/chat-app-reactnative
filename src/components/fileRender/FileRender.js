@@ -2,22 +2,18 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-09 10:54:16
- * @LastEditTime: 2021-07-14 16:51:49
+ * @LastEditTime: 2021-07-20 12:37:50
  * @LastEditors: Kenzi
  */
 
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Icon } from "react-native-elements";
-import {
-  downloadAndOpenFile,
-  downloadFile,
-} from "../../library/utils/resources";
-import { Container } from "../../styles/layout";
-import { downloadToFolder } from "expo-file-dl";
+import { downloadAndOpenFile } from "../../library/utils/resources";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import { selectExpoPushToken } from "../../redux/auth/auth.selector";
+
 const FileRender = ({ file }) => {
   const { url, name, id, path, mime_type } = file;
 

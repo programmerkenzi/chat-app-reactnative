@@ -2,7 +2,7 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-07-19 17:40:25
+ * @LastEditTime: 2021-07-21 17:14:30
  * @LastEditors: Kenzi
  */
 import React, { useState, useCallback } from "react";
@@ -297,6 +297,8 @@ const ChatMessagePage = ({
         isLoadingEarlier={false}
         renderLoadEarlier={() => <View></View>}
         loadEarlier={true}
+        renderAvatar={() => null}
+        showAvatarForEveryMessage={true}
         renderChatFooter={() => (
           <>
             <EmojiBoard

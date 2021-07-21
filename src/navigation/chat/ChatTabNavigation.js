@@ -2,7 +2,7 @@
  * @Description: 聊天画面
  * @Author: Lewis
  * @Date: 2021-01-18 17:41:17
- * @LastEditTime: 2021-07-06 11:50:35
+ * @LastEditTime: 2021-07-21 17:26:44
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -29,9 +29,9 @@ const ChatTabNavigation = () => {
               : "ios-chatbubble-sharp";
           } else if (route.name === t("chat.groups")) {
             iconName = focused ? "people" : "people";
-          } else if (route.name === t("chat.pf")) {
-            iconName = focused ? "person" : "person";
-          } else if (route.name === t("chat.contacts")) {
+          } else if (route.name === t("cmn.settings")) {
+            iconName = focused ? "settings" : "settings";
+          } else if (route.name === t("chat.friends")) {
             iconName = focused ? "contacts" : "contacts";
             return <AntDesign name={iconName} size={size} color={color} />;
           }
@@ -52,10 +52,13 @@ const ChatTabNavigation = () => {
       />
       {/* <ChatTab.Screen name={t("chat.groups")} component={GroupStackNavigator} /> */}
       <ChatTab.Screen
-        name={t("chat.contacts")}
+        name={t("chat.friends")}
         component={ContactStackNavigation}
       />
-      <ChatTab.Screen name={t("chat.pf")} component={MyProfileStackNavigator} />
+      <ChatTab.Screen
+        name={t("cmn.settings")}
+        component={MyProfileStackNavigator}
+      />
     </ChatTab.Navigator>
   );
 };

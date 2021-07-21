@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:33:46
- * @LastEditTime: 2021-07-16 17:45:11
+ * @LastEditTime: 2021-07-21 15:41:27
  * @LastEditors: Kenzi
  */
 import {
@@ -21,6 +21,7 @@ import { onSocketIoConnected, onSocketIoDisConnected } from "./ws.action";
 import authActionType from "./../auth/auth.type";
 import {
   gotNewMessages,
+  onAddFriend,
   onDeleteConversation,
   onRecipientMarkRead,
 } from "../chat/chat.actions";
@@ -32,6 +33,7 @@ import {
 } from "../network/network.action";
 import { store } from "../store";
 import { onSocketIoReConnect } from "./ws.action";
+import { onGotNewNotification } from "../notification/notification.action";
 
 function initSocketIo(user_id) {
   return eventChannel((emitter) => {
@@ -57,8 +59,12 @@ function initSocketIo(user_id) {
       emitter(onRecipientMarkRead(data.data));
     });
 
+    socket.on("add_friend_request", (data) => {
+      emitter(onGotNewNotification(data.data));
+    });
+
     socket.on("add_friend", (data) => {
-      console.log("add_friend :>> ", data);
+      emitter(onAddFriend(data.data));
     });
 
     socket.on("delete_message", (data) => {
@@ -134,7 +140,6 @@ function* onUpdateNetworkStatus() {
 function* handleConnectWs() {
   const auth = yield (state) => state.secure.auth;
   const { userToken } = yield select(auth);
-  console.log("handleConnectWs userToken :>> ", userToken);
   if (userToken) {
     yield fork(() => handleWebSocket(userToken));
   }

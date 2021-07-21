@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:34:11
- * @LastEditTime: 2021-07-14 11:22:13
+ * @LastEditTime: 2021-07-21 12:01:41
  * @LastEditors: Kenzi
  */
 
@@ -15,9 +15,9 @@ export const selectConversations = createSelector(
   (chat) => chat.conversations
 );
 
-export const selectContactList = createSelector(
+export const selectFriendList = createSelector(
   [selectChat],
-  (chat) => chat.contactList
+  (chat) => chat.friendList
 );
 
 export const selectUserInfo = createSelector(

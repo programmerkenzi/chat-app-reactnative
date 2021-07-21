@@ -119,6 +119,7 @@ export default {
     pf: "个人信息",
     type: "输入讯息...",
     new_msg: "新讯息",
+    friends: "好友",
   },
 
   assets: {

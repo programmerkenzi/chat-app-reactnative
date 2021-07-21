@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:26:51
- * @LastEditTime: 2021-07-16 11:57:45
+ * @LastEditTime: 2021-07-21 14:22:51
  * @LastEditors: Kenzi
  */
 
@@ -17,6 +17,7 @@ import chatReducer from "./chat/chat.reducer";
 import networkReducer from "./network/network.reducer";
 import createSecureStore from "redux-persist-expo-securestore";
 import userReducer from "./user/user.reducer";
+import notificationReducer from "./notification/notification.reducer";
 
 // Secure storage
 const secureStorage = createSecureStore();
@@ -24,7 +25,7 @@ const secureStorage = createSecureStore();
 const mainPersistConfig = {
   key: "main",
   storage: AsyncStorage,
-  whitelist: ["router", "ws", "app", "chat", "user"],
+  whitelist: ["router", "ws", "app", "chat", "user", "notify"],
 };
 
 const securePersistConfig = {
@@ -40,6 +41,7 @@ const mainReducer = combineReducers({
   chat: chatReducer,
   network: networkReducer,
   user: userReducer,
+  notify: notificationReducer,
 });
 
 const secureReducer = combineReducers({

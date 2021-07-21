@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2021-01-27 12:32:02
- * @LastEditTime: 2021-07-09 16:56:19
+ * @LastEditTime: 2021-07-20 15:47:35
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -10,9 +10,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Bubble } from "react-native-gifted-chat";
 import AudioPlayBar from "../../components/audioPlayBar/AudioPlayBar";
 import * as mime from "react-native-mime-types";
-import * as FileSystem from "expo-file-system";
-import { uploadFile } from "../../chat_api/chat";
-import { FlingGestureHandler } from "react-native-gesture-handler";
+import { uploadFile } from "./../../chat_api/file";
 
 //显示聊天记录
 export function handleRenderBubble(props, fromRoomType) {

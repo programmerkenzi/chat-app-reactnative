@@ -72,7 +72,7 @@ export default {
     desc: "description",
     image_f: "images fail to load",
     fill_all: "please fill all fields",
-    f_password: "忘记密码",
+    f_password: "forgot password",
   },
   user: {
     pf: "profile",
@@ -120,6 +120,7 @@ export default {
     pf: "my profile",
     type: "Type a message...",
     new_msg: "new message",
+    friends: "好友",
   },
 
   assets: {

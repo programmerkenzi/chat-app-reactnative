@@ -2,16 +2,16 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-21 14:34:35
- * @LastEditTime: 2021-07-16 17:15:41
+ * @LastEditTime: 2021-07-21 11:54:23
  * @LastEditors: Kenzi
  */
 
+import { fetchMyFriendList } from "../../chat_api/user";
 import { createFileUrl } from "../../library/utils/utils";
 import { store } from "../store";
 import {
   fetchConversationsByRoomId,
   initializeChatRoom,
-  fetchMyContact,
   fetchChatRoom,
 } from "./../../chat_api/chat";
 
@@ -150,8 +150,8 @@ export const getChatRooms = async (fetchPage) => {
   return newList;
 };
 
-export const getContactList = async () => {
-  const res = await fetchMyContact();
+export const getFriendList = async () => {
+  const res = await fetchMyFriendList();
   const data = await res.data;
   const list = [];
   data.forEach((contact) => {

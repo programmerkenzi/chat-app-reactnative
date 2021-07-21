@@ -15,6 +15,8 @@ const initialState = {
   langTranslations: { zh: zh, en: en },
   error: null,
   appState: "background",
+  expoPushToken: null,
+  isLoading: false,
 };
 
 const appReducer = (state = initialState, action) => {

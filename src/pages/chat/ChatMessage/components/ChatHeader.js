@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-11 17:53:42
- * @LastEditTime: 2021-07-13 15:50:16
+ * @LastEditTime: 2021-07-21 17:03:09
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -11,11 +11,15 @@ import { Avatar } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { toUserInfoPage } from "./../../utils";
-
-const ChatHeader = ({ roomInfo, currentUserId }) => {
+import { useRoute } from "@react-navigation/native";
+import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
+import { selectUserInfo } from "./../../../../redux/user/user.selector";
+const ChatHeader = ({ userInfo }) => {
   const navigation = useNavigation();
+  const roomInfo = useRoute().params.room_info;
   const users = roomInfo.users;
-  const receiver = users.filter((u) => u._id !== currentUserId)[0];
+  const receiver = users.filter((u) => u._id !== userInfo._id)[0];
   const avatar =
     roomInfo.type === "private" ? receiver.avatar : roomInfo.avatar; // 私人||群组
   const avatarUrl = avatar.length > 0 ? avatar : "http://";
@@ -33,10 +37,10 @@ const ChatHeader = ({ roomInfo, currentUserId }) => {
     // } else {
     //   return toUserInfoPage(receiver, navigation);
     // }
-    toUserInfoPage(receiver, navigation);
+    return toUserInfoPage(receiver, navigation);
   };
 
-  return (
+  return roomInfo ? (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => handleOnPress()}>
         <View style={styles.avatarButton}>
@@ -54,18 +58,18 @@ const ChatHeader = ({ roomInfo, currentUserId }) => {
         <Icon name="call" style={styles.callButton}></Icon>
       </TouchableOpacity>
     </View>
-  );
+  ) : null;
 };
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
-    alignItems: "flex-end",
-    alignContent: "center",
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
     backgroundColor: "#405de6",
     paddingBottom: 10,
+    paddingRight: 10,
     width: "100%",
-    height: 120,
+    height: 110,
     top: 0,
   },
   name: {
@@ -73,23 +77,25 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  avatar: {},
+  avatar: { marginRight: 8 },
   avatarButton: {
     display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
+    flexDirection: "row",
     alignItems: "center",
+    marginLeft: 50,
   },
   buttonRow: {
-    position: "absolute",
     flexDirection: "row",
-    alignSelf: "flex-end",
-    right: 10,
-    bottom: 10,
   },
   callButton: {
     fontSize: 25,
   },
 });
 
-export default ChatHeader;
+const mapStateToProps = createStructuredSelector({
+  userInfo: selectUserInfo,
+});
+
+const mapDispatchToProps = {};
+
+export default connect(mapStateToProps)(ChatHeader);

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-14 17:54:54
- * @LastEditTime: 2021-07-19 18:50:20
+ * @LastEditTime: 2021-07-21 13:56:58
  * @LastEditors: Kenzi
  */
 
@@ -19,6 +19,7 @@ import { stopLoading } from "./../redux/auth/auth.actions";
 import { onUserTokenExpired } from "./../redux/auth/auth.actions";
 import { onRefreshToken } from "./auth";
 import { onRefreshTokenSuccess } from "./../redux/auth/auth.actions";
+import * as Device from "expo-device";
 
 const axiosChatClient = axios.create({
   baseURL: __DEV__
@@ -34,11 +35,12 @@ axiosChatClient.interceptors.request.use(
     const state = store.getState();
     const { socketIoClientId } = state.main.ws;
     const { userToken } = state.secure.auth;
+    const device_id = Device.osBuildFingerprint;
 
     if (userToken) {
       config.headers[
         "Authorization"
-      ] = `${userToken} socket ${socketIoClientId}`;
+      ] = `${userToken} socket ${socketIoClientId} device ${device_id}`;
     }
     return config;
   },

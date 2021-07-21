@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:48
- * @LastEditTime: 2021-07-19 14:52:47
+ * @LastEditTime: 2021-07-21 12:02:19
  * @LastEditors: Kenzi
  */
 import chatActionType from "./chat.type";
@@ -13,7 +13,7 @@ import networkActionTypes from "./../network/network.type";
 const initialState = {
   chatRoomList: {},
   conversations: {},
-  contactList: [],
+  friendList: [],
   error: null,
   websocketClientId: null,
   messageReRendererTrigger: false,
@@ -23,10 +23,11 @@ const initialState = {
 
 const chatReducer = (state = initialState, action) => {
   switch (action.type) {
-    case chatActionType.GET_MY_CONTACT_SUCCESS:
+    case chatActionType.GET_MY_FRIEND_SUCCESS:
+    case chatActionType.UPDATE_FRIEND_LIST:
       return {
         ...state,
-        contactList: action.payload,
+        friendList: action.payload,
       };
 
     case chatActionType.INITIALIZE_CHAT_ROOM_SUCCESS:

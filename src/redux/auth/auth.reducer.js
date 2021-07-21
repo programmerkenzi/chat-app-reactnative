@@ -2,22 +2,15 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-01 11:33:03
- * @LastEditTime: 2021-07-19 14:50:44
+ * @LastEditTime: 2021-07-21 17:17:38
  * @LastEditors: Kenzi
  */
 
 import authActionType from "./auth.type";
 
 const initState = {
-  isLoading: false,
-  username: null,
-  password: null,
   userToken: null,
   refreshToken: null,
-  isLoginFailure: false,
-  failureLoginMessage: null,
-  expoPushToken: null,
-  error: null,
 };
 
 const authReducer = (state = initState, action) => {

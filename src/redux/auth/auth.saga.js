@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-02-28 15:47:34
- * @LastEditTime: 2021-07-19 17:29:45
+ * @LastEditTime: 2021-07-21 13:55:17
  * @LastEditors: Kenzi
  */
 
@@ -20,10 +20,13 @@ import { logoutSuccess } from "./auth.actions";
 import { onLogout } from "./../../chat_api/auth";
 import { onRefreshTokenFailure } from "./auth.actions";
 import { refreshTokenWhenTimeout } from "./utils";
+import * as Device from "expo-device";
 
 function* login({ payload }) {
   try {
-    const res = yield onLogin(payload);
+    const { username, password } = payload;
+    const device_id = Device.osBuildFingerprint;
+    const res = yield onLogin(username, password, device_id);
     if (res) {
       const { accessToken, refreshToken, userInfo } = res;
       yield put(loginSuccess(accessToken, refreshToken, userInfo));

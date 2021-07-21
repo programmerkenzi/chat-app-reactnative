@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2021-02-10 15:02:13
- * @LastEditTime: 2021-07-14 17:08:35
+ * @LastEditTime: 2021-07-21 15:43:49
  * @LastEditors: Kenzi
  */
 import React, { useState } from "react";
@@ -15,11 +15,11 @@ import { StyleSheet } from "react-native";
 import { useRoute } from "@react-navigation/core";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
-import { selectContactList } from "../../../redux/chat/chat.selector";
+import { selectFriendList } from "../../../redux/chat/chat.selector";
+import { getMyFriendStart } from "../../../redux/chat/chat.actions";
+import { useEffect } from "react";
 
-const SelectMembersPage = ({ navigation, contactList }) => {
-  const myUserId = "u2";
-
+const SelectMembersPage = ({ navigation, friendList, getMyFriendList }) => {
   //上個頁面名稱
   const fromRouteName = useRoute().params.routeName;
 
@@ -64,17 +64,20 @@ const SelectMembersPage = ({ navigation, contactList }) => {
   const onSubmitEditMembers = () => {
     return navigation.goBack();
   };
+  useEffect(() => {
+    getMyFriendList();
+  }, []);
 
   return (
     <View style={style.container}>
       <PrimarySearchBar
-        data={contactList}
+        data={friendList}
         searchString={searchString}
         setSearchString={setSearchString}
         setSearchResults={setSearchResults}
       />
       <FlatList
-        data={searchString.length ? searchResults : contactList}
+        data={searchString.length ? searchResults : friendList}
         renderItem={({ item, index }) => (
           <ContactCheckBox
             item={item}
@@ -96,12 +99,14 @@ const SelectMembersPage = ({ navigation, contactList }) => {
   );
 };
 const mapStateToProps = createStructuredSelector({
-  contactList: selectContactList,
+  friendList: selectFriendList,
 });
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = (dispatch) => ({
+  getMyFriendList: () => dispatch(getMyFriendStart()),
+});
 
-export default connect(mapStateToProps)(SelectMembersPage);
+export default connect(mapStateToProps, mapDispatchToProps)(SelectMembersPage);
 
 const style = StyleSheet.create({
   container: {
