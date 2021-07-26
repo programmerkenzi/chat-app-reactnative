@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-06 11:09:28
- * @LastEditTime: 2021-07-16 18:43:57
+ * @LastEditTime: 2021-07-26 18:43:40
  * @LastEditors: Kenzi
  */
 
@@ -101,6 +101,7 @@ const MainStackNavigation = ({
         const currentRouteName = navigationRef.current.getCurrentRoute().name;
         const currentRouteParams =
           navigationRef.current.getCurrentRoute().params;
+        console.log(previousRouteName);
         if (previousRouteName !== currentRouteName) {
           updateCurrentPageInfo(
             previousRouteName,

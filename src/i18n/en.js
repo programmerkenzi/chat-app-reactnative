@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-14 14:39:34
- * @LastEditTime: 2021-07-07 18:02:13
+ * @LastEditTime: 2021-07-26 17:55:07
  * @LastEditors: Kenzi
  */
 
@@ -33,6 +33,7 @@ export default {
     ncp: "No access to camera",
     alert: "alert",
     alert_del: "Are you sure want to delete it?",
+    del: "delete",
     scan: "scanner",
     select: "select",
     select_it: "select it",
@@ -73,6 +74,7 @@ export default {
     image_f: "images fail to load",
     fill_all: "please fill all fields",
     f_password: "forgot password",
+    color_m: "color mode",
   },
   user: {
     pf: "profile",
@@ -106,6 +108,7 @@ export default {
     male: "male",
     female: "female",
     edit_p: "edit phone",
+    edit: "edit",
   },
 
   chat: {
@@ -120,7 +123,11 @@ export default {
     pf: "my profile",
     type: "Type a message...",
     new_msg: "new message",
-    friends: "好友",
+    friends: "friends",
+    forwarded_f: "forwarded from",
+    forward: "forward to",
+    reply_to: "reply to",
+    reply: "reply",
   },
 
   assets: {

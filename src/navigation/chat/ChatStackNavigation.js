@@ -2,7 +2,7 @@
  * @Description: 聊天列表屏幕
  * @Author: Lewis
  * @Date: 2021-01-19 10:32:35
- * @LastEditTime: 2021-07-21 16:49:59
+ * @LastEditTime: 2021-07-22 16:06:11
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -21,6 +21,7 @@ import {
   TransparentHeaderOptions,
   GeneralHeaderOptions,
   TransparentHeaderOptionsWithRightButton,
+  HeaderOptionsWithRightAndLeftButton,
 } from "../Options";
 
 const ChatListStack = createStackNavigator();
@@ -36,7 +37,7 @@ const ChatStackNavigation = () => {
       <ChatListStack.Screen
         name="Messages"
         component={ChatMessagePage}
-        options={TransparentHeaderOptions()}
+        options={HeaderOptionsWithRightAndLeftButton(false, "avatar", "call")}
       />
 
       <ChatListStack.Screen

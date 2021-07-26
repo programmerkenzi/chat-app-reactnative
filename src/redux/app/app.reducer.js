@@ -44,7 +44,11 @@ const appReducer = (state = initialState, action) => {
         ...state,
         appState: action.payload,
       };
-
+    case appActionTypes.UPDATE_LOADING_STATUS:
+      return {
+        ...state,
+        isLoading: action.payload,
+      };
     case appActionTypes.GET_ALL_LANG_TYPE_FAILURE:
     case appActionTypes.GET_LANG_TRANSLATIONS_FAILURE:
       return { ...state, error: action.payload };

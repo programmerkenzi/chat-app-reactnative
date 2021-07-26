@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2021-02-10 15:02:13
- * @LastEditTime: 2021-07-21 15:43:49
+ * @LastEditTime: 2021-07-26 18:46:27
  * @LastEditors: Kenzi
  */
 import React, { useState } from "react";
@@ -18,11 +18,14 @@ import { createStructuredSelector } from "reselect";
 import { selectFriendList } from "../../../redux/chat/chat.selector";
 import { getMyFriendStart } from "../../../redux/chat/chat.actions";
 import { useEffect } from "react";
+import { selectRouterName } from "../../../redux/router/router.select";
 
-const SelectMembersPage = ({ navigation, friendList, getMyFriendList }) => {
-  //上個頁面名稱
-  const fromRouteName = useRoute().params.routeName;
-
+const SelectMembersPage = ({
+  navigation,
+  friendList,
+  getMyFriendList,
+  fromRouteName,
+}) => {
   //搜尋
   const [searchString, setSearchString] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -100,6 +103,7 @@ const SelectMembersPage = ({ navigation, friendList, getMyFriendList }) => {
 };
 const mapStateToProps = createStructuredSelector({
   friendList: selectFriendList,
+  fromRouteName: selectRouterName,
 });
 
 const mapDispatchToProps = (dispatch) => ({

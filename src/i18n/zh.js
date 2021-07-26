@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-14 14:39:43
- * @LastEditTime: 2021-06-07 12:19:50
+ * @LastEditTime: 2021-07-26 18:01:05
  * @LastEditors: Kenzi
  */
 export default {
@@ -32,6 +32,7 @@ export default {
     ncp: "没有使用相机权限",
     alert: "警告",
     alert_del: "确定要删除吗?",
+    del: "删除",
     scan: "扫码",
     select: "请选择",
     select_it: "选取",
@@ -72,6 +73,8 @@ export default {
     image_f: "图片加载失败",
     fill_all: "请填写所有栏位",
     f_password: "忘记帐号或密码",
+    color_m: "主题",
+    edit: "编辑",
   },
 
   user: {
@@ -120,6 +123,10 @@ export default {
     type: "输入讯息...",
     new_msg: "新讯息",
     friends: "好友",
+    forwarded_f: "转发自",
+    forward: "转发",
+    reply_to: "回复给",
+    reply: "回复",
   },
 
   assets: {

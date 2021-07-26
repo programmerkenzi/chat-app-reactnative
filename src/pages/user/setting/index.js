@@ -2,12 +2,18 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-06 11:55:32
- * @LastEditTime: 2021-07-21 18:12:03
+ * @LastEditTime: 2021-07-26 14:44:13
  * @LastEditors: Kenzi
  */
 
 import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableHighlightBase,
+} from "react-native";
 import { Button } from "native-base";
 import { connect } from "react-redux";
 import { logoutStart } from "../../../redux/auth/auth.actions";
@@ -15,10 +21,14 @@ import { Box } from "native-base";
 import { tw } from "react-native-tailwindcss";
 import { createStructuredSelector } from "reselect";
 import { selectUserInfo } from "./../../../redux/user/user.selector";
-import { Avatar, Icon } from "react-native-elements";
+import { Avatar, Icon, ListItem } from "react-native-elements";
 import { handleGetImageLibrary } from "./../../../library/utils/resources";
 import { createFileUrl } from "./../../../library/utils/utils";
-import { green, red } from "../../../styles/color";
+import { darkGary, green, red } from "../../../styles/color";
+import { t } from "../../../i18n";
+import { lightGary } from "./../../../styles/color";
+import { TouchableHighlight } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 const SettingPage = ({ logout, userInfo }) => {
   const { avatar, name, status, public_id } = userInfo;
@@ -38,13 +48,48 @@ const SettingPage = ({ logout, userInfo }) => {
     return;
   };
 
+  const settingItem = [
+    {
+      title: t("cmn.lang"),
+      name: "lang",
+      icon: "globe-europe",
+    },
+
+    {
+      title: t("cmn.color_m"),
+      name: "color",
+      icon: "adjust",
+    },
+
+    {
+      title: t("cmn.logout"),
+      name: "logout",
+      icon: "sign-out-alt",
+    },
+  ];
+
+  const handlePressSettingItem = async (name) => {
+    if (name === "logout") return await logout();
+
+    return console.log(name);
+  };
+
   //修改头像
   const handleChangeAvatar = async () => {};
   return (
     <View
-      style={[tw.flex1, tw.flexCol, tw.justifyBetween, tw.pT20, tw.bgWhite]}
+      style={[
+        tw.flex1,
+        tw.flexCol,
+        tw.justifyBetween,
+        tw.pT20,
+        tw.bgWhite,
+        tw.pX2,
+        tw.pB5,
+      ]}
     >
       <View style={[tw.flex1, tw.flexCol, tw.itemsCenter, tw.alignCenter]}>
+        {/* 会员信息 */}
         <View style={[tw.flex2]}>
           <Avatar
             rounded
@@ -94,8 +139,57 @@ const SettingPage = ({ logout, userInfo }) => {
           <Text style={[tw.selfCenter, tw.textGray600, tw.mT2]}>{status}</Text>
         </View>
       </View>
-      <View style={[tw.flex2]}>
-        <Button onPress={() => logout()}>logout</Button>
+      {/* 功能设定 */}
+      <View
+        style={[
+          tw.flex2,
+          tw.flexCol,
+          tw.wPy,
+          tw.p5,
+          tw.bgGray300,
+          tw.roundedLg,
+          tw.shadowMd,
+        ]}
+      >
+        <FlatList
+          keyExtractor={(item) => {
+            item.name;
+          }}
+          data={settingItem}
+          renderItem={({ item, i }) => (
+            <TouchableOpacity onPress={() => handlePressSettingItem(item.name)}>
+              <View
+                style={[
+                  tw.flex1,
+                  tw.h12,
+                  tw.flexRow,
+                  tw.textCenter,
+                  tw.justifyBetween,
+                  tw.borderB,
+                  tw.itemsCenter,
+                  tw.borderGray400,
+                ]}
+              >
+                <View style={[tw.flexRow]}>
+                  <Icon
+                    name={item.icon}
+                    type="font-awesome-5"
+                    color="#515563"
+                  />
+                  <Text style={[tw.textGray600, tw.selfCenter, tw.mL10]}>
+                    {item.title}
+                  </Text>
+                </View>
+                <Icon
+                  name="chevron-right"
+                  type="font-awesome-5"
+                  size={12}
+                  color="#515563"
+                />
+              </View>
+            </TouchableOpacity>
+          )}
+        />
       </View>
     </View>
   );

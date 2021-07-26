@@ -31,12 +31,6 @@ const authReducer = (state = initState, action) => {
         password: null,
       };
 
-    case authActionType.UPDATE_LOADING_STATUS:
-      return {
-        ...state,
-        isLoading: action.payload,
-      };
-
     case authActionType.GET_USER_INFO_SUCCESS:
     case authActionType.UPDATE_USER_INFO_SUCCESS:
       return {

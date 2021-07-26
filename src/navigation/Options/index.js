@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-19 12:36:22
- * @LastEditTime: 2021-07-21 16:27:08
+ * @LastEditTime: 2021-07-22 16:08:33
  * @LastEditors: Kenzi
  */
 
@@ -13,6 +13,11 @@ import ChatMenuButton from "./Buttons/ChatMenu";
 import ChatGroupEditMenu from "./Buttons/ChatGroupEditMenu";
 import AddGroupChat from "./Buttons/AddGroupChat";
 import AddFriend from "./Buttons/AddFriend";
+import AvatarButton from "./Buttons/Avatar";
+import { Icon } from "react-native-elements/dist/icons/Icon";
+import { HeaderBackButton } from "@react-navigation/stack";
+import { tw } from "react-native-tailwindcss";
+import CallButton from "./Buttons/Call";
 
 export const GeneralHeaderOptions = (title) => {
   return {
@@ -70,6 +75,44 @@ export const TransparentHeaderOptionsWithRightButton = (headerRight) => {
     headerRight: () => (
       <View style={{ paddingRight: 5 }}>
         {headerRight === "chatGroup" ? <ChatGroupEditMenu /> : null}
+      </View>
+    ),
+  };
+};
+
+export const HeaderOptionsWithRightAndLeftButton = (
+  title,
+  leftButton,
+  rightButton
+) => {
+  return {
+    headerStyle: {
+      backgroundColor: "#405DE6",
+    },
+    title: null,
+
+    headerTintColor: "#fff",
+    headerTitleAlign: "center",
+    headerTitleStyle: {
+      alignSelf: "center",
+      fontWeight: "bold",
+    },
+
+    headerLeft: () => (
+      <View style={[tw.flex, tw.flexRow]}>
+        {leftButton === "avatar" ? <AvatarButton /> : null}
+      </View>
+    ),
+
+    headerRight: () => (
+      <View style={{ paddingRight: 5 }}>
+        {rightButton === "chat" ? (
+          <AddGroupChat />
+        ) : rightButton === "addNewFriend" ? (
+          <AddFriend />
+        ) : rightButton === "call" ? (
+          <CallButton />
+        ) : null}
       </View>
     ),
   };

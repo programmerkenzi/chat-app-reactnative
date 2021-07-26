@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-09 13:05:04
- * @LastEditTime: 2021-07-21 16:34:09
+ * @LastEditTime: 2021-07-22 16:27:38
  * @LastEditors: Kenzi
  */
 
@@ -87,7 +87,7 @@ const PrimarySearchBar = ({
   };
   return (
     <SearchBar
-      placeholder="Type Here..."
+      placeholder=""
       onChangeText={(text) => updateSearch(text)}
       on
       value={searchString}

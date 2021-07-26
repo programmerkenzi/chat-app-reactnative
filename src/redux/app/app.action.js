@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-14 10:42:43
- * @LastEditTime: 2021-07-16 18:56:07
+ * @LastEditTime: 2021-07-22 16:20:18
  * @LastEditors: Kenzi
  */
 import appActionTypes from "./app.type";
@@ -48,4 +48,17 @@ export const updateAppState = (state) => ({
 export const onAppStateChange = (state) => ({
   type: appActionTypes.ON_APP_STATE_CHANGE,
   payload: state,
+});
+
+export const startLoading = () => ({
+  type: appActionTypes.START_LOADING,
+});
+
+export const updateLoadingStatus = (status) => ({
+  type: appActionTypes.UPDATE_LOADING_STATUS,
+  payload: status,
+});
+
+export const stopLoading = () => ({
+  type: appActionTypes.STOP_LOADING,
 });

@@ -35,19 +35,6 @@ export const logoutFailure = (error) => ({
   payload: error,
 });
 
-export const startLoading = () => ({
-  type: authActionType.START_LOADING,
-});
-
-export const updateLoadingStatus = (status) => ({
-  type: authActionType.UPDATE_LOADING_STATUS,
-  payload: status,
-});
-
-export const stopLoading = () => ({
-  type: authActionType.STOP_LOADING,
-});
-
 export const onUserTokenExpired = () => ({
   type: authActionType.USER_TOKEN_EXPIRED,
 });

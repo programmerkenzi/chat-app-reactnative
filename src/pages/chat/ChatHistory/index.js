@@ -2,7 +2,7 @@
  * @Description: 聊天列表
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:24
- * @LastEditTime: 2021-07-16 16:18:29
+ * @LastEditTime: 2021-07-22 10:36:28
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -218,6 +218,11 @@ const ChatHistoryPage = ({
       component: handleSetIcon("delete"),
     },
   ];
+
+  useEffect(() => {
+    getChatRoom();
+  }, []);
+
   return (
     <ContainerWithBgColor bgColor="#fff">
       <PrimarySearchBar

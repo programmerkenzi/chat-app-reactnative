@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-05-25 18:48:09
- * @LastEditTime: 2021-07-05 18:29:39
+ * @LastEditTime: 2021-07-26 18:45:01
  * @LastEditors: Kenzi
  */
 
@@ -19,7 +19,7 @@ const routerReducer = (state = initialState, action) => {
     case routerActionType.UPDATE_CURRENT_PAGE_INFO:
       return {
         ...state,
-        pervious_name: action.payload.pervious_name,
+        pervious_name: action.payload.previous_name,
         name: action.payload.name,
         params: action.payload.params
           ? action.payload.params

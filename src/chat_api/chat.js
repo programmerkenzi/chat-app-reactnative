@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-14 17:57:36
- * @LastEditTime: 2021-07-21 14:11:34
+ * @LastEditTime: 2021-07-26 18:48:29
  * @LastEditors: Kenzi
  */
 
@@ -74,4 +74,18 @@ export const deleteMessage = (room_id, message_ids) =>
     url: `delete/${room_id}/messages`,
     method: "delete",
     data: { message_ids },
+  });
+
+export const forwardMessages = (room_id, message_ids, file, message) =>
+  axiosChatClient({
+    url: `/room/${room_id}/forward_messages`,
+    method: "post",
+    data: { message_ids, file, message },
+  });
+
+export const replyMessage = (room_id, message_ids, file, message) =>
+  axiosChatClient({
+    url: `/room/${room_id}/forward_messages`,
+    method: "post",
+    data: { message_ids, file, message },
   });

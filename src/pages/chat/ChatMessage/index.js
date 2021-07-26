@@ -2,11 +2,11 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-07-21 17:14:30
+ * @LastEditTime: 2021-07-26 18:50:40
  * @LastEditors: Kenzi
  */
 import React, { useState, useCallback } from "react";
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet } from "react-native";
 import { connect } from "react-redux";
 import { FAB, Icon } from "react-native-elements";
 
@@ -25,7 +25,6 @@ import {
 } from "../../../redux/chat/chat.selector";
 import { selectConversations } from "../../../redux/chat/chat.selector";
 import { useRoute } from "@react-navigation/native";
-import ChatHeader from "./components/ChatHeader";
 import PrimarySearchBar from "../../../components/searchBar/PrimarySearchBar";
 import { useEffect } from "react";
 import { GiftedChat } from "react-native-gifted-chat";
@@ -44,12 +43,14 @@ import FilesRender from "./../../../components/Chat/FilesRender";
 import { handleUploadMultipleFile } from "./../utils";
 import { handleOnSelect } from "../../../library/utils/utils";
 import { darkGary, red } from "../../../styles/color";
-import * as Animatable from "react-native-animatable";
 import { deleteMessage } from "./../../../chat_api/chat";
 import { onDeleteConversation } from "./../../../redux/chat/chat.actions";
 import { createFileUrl } from "./../../../library/utils/utils";
-import { SafeAreaView } from "react-native";
 import { selectUserInfo } from "./../../../redux/user/user.selector";
+import { t } from "../../../i18n";
+import ForwardedMessage from "../../../components/Chat/ForwardedMessage";
+import ReplyMessage from "./../../../components/Chat/ReplyMessage";
+import MessageFunctionBar from "./../../../components/Chat/MessageFunctionBar";
 
 const ChatMessagePage = ({
   userInfo,
@@ -96,15 +97,17 @@ const ChatMessagePage = ({
           createdAt,
           message,
           type,
-          user,
+          forwarded_from_messages,
+          reply_for_message,
           read_by_recipients,
+          post_by_user,
           file,
         } = item;
-        const postedByUser = user[0]._id;
+        const postedByUser = post_by_user[0]._id;
         const isRead = read_by_recipients.findIndex(
           (user) => user.read_by_user_id !== user_id
         );
-        const { name, avatar } = user[0];
+        const { name, avatar } = post_by_user[0];
         //gift chat用的obj
         let msg = {
           _id: _id,
@@ -121,6 +124,8 @@ const ChatMessagePage = ({
             : isRead === -1
             ? false
             : true,
+          forwarded_from: forwarded_from_messages,
+          reply_for: reply_for_message,
         };
         if (file.length > 0) {
           file.forEach((item) => {
@@ -131,11 +136,9 @@ const ChatMessagePage = ({
             });
           });
         }
-
         giftedChatMessagesData.push(msg);
       });
     }
-
     setMessages(giftedChatMessagesData);
   };
 
@@ -180,7 +183,7 @@ const ChatMessagePage = ({
 
   const onSendMessage = async (theMessage) => {
     let modifiedMessage = theMessage;
-    let modifiedFiles = selectedFile;
+    let modifiedFiles = [...selectedFile];
     let filesUploaded = null;
 
     //已經成功上傳的檔案路徑
@@ -191,10 +194,9 @@ const ChatMessagePage = ({
         file.url = file.uri;
       });
       modifiedMessage[0].file = modifiedFiles;
+      setSelectedFile([]);
       const res = await handleUploadMultipleFile(selectedFile);
-      console.log("res :>> ", res);
       if (res.success) {
-        setSelectedFile([]);
         filesUploaded = res.file;
       }
     }
@@ -228,13 +230,24 @@ const ChatMessagePage = ({
       onDeleteConversation(room_id, selectedMessage);
     }
   };
+
+  //转发讯息
+  const handleForwardMessages = async () => {
+    console.log("forward :>> ");
+  };
+
+  //回复讯息
+
+  const handleReplyMessage = async () => {
+    console.log("currentMessage :>> ", currentMessage);
+  };
+
   return (
     <ContainerWithBgColor
       bgColor="#ffffff"
       pd="none"
       style={{ position: "relative" }}
     >
-      <ChatHeader roomInfo={roomInfo} currentUserId={user_id} />
       <PrimarySearchBar
         data={messages}
         searchString={searchString}
@@ -247,11 +260,28 @@ const ChatMessagePage = ({
         text={currentMessage}
         onInputTextChanged={(messages) => setCurrentMessage(messages)}
         onSend={(messages) => onSendMessage(messages)}
-        renderCustomView={(props) =>
-          props.currentMessage.file ? (
-            <FilesRender files={props.currentMessage.file} />
-          ) : null
-        }
+        renderCustomView={(props) => (
+          <>
+            {props.currentMessage.reply_for.length ? (
+              <ReplyMessage
+                messages={props.currentMessage.reply_for}
+                post_by_user={props.currentMessage.user._id}
+                user_id={user_id}
+              />
+            ) : null}
+            {props.currentMessage.forwarded_from.length ? (
+              <ForwardedMessage
+                messages={props.currentMessage.forwarded_from}
+                post_by_user={props.currentMessage.user._id}
+                user_id={user_id}
+              />
+            ) : null}
+
+            {props.currentMessage.file ? (
+              <FilesRender files={props.currentMessage.file} />
+            ) : null}
+          </>
+        )}
         showAvatarForEveryMessage={false}
         renderActions={(props) => (
           <FunctionsBar
@@ -299,8 +329,16 @@ const ChatMessagePage = ({
         loadEarlier={true}
         renderAvatar={() => null}
         showAvatarForEveryMessage={true}
+        placeholder={t("chat.type")}
         renderChatFooter={() => (
           <>
+            {selectedMessage.length > 0 ? (
+              <MessageFunctionBar
+                handleDeleteMessage={handleDeleteMessage}
+                handleForwardMessages={handleForwardMessages}
+                handleReplyMessage={handleReplyMessage}
+              />
+            ) : null}
             <EmojiBoard
               containerStyle={{ width: "100%" }}
               showBoard={showEmojiBoard}
@@ -328,9 +366,9 @@ const ChatMessagePage = ({
           </>
         )}
       />
-      {/* 刪除訊息按鈕 */}
-      {selectedMessage.length > 0 ? (
-        <Animatable.View
+      {/* 功能按鈕 */}
+    </ContainerWithBgColor>
+    /* <Animatable.View
           animation="zoomIn"
           style={[styles.floatBtnContainer, { bottom: 70 }]}
         >
@@ -350,9 +388,7 @@ const ChatMessagePage = ({
             containerStyle={styles.fab}
             onPress={() => clearSelectedMessage()}
           />
-        </Animatable.View>
-      ) : null}
-    </ContainerWithBgColor>
+        </Animatable.View> */
   );
 };
 

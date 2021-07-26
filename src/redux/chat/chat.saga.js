@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:57
- * @LastEditTime: 2021-07-21 12:55:31
+ * @LastEditTime: 2021-07-26 14:13:45
  * @LastEditors: Kenzi
  */
 
@@ -55,54 +55,58 @@ import { getConversations } from "./utils";
 import { createFileUrl } from "./../../library/utils/utils";
 
 function* gotNewMessage({ payload }) {
-  const data = yield payload.data;
-  const chat_room_id = yield data[0].chat_room_id;
-  const posted_by_user = yield data[0].user[0]._id;
-  const chat = yield (state) => state.main.chat;
-  const user = yield (state) => state.main.user;
-  const { conversations } = yield select(chat);
-  const { userInfo } = yield select(user);
-  const conversationsSaved = yield conversations[chat_room_id];
+  try {
+    const data = yield payload.data;
+    const chat_room_id = yield data[0].chat_room_id;
+    const posted_by_user = yield data[0].post_by_user[0]._id;
+    const chat = yield (state) => state.main.chat;
+    const user = yield (state) => state.main.user;
+    const { conversations } = yield select(chat);
+    const { userInfo } = yield select(user);
+    const conversationsSaved = yield conversations[chat_room_id];
 
-  if (conversationsSaved) {
-    const newConversations = [...data, ...conversationsSaved];
-    yield put(updateConversation(newConversations, chat_room_id));
-  } else {
-    const newConversations = data;
-    yield put(updateConversation(newConversations, chat_room_id));
-  }
+    if (conversationsSaved) {
+      const newConversations = [...data, ...conversationsSaved];
+      yield put(updateConversation(newConversations, chat_room_id));
+    } else {
+      const newConversations = data;
+      yield put(updateConversation(newConversations, chat_room_id));
+    }
 
-  //判断是否要标记已读讯息
-  const router = yield (state) => state.main.router;
-  const { name, params } = yield select(router);
-  const currentUser = yield userInfo._id;
-  const app = yield (state) => state.main.app;
-  const { appState } = yield select(app);
-  //在聊天室里
+    //判断是否要标记已读讯息
+    const router = yield (state) => state.main.router;
+    const { name, params } = yield select(router);
+    const currentUser = yield userInfo._id;
+    const app = yield (state) => state.main.app;
+    const { appState } = yield select(app);
+    //在聊天室里
 
-  if (name === "Messages" && appState !== "background") {
-    const currentRoom = yield params.room_info._id;
-    //在同一个聊天室里
-    if (chat_room_id === currentRoom) {
-      //不是自己发的讯息
-      if (posted_by_user !== currentUser) {
-        const res = yield markReadByRoomId(chat_room_id);
-        if (res) {
+    if (name === "Messages" && appState !== "background") {
+      const currentRoom = yield params.room_info._id;
+      //在同一个聊天室里
+      if (chat_room_id === currentRoom) {
+        //不是自己发的讯息
+        if (posted_by_user !== currentUser) {
+          const res = yield markReadByRoomId(chat_room_id);
+          if (res) {
+            yield put(
+              updateChatRoomStateStart(chat_room_id, data, "new_message_read")
+            );
+          }
+        } else {
           yield put(
             updateChatRoomStateStart(chat_room_id, data, "new_message_read")
           );
         }
-      } else {
-        yield put(
-          updateChatRoomStateStart(chat_room_id, data, "new_message_read")
-        );
       }
+      //不再聊天室里
+    } else {
+      yield put(
+        updateChatRoomStateStart(chat_room_id, data, "new_message_unread")
+      );
     }
-    //不再聊天室里
-  } else {
-    yield put(
-      updateChatRoomStateStart(chat_room_id, data, "new_message_unread")
-    );
+  } catch (e) {
+    console.log("e :>> ", e);
   }
 }
 

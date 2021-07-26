@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-14 17:54:54
- * @LastEditTime: 2021-07-21 13:56:58
+ * @LastEditTime: 2021-07-22 16:23:27
  * @LastEditors: Kenzi
  */
 
@@ -10,16 +10,12 @@ import axios from "axios";
 import queryString from "query-string";
 import { store } from "./../redux/store";
 import { Alert } from "react-native";
-import {
-  logoutStart,
-  onRefreshTokenStart,
-  startLoading,
-} from "../redux/auth/auth.actions";
-import { stopLoading } from "./../redux/auth/auth.actions";
+import { logoutStart, onRefreshTokenStart } from "../redux/auth/auth.actions";
 import { onUserTokenExpired } from "./../redux/auth/auth.actions";
 import { onRefreshToken } from "./auth";
 import { onRefreshTokenSuccess } from "./../redux/auth/auth.actions";
 import * as Device from "expo-device";
+import { startLoading, stopLoading } from "./../redux/app/app.action";
 
 const axiosChatClient = axios.create({
   baseURL: __DEV__
@@ -32,6 +28,7 @@ const axiosChatClient = axios.create({
 // request interceptor
 axiosChatClient.interceptors.request.use(
   async (config) => {
+    store.dispatch(startLoading());
     const state = store.getState();
     const { socketIoClientId } = state.main.ws;
     const { userToken } = state.secure.auth;
@@ -54,7 +51,6 @@ axiosChatClient.interceptors.request.use(
 // response interceptor
 axiosChatClient.interceptors.response.use(
   (response) => {
-    console.log("response :>> ", response);
     store.dispatch(stopLoading());
     const res = response.data;
 
@@ -67,9 +63,15 @@ axiosChatClient.interceptors.response.use(
       error.response.status === 401 &&
       originalRequest.url.includes("/refresh-token")
     ) {
+      store.dispatch(startLoading());
+
       await store.dispatch(logoutStart());
+      store.dispatch(stopLoading());
+
       return Promise.reject(error);
     } else if (error.response.status === 401 && !originalRequest._retry) {
+      store.dispatch(startLoading());
+
       originalRequest._retry = true;
       // await execution of the store async action before
       // return
@@ -82,6 +84,7 @@ axiosChatClient.interceptors.response.use(
         );
         return axiosChatClient(originalRequest);
       }
+      store.dispatch(stopLoading());
     }
     return Promise.reject(error);
   }

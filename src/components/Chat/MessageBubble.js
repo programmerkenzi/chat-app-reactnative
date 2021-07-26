@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-01 13:20:25
- * @LastEditTime: 2021-07-07 11:49:02
+ * @LastEditTime: 2021-07-22 18:58:44
  * @LastEditors: Kenzi
  */
 
@@ -36,9 +36,9 @@ const MessageBubble = ({ props, selectedMessage }) => {
       setLeftBackgroundColor(blue.primary);
     }
   }, [selectedMessage]);
-
   return (
     <Bubble
+      renderCustomView={<Text>123</Text>}
       {...props}
       wrapperStyle={{
         right: {
