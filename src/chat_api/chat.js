@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-14 17:57:36
- * @LastEditTime: 2021-07-26 18:48:29
+ * @LastEditTime: 2021-07-27 11:50:03
  * @LastEditors: Kenzi
  */
 
@@ -83,9 +83,9 @@ export const forwardMessages = (room_id, message_ids, file, message) =>
     data: { message_ids, file, message },
   });
 
-export const replyMessage = (room_id, message_ids, file, message) =>
+export const replyMessage = (room_id, message_id, file, message) =>
   axiosChatClient({
-    url: `/room/${room_id}/forward_messages`,
+    url: `/room/${room_id}/reply_message`,
     method: "post",
-    data: { message_ids, file, message },
+    data: { message_id, file, message },
   });

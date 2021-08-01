@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:57
- * @LastEditTime: 2021-07-26 14:13:45
+ * @LastEditTime: 2021-07-28 12:06:04
  * @LastEditors: Kenzi
  */
 
@@ -82,9 +82,11 @@ function* gotNewMessage({ payload }) {
     //在聊天室里
 
     if (name === "Messages" && appState !== "background") {
+      console.log("in Messages page :>> ");
       const currentRoom = yield params.room_info._id;
       //在同一个聊天室里
       if (chat_room_id === currentRoom) {
+        console.log("in same room :>> ");
         //不是自己发的讯息
         if (posted_by_user !== currentUser) {
           const res = yield markReadByRoomId(chat_room_id);
@@ -286,7 +288,7 @@ function* initChatRoom({ payload }) {
     if (newRoomInfo) {
       yield put(initializeChatRoomSuccess(newRoomInfo, newRoomInfo._id));
     }
-    yield toMessagesPage(navigation, newRoomInfo);
+    yield toMessagesPage(navigation, { room_info: newRoomInfo });
   } catch (error) {
     yield put(initializeChatRoomFailure(error));
   }

@@ -2,7 +2,7 @@
  * @Description: 聊天列表
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:24
- * @LastEditTime: 2021-07-22 10:36:28
+ * @LastEditTime: 2021-08-02 11:16:11
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -15,14 +15,24 @@ import { createStructuredSelector } from "reselect";
 import {
   selectChatRoomList,
   selectChatRoomListRendererTrigger,
+  selectSelectedForwardMessage,
 } from "../../../redux/chat/chat.selector";
 import PrimarySearchBar from "../../../components/searchBar/PrimarySearchBar";
 import { ContainerWithBgColor } from "./../../../styles/layout";
-import { getChatRoomStart } from "../../../redux/chat/chat.actions";
+import {
+  getChatRoomStart,
+  onClearSelectedForwardMessage,
+} from "../../../redux/chat/chat.actions";
 import { toMessagesPage } from "../utils";
 import * as mime from "react-native-mime-types";
 import { selectUserToken } from "./../../../redux/auth/auth.selector";
 import { selectUserInfo } from "./../../../redux/user/user.selector";
+import { useRoute } from "@react-navigation/native";
+import { t } from "../../../i18n";
+import { Button } from "react-native-elements/dist/buttons/Button";
+import { HeaderOptionsWithRightButton } from "../../../navigation/Options";
+import { selectParams } from "./../../../redux/router/router.select";
+
 selectUserInfo;
 const ChatHistoryPage = ({
   navigation,
@@ -32,6 +42,9 @@ const ChatHistoryPage = ({
   renderTrigger,
   getUserInfo,
   userToken,
+  pendingForwardMessage,
+  clearSelectedForwardMessage,
+  routerParams,
 }) => {
   //搜尋
   const [searchString, setSearchString] = useState("");
@@ -58,7 +71,8 @@ const ChatHistoryPage = ({
         const currentUserId = userInfo._id;
         const avatar =
           props.avatar ||
-          users.filter((u) => u._id !== currentUserId)[0].avatar;
+          users.filter((u) => u._id !== currentUserId)[0].avatar ||
+          "http://";
         const name =
           props.name || users.filter((u) => u._id !== currentUserId)[0].name; //群組 || 私人
         const hasLastMessage = props.last_message;
@@ -139,6 +153,32 @@ const ChatHistoryPage = ({
     creatListItemData();
   }, [chatRoomList]);
 
+  const onCancelForwardToUser = async () => {
+    await clearSelectedForwardMessage();
+    return navigation.navigate("Messages", {
+      room_info: routerParams.room_info,
+    });
+  };
+
+  useEffect(() => {
+    if (pendingForwardMessage.length > 0) {
+      return navigation.setOptions({
+        title: `${t("chat.forward_to")}`,
+        headerRight: () => null,
+        headerLeft: () => (
+          <Button
+            type="clear"
+            title={t("cmn.cancel")}
+            titleStyle={{ color: "white" }}
+            onPress={() => onCancelForwardToUser()}
+          />
+        ),
+      });
+    } else {
+      navigation.setOptions(HeaderOptionsWithRightButton("chat.chat", "chat"));
+    }
+  }, [pendingForwardMessage.length]);
+
   //合併私人對話跟群組對話列表資料並按照最後訊息時間新到舊排序
   const concatChatRoomList = () => {
     const list = chatData.concat(groupChatData);
@@ -154,7 +194,9 @@ const ChatHistoryPage = ({
   const handleGetMessages = (item) => {
     const current_room_id = item._id;
     const room_info = chatRoomList[current_room_id];
-    return toMessagesPage(navigation, room_info);
+    return toMessagesPage(navigation, {
+      room_info: room_info,
+    });
   };
   function onSwipeOpen(index) {
     setTimeout(() => {
@@ -263,10 +305,13 @@ const mapStateToProps = createStructuredSelector({
   userInfo: selectUserInfo,
   renderTrigger: selectChatRoomListRendererTrigger,
   userToken: selectUserToken,
+  pendingForwardMessage: selectSelectedForwardMessage,
+  routerParams: selectParams,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   getChatRoom: () => dispatch(getChatRoomStart()),
+  clearSelectedForwardMessage: () => dispatch(onClearSelectedForwardMessage()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatHistoryPage);

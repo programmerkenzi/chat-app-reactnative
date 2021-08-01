@@ -2,7 +2,7 @@
  * @Description: 聊天加好友
  * @Author: Lewis
  * @Date: 2021-02-10 15:02:01
- * @LastEditTime: 2021-07-21 12:46:15
+ * @LastEditTime: 2021-08-02 10:54:27
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -63,8 +63,8 @@ const NewFriendPage = ({
       await removeNotifications(theNotification._id);
       await addFriend(res.data.user_info);
       toast.show({
-        title: "测试",
-        description: "通过交友请求",
+        title: "",
+        description: "已加入好友",
         duration: 2000,
         isClosable: true,
         placement: "top",
@@ -84,8 +84,8 @@ const NewFriendPage = ({
       await removeNotifications(theNotification._id);
 
       toast.show({
-        title: "测试",
-        description: "发送交友请求",
+        title: "",
+        description: "已删除交友请求",
         duration: 2000,
         isClosable: true,
         placement: "top",

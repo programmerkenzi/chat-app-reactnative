@@ -2,7 +2,7 @@
  * @Description: 聊天记录
  * @Author: Lewis
  * @Date: 2021-01-20 16:32:48
- * @LastEditTime: 2021-07-20 18:10:17
+ * @LastEditTime: 2021-08-02 11:06:50
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -37,6 +37,7 @@ const ContactItem = ({
     // } else {
     //   return toUserInfoPage(props, navigation);
     // }
+    console.log("props :>> ", props);
     toUserInfoPage(props, navigation, toChatRoom);
   };
   const toast = useToast();
@@ -46,8 +47,8 @@ const ContactItem = ({
 
     if (res.success) {
       toast.show({
-        title: "测试",
-        description: "发送交友请求",
+        title: "",
+        description: "已发送交友请求",
         duration: 2000,
         isClosable: true,
         placement: "top",
@@ -64,7 +65,7 @@ const ContactItem = ({
           size="medium"
           title={props.name.toUpperCase().substring(0, 2)}
           source={{
-            uri: props.avatar,
+            uri: props.avatar ? props.avatar : "http://",
           }}
         />
       </TouchableOpacity>

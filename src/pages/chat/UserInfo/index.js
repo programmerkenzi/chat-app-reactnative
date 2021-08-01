@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-08 15:40:44
- * @LastEditTime: 2021-07-14 12:51:41
+ * @LastEditTime: 2021-08-02 11:25:59
  * @LastEditors: Kenzi
  */
 /*
@@ -38,10 +38,11 @@ import { selectUserInfo } from "./../../../redux/user/user.selector";
 const UserInfoPage = ({ navigation, userInfo, initChatRoom, chatRoomList }) => {
   const item = useRoute().params.item;
   const inContact = useRoute().params.inContact;
-  const toChatRoom = async () => {
-    const chatRoomArray = Object.values(chatRoomList);
+
+  const toChatRoom = async (user_id) => {
     const roomUserIds = [userInfo._id, item._id];
     let isExistRoom = null;
+    let chatRoomArray = Object.values(chatRoomList);
     //确认该房间使否已经在列表
     chatRoomArray.some((room) => {
       if (typeof room === "object") {
@@ -52,12 +53,12 @@ const UserInfoPage = ({ navigation, userInfo, initChatRoom, chatRoomList }) => {
           return false;
         }
       }
-      return true;
     });
+
     if (isExistRoom) {
-      return toMessagesPage(navigation, isExistRoom);
+      return toMessagesPage(navigation, { room_info: isExistRoom });
     } else {
-      const initRoom = await initChatRoom(navigation, [item._id], "private");
+      const initRoom = await initChatRoom(navigation, [user_id], "private");
     }
   };
 

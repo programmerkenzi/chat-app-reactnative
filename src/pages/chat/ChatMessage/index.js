@@ -2,7 +2,7 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-07-26 18:50:40
+ * @LastEditTime: 2021-07-28 12:20:35
  * @LastEditors: Kenzi
  */
 import React, { useState, useCallback } from "react";
@@ -16,31 +16,37 @@ import {
   updateChatRoomStateStart,
   onUpdateSelectedMessage,
   onClearSelectedMessage,
+  onSaveSelectedForwardMessage,
 } from "../../../redux/chat/chat.actions";
 import { createStructuredSelector } from "reselect";
 import {
   selectChatRoomList,
   selectMessagesReRenderTrigger,
+  selectSelectedForwardMessage,
   selectSelectedMessage,
 } from "../../../redux/chat/chat.selector";
 import { selectConversations } from "../../../redux/chat/chat.selector";
 import { useRoute } from "@react-navigation/native";
 import PrimarySearchBar from "../../../components/searchBar/PrimarySearchBar";
 import { useEffect } from "react";
-import { GiftedChat } from "react-native-gifted-chat";
+import { GiftedChat, InputToolbar } from "react-native-gifted-chat";
 import FunctionsBar from "./../../../components/Chat/FunctionsBar";
 import EmojiBoard from "react-native-emoji-board";
 import SentButton from "./../../../components/Chat/SentButton";
 import MessageBubble from "./../../../components/Chat/MessageBubble";
 import { View } from "react-native";
-import { markReadByRoomId, postMessage } from "../../../chat_api/chat";
+import {
+  markReadByRoomId,
+  postMessage,
+  replyMessage,
+} from "../../../chat_api/chat";
 import { getConversationStart } from "./../../../redux/chat/chat.actions";
 import { getChatRoomStart } from "./../../../redux/chat/chat.actions";
 import { ContainerWithBgColor } from "./../../../styles/layout";
 import * as mime from "react-native-mime-types";
 import FileContainer from "./../../../components/Chat/FileContainer";
 import FilesRender from "./../../../components/Chat/FilesRender";
-import { handleUploadMultipleFile } from "./../utils";
+import { handleUploadMultipleFile, toSelectMembersPage } from "./../utils";
 import { handleOnSelect } from "../../../library/utils/utils";
 import { darkGary, red } from "../../../styles/color";
 import { deleteMessage } from "./../../../chat_api/chat";
@@ -51,13 +57,19 @@ import { t } from "../../../i18n";
 import ForwardedMessage from "../../../components/Chat/ForwardedMessage";
 import ReplyMessage from "./../../../components/Chat/ReplyMessage";
 import MessageFunctionBar from "./../../../components/Chat/MessageFunctionBar";
+import { forwardMessages } from "./../../../chat_api/chat";
+import { tw } from "react-native-tailwindcss";
+import SelectedMessagesContainer from "../../../components/Chat/SelectedMessagesContainer";
+import {
+  onRemoveSelectedForwardMessage,
+  onClearSelectedForwardMessage,
+} from "./../../../redux/chat/chat.actions";
 
 const ChatMessagePage = ({
   userInfo,
   navigation,
   conversations,
   getConversations,
-  messageReRenderTrigger,
   updateChatRoomState,
   gotNewMessage,
   selectedMessage,
@@ -65,10 +77,15 @@ const ChatMessagePage = ({
   clearSelectedMessage,
   onDeleteConversation,
   chatRoomList,
+  saveSelectedForwardMessages,
+  removeSelectedForwardMessage,
+  selectedForwardMessage,
+  clearSelectedForwardMessage,
 }) => {
   //聊天记录
   const chatRoomArray = Object.values(chatRoomList);
-  const roomInfo = useRoute().params.room_info.unread
+
+  const roomInfo = useRoute().params
     ? useRoute().params.room_info
     : chatRoomArray.filter(
         (room) => room._id === useRoute().params.room_info.room_id
@@ -85,6 +102,10 @@ const ChatMessagePage = ({
 
   const [searchString, setSearchString] = useState("");
   const [searchResults, setSearchResults] = useState("");
+
+  const [isOnReply, setIsOnReply] = useState(false);
+
+  const [showMessageFunctionBar, setShowMessageFunctionBar] = useState(false);
 
   //讯息array
   const createGiftChatData = () => {
@@ -175,6 +196,37 @@ const ChatMessagePage = ({
     getConversations(room_id);
   };
 
+  //选取訊息
+
+  const onLongPress = (props, context) => {
+    updateSelectedMessage(context);
+  };
+
+  //刪除訊息
+
+  const handleDeleteMessage = async () => {
+    const selectedMessageIds = selectedMessage.map((message) => message._id);
+
+    const { success } = await deleteMessage(room_id, selectedMessageIds);
+
+    if (success) {
+      onDeleteConversation(room_id, selectedMessageIds);
+    }
+  };
+
+  //转发讯息
+  const handleForwardMessages = async () => {
+    await saveSelectedForwardMessages(selectedMessage);
+
+    return navigation.navigate("Chats", { room_info: roomInfo });
+  };
+
+  //回复讯息
+  const handleReplyMessage = async () => {
+    setShowMessageFunctionBar(false);
+    setIsOnReply(true);
+  };
+
   const onSend = useCallback((messages = []) => {
     setMessages((previousMessages) =>
       GiftedChat.append(previousMessages, messages)
@@ -186,7 +238,7 @@ const ChatMessagePage = ({
     let modifiedFiles = [...selectedFile];
     let filesUploaded = null;
 
-    //已經成功上傳的檔案路徑
+    //上傳檔案
     if (selectedFile.length > 0) {
       modifiedFiles.forEach((file) => {
         const mime_type = mime.lookup(file.uri);
@@ -197,50 +249,100 @@ const ChatMessagePage = ({
       setSelectedFile([]);
       const res = await handleUploadMultipleFile(selectedFile);
       if (res.success) {
+        //储存档案路径
         filesUploaded = res.file;
       }
     }
 
+    //回复讯息
+    if (isOnReply) {
+      const { file, forwarded_from, text, user, reply_for, _id } =
+        selectedMessage[0];
+      modifiedMessage[0].reply_for = [
+        {
+          _id: _id,
+          file: file,
+          message: text,
+          post_by_user: [user],
+        },
+      ];
+
+      setIsOnReply(false);
+    }
+
+    //转发讯息
+    if (selectedForwardMessage.length > 0) {
+      modifiedMessage[0].forwarded_from = selectedForwardMessage.map((msg) => {
+        const { file, forwarded_from, text, user, reply_for, _id } = msg;
+        return {
+          _id: _id,
+          file: file,
+          message: text,
+          post_by_user: [user],
+        };
+      });
+    }
+
+    //显示正在发送的讯息
     modifiedMessage[0].pending = true;
 
     onSend(modifiedMessage);
 
-    const { success, data } = await postMessage(
-      room_id,
-      filesUploaded,
-      theMessage[0].text
-    );
-    if (success) {
-      gotNewMessage({ data: data });
+    if (isOnReply) {
+      const { success, data } = await replyMessage(
+        room_id,
+        selectedMessage[0]._id,
+        filesUploaded,
+        currentMessage
+      );
+      if (success) {
+        gotNewMessage({ data: data.data });
+        clearSelectedMessage();
+      }
+    } else if (selectedForwardMessage.length > 0) {
+      const pendingForwardMessageIds = selectedForwardMessage.map(
+        (msg) => msg._id
+      );
+
+      const { success, data } = await forwardMessages(
+        room_id,
+        pendingForwardMessageIds,
+        filesUploaded,
+        currentMessage
+      );
+      if (success) {
+        gotNewMessage({ data: data.data });
+        clearSelectedForwardMessage();
+      }
+    } else {
+      const { success, data } = await postMessage(
+        room_id,
+        filesUploaded,
+        theMessage[0].text
+      );
+      if (success) {
+        gotNewMessage({ data: data });
+      }
     }
   };
 
-  //編輯訊息
+  //开关已选讯息功能列
 
-  const onLongPress = (props, context) => {
-    updateSelectedMessage(context._id);
-  };
-
-  //刪除訊息
-
-  const handleDeleteMessage = async () => {
-    const { success } = await deleteMessage(room_id, selectedMessage);
-
-    if (success) {
-      onDeleteConversation(room_id, selectedMessage);
+  useEffect(() => {
+    if (
+      selectedMessage.length > 0 &&
+      !isOnReply &&
+      !selectedForwardMessage.length
+    ) {
+      setShowMessageFunctionBar(true);
+    } else if (selectedMessage.length > 1 && !selectedForwardMessage.length) {
+      setShowMessageFunctionBar(true);
+      setIsOnReply(false);
+    } else {
+      setShowMessageFunctionBar(false);
+      setIsOnReply(false);
     }
-  };
-
-  //转发讯息
-  const handleForwardMessages = async () => {
-    console.log("forward :>> ");
-  };
-
-  //回复讯息
-
-  const handleReplyMessage = async () => {
-    console.log("currentMessage :>> ", currentMessage);
-  };
+  }, [selectedMessage.length]);
 
   return (
     <ContainerWithBgColor
@@ -262,14 +364,14 @@ const ChatMessagePage = ({
         onSend={(messages) => onSendMessage(messages)}
         renderCustomView={(props) => (
           <>
-            {props.currentMessage.reply_for.length ? (
+            {props.currentMessage.reply_for ? (
               <ReplyMessage
                 messages={props.currentMessage.reply_for}
                 post_by_user={props.currentMessage.user._id}
                 user_id={user_id}
               />
             ) : null}
-            {props.currentMessage.forwarded_from.length ? (
+            {props.currentMessage.forwarded_from ? (
               <ForwardedMessage
                 messages={props.currentMessage.forwarded_from}
                 post_by_user={props.currentMessage.user._id}
@@ -314,14 +416,14 @@ const ChatMessagePage = ({
             showEmojiBoard={showEmojiBoard}
           />
         )}
-        renderSend={(props) => SentButton(props, selectedFile, onSendMessage)}
+        renderSend={(props) => SentButton(props, selectedFile, selectedMessage)}
         user={{
           _id: user_id,
         }}
         renderBubble={(props) => <MessageBubble props={props} />}
         renderUsernameOnMessage={false}
         infiniteScroll={true}
-        scrollToBottom={selectedMessage.length > 0 ? false : true}
+        scrollToBottom={true}
         onLongPress={(props, context) => onLongPress(props, context)}
         onLoadEarlier={fetchEarlierData}
         isLoadingEarlier={false}
@@ -332,21 +434,30 @@ const ChatMessagePage = ({
         placeholder={t("chat.type")}
         renderChatFooter={() => (
           <>
-            {selectedMessage.length > 0 ? (
+            {/* 功能按鈕 */}
+            {showMessageFunctionBar ? (
               <MessageFunctionBar
                 handleDeleteMessage={handleDeleteMessage}
                 handleForwardMessages={handleForwardMessages}
                 handleReplyMessage={handleReplyMessage}
+                numSelected={selectedMessage.length}
+                handleClose={clearSelectedMessage}
               />
             ) : null}
-            <EmojiBoard
-              containerStyle={{ width: "100%" }}
-              showBoard={showEmojiBoard}
-              onClick={(messages) => {
-                setCurrentMessage(`${currentMessage}${messages.code}`);
-              }}
-              onRemove={() => setShowEmojiBoard(!showEmojiBoard)}
-            />
+            {isOnReply ? (
+              <SelectedMessagesContainer
+                messages={selectedMessage}
+                handleClose={(message) => updateSelectedMessage(message)}
+              />
+            ) : null}
+            {selectedForwardMessage.length ? (
+              <SelectedMessagesContainer
+                type="forwarded"
+                messages={selectedForwardMessage}
+                handleClose={(message) => removeSelectedForwardMessage(message)}
+              />
+            ) : null}
+
             <FileContainer
               show={selectedFile.length > 0 ? true : false}
               selectedFile={selectedFile}
@@ -366,29 +477,16 @@ const ChatMessagePage = ({
           </>
         )}
       />
-      {/* 功能按鈕 */}
+
+      <EmojiBoard
+        containerStyle={[tw.relative, showEmojiBoard ? tw.h100 : tw.h0]}
+        showBoard={true}
+        onClick={(messages) => {
+          setCurrentMessage(`${currentMessage}${messages.code}`);
+        }}
+        onRemove={() => setShowEmojiBoard(!showEmojiBoard)}
+      />
     </ContainerWithBgColor>
-    /* <Animatable.View
-          animation="zoomIn"
-          style={[styles.floatBtnContainer, { bottom: 70 }]}
-        >
-          <FAB
-            title=""
-            color={red.primary}
-            icon={<Icon name="trash-alt" type="font-awesome-5" size={20} />}
-            containerStyle={styles.fab}
-            size="large"
-            onPress={() => handleDeleteMessage()}
-          />
-          <FAB
-            title=""
-            color={darkGary.primary}
-            icon={<Icon name="times" type="font-awesome-5" size={12} />}
-            size="small"
-            containerStyle={styles.fab}
-            onPress={() => clearSelectedMessage()}
-          />
-        </Animatable.View> */
   );
 };
 
@@ -404,6 +502,11 @@ const mapDispatchToProp = (dispatch) => ({
   clearSelectedMessage: () => dispatch(onClearSelectedMessage()),
   onDeleteConversation: (room_id, message_ids) =>
     dispatch(onDeleteConversation(room_id, message_ids, true)),
+  saveSelectedForwardMessages: (messages) =>
+    dispatch(onSaveSelectedForwardMessage(messages)),
+  removeSelectedForwardMessage: (message) =>
+    dispatch(onRemoveSelectedForwardMessage(message)),
+  clearSelectedForwardMessage: () => dispatch(onClearSelectedForwardMessage()),
 });
 
 const mapStateToProp = createStructuredSelector({
@@ -412,6 +515,7 @@ const mapStateToProp = createStructuredSelector({
   messageReRenderTrigger: selectMessagesReRenderTrigger,
   selectedMessage: selectSelectedMessage,
   chatRoomList: selectChatRoomList,
+  selectedForwardMessage: selectSelectedForwardMessage,
 });
 
 export default connect(mapStateToProp, mapDispatchToProp)(ChatMessagePage);

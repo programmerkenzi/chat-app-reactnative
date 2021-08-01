@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-21 14:34:35
- * @LastEditTime: 2021-07-21 11:54:23
+ * @LastEditTime: 2021-08-02 10:43:15
  * @LastEditors: Kenzi
  */
 
@@ -158,7 +158,7 @@ export const getFriendList = async () => {
     const avatar = contact.avatar;
     list.push({
       ...contact,
-      avatar: avatar.length > 0 ? createFileUrl(avatar) : avatar,
+      avatar: avatar.length > 0 ? createFileUrl(avatar) : "http://",
     });
   });
 

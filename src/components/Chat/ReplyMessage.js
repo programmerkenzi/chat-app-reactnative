@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-26 13:47:04
- * @LastEditTime: 2021-07-26 16:48:16
+ * @LastEditTime: 2021-07-27 11:28:51
  * @LastEditors: Kenzi
  */
 
@@ -51,7 +51,7 @@ const ReplyMessage = ({ messages, post_by_user, user_id }) => {
     );
   };
 
-  return (
+  return messages.length ? (
     <View
       style={[
         tw.m2,
@@ -62,7 +62,7 @@ const ReplyMessage = ({ messages, post_by_user, user_id }) => {
     >
       {messages.map((message) => renderMessage(message))}
     </View>
-  );
+  ) : null;
 };
 
 export default ReplyMessage;

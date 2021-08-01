@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-14 14:39:43
- * @LastEditTime: 2021-07-26 18:01:05
+ * @LastEditTime: 2021-07-28 10:44:07
  * @LastEditors: Kenzi
  */
 export default {
@@ -125,7 +125,8 @@ export default {
     friends: "好友",
     forwarded_f: "转发自",
     forward: "转发",
-    reply_to: "回复给",
+    forward_to: "转发至...",
+    reply_to: "回复给...",
     reply: "回复",
   },
 

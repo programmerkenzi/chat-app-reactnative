@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-06 11:55:32
- * @LastEditTime: 2021-07-26 14:44:13
+ * @LastEditTime: 2021-08-02 10:38:23
  * @LastEditors: Kenzi
  */
 
@@ -33,7 +33,7 @@ import { TouchableOpacity } from "react-native";
 const SettingPage = ({ logout, userInfo }) => {
   const { avatar, name, status, public_id } = userInfo;
 
-  const avatarUrl = avatar.length > 0 ? createFileUrl(avatar) : "";
+  const avatarUrl = avatar.length > 0 ? createFileUrl(avatar) : "http://";
 
   const [imageUri, setImageUri] = useState(avatarUrl);
 

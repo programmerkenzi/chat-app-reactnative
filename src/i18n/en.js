@@ -126,6 +126,7 @@ export default {
     friends: "friends",
     forwarded_f: "forwarded from",
     forward: "forward to",
+    forward_to: "forward to ...",
     reply_to: "reply to",
     reply: "reply",
   },

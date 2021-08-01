@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-02-28 15:47:34
- * @LastEditTime: 2021-07-21 13:55:17
+ * @LastEditTime: 2021-08-02 10:46:53
  * @LastEditors: Kenzi
  */
 
@@ -32,7 +32,7 @@ function* login({ payload }) {
       yield put(loginSuccess(accessToken, refreshToken, userInfo));
     }
   } catch (error) {
-    yield put(loginFailure(error));
+    yield put(loginFailure(error.message));
   }
 }
 

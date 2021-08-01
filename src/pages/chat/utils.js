@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2021-01-27 12:32:02
- * @LastEditTime: 2021-07-20 15:47:35
+ * @LastEditTime: 2021-07-28 11:53:08
  * @LastEditors: Kenzi
  */
 import React from "react";
@@ -61,8 +61,8 @@ export const toUserInfoPage = (item, navigation) => {
  * @param {Object} room_info current room info
  * @returns
  */
-export const toMessagesPage = (navigation, room_info) => {
-  return navigation.navigate("Messages", { room_info: room_info });
+export const toMessagesPage = (navigation, data) => {
+  return navigation.navigate("Messages", data);
 };
 export const toGroupInfoPage = (item, navigation) => {
   return navigation.navigate("GroupInfo", { item: item, inContact: true });

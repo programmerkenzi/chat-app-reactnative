@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2021-02-10 15:02:13
- * @LastEditTime: 2021-07-26 18:46:27
+ * @LastEditTime: 2021-07-27 15:46:04
  * @LastEditors: Kenzi
  */
 import React, { useState } from "react";
@@ -18,13 +18,17 @@ import { createStructuredSelector } from "reselect";
 import { selectFriendList } from "../../../redux/chat/chat.selector";
 import { getMyFriendStart } from "../../../redux/chat/chat.actions";
 import { useEffect } from "react";
-import { selectRouterName } from "../../../redux/router/router.select";
+import {
+  selectPerviousRouterName,
+  selectRouterName,
+} from "../../../redux/router/router.select";
 
 const SelectMembersPage = ({
   navigation,
   friendList,
   getMyFriendList,
   fromRouteName,
+  handleForwardMessage,
 }) => {
   //搜尋
   const [searchString, setSearchString] = useState("");
@@ -103,7 +107,7 @@ const SelectMembersPage = ({
 };
 const mapStateToProps = createStructuredSelector({
   friendList: selectFriendList,
-  fromRouteName: selectRouterName,
+  fromRouteName: selectPerviousRouterName,
 });
 
 const mapDispatchToProps = (dispatch) => ({

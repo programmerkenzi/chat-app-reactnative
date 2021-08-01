@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-05-27 14:08:15
- * @LastEditTime: 2021-07-16 10:28:42
+ * @LastEditTime: 2021-07-27 15:45:10
  * @LastEditors: Kenzi
  */
 
@@ -14,6 +14,12 @@ export const selectRouterName = createSelector(
   [selectRouter],
   (router) => router.name
 );
+
+export const selectPerviousRouterName = createSelector(
+  [selectRouter],
+  (router) => router.pervious_name
+);
+
 export const selectParams = createSelector(
   [selectRouter],
   (router) => router.params

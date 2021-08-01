@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:48
- * @LastEditTime: 2021-07-21 12:02:19
+ * @LastEditTime: 2021-07-28 10:29:55
  * @LastEditors: Kenzi
  */
 import chatActionType from "./chat.type";
@@ -19,6 +19,7 @@ const initialState = {
   messageReRendererTrigger: false,
   chatRoomListRendererTrigger: false,
   selectedMessage: [],
+  selectedForwardMessage: [],
 };
 
 const chatReducer = (state = initialState, action) => {
@@ -78,6 +79,29 @@ const chatReducer = (state = initialState, action) => {
         selectedMessage: newSelectedMessage,
       };
 
+    case chatActionType.SAVE_SELECTED_FORWARD_MESSAGE:
+      return {
+        ...state,
+        selectedForwardMessage: action.payload,
+      };
+
+    case chatActionType.REMOVE_SELECTED_FORWARD_MESSAGE:
+      let oldSelectedForwardMessage = [...state.selectedForwardMessage];
+      const indexOfDeleteMessage = oldSelectedForwardMessage.findIndex(
+        (msg) => msg._id === action.payload._id
+      );
+      oldSelectedForwardMessage.splice(indexOfDeleteMessage, 1);
+      return {
+        ...state,
+        selectedForwardMessage: oldSelectedForwardMessage,
+      };
+
+    case chatActionType.CLEAR_SELECTED_FORWARD_MESSAGE:
+      return {
+        ...state,
+        selectedForwardMessage: [],
+      };
+
     case chatActionType.CLEAR_SELECTED_MESSAGE:
       return {
         ...state,
@@ -90,6 +114,7 @@ const chatReducer = (state = initialState, action) => {
     case wsActionType.SOCKET_IO_DISCONNECTED:
     case networkActionTypes.NETWORK_DISCONNECTED:
       return {
+        ...state,
         chatRoomList: {},
         conversations: {},
         contactList: [],

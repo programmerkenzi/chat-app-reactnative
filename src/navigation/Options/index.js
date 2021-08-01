@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-19 12:36:22
- * @LastEditTime: 2021-07-22 16:08:33
+ * @LastEditTime: 2021-07-28 11:44:49
  * @LastEditors: Kenzi
  */
 
@@ -56,6 +56,7 @@ export const HeaderOptionsWithRightButton = (title, rightButton) => {
         ) : null}
       </View>
     ),
+    headerLeft: () => null,
   };
 };
 

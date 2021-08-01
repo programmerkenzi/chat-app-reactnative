@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:41
- * @LastEditTime: 2021-07-21 15:14:38
+ * @LastEditTime: 2021-07-28 10:17:11
  * @LastEditors: Kenzi
  */
 
@@ -136,12 +136,24 @@ export const onRecipientMarkRead = (room_id) => ({
   payload: room_id,
 });
 
-export const onUpdateSelectedMessage = (message_id) => ({
+export const onUpdateSelectedMessage = (message) => ({
   type: chatActionType.UPDATE_SELECTED_MESSAGE,
-  payload: message_id,
+  payload: message,
 });
 export const onClearSelectedMessage = () => ({
   type: chatActionType.CLEAR_SELECTED_MESSAGE,
+});
+
+export const onSaveSelectedForwardMessage = (messages) => ({
+  type: chatActionType.SAVE_SELECTED_FORWARD_MESSAGE,
+  payload: messages,
+});
+export const onRemoveSelectedForwardMessage = (message) => ({
+  type: chatActionType.REMOVE_SELECTED_FORWARD_MESSAGE,
+  payload: message,
+});
+export const onClearSelectedForwardMessage = () => ({
+  type: chatActionType.CLEAR_SELECTED_FORWARD_MESSAGE,
 });
 
 /**

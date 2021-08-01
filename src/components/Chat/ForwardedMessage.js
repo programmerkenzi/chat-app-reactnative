@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-26 13:47:04
- * @LastEditTime: 2021-07-26 16:48:33
+ * @LastEditTime: 2021-07-27 10:22:17
  * @LastEditors: Kenzi
  */
 
@@ -50,7 +50,7 @@ const ForwardedMessage = ({ messages, post_by_user, user_id }) => {
     );
   };
 
-  return (
+  return messages.length ? (
     <View
       style={[
         tw.m2,
@@ -61,7 +61,7 @@ const ForwardedMessage = ({ messages, post_by_user, user_id }) => {
     >
       {messages.map((message) => renderMessage(message))}
     </View>
-  );
+  ) : null;
 };
 
 export default ForwardedMessage;

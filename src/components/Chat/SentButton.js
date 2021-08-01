@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-28 16:28:21
- * @LastEditTime: 2021-07-06 14:45:07
+ * @LastEditTime: 2021-07-27 09:46:43
  * @LastEditors: Kenzi
  */
 
@@ -11,9 +11,13 @@ import { TouchableOpacity, StyleSheet } from "react-native";
 import { blue } from "../../styles/color";
 import { Icon } from "react-native-elements";
 
-const SentButton = (sendProps, selectedFile) => {
+const SentButton = (sendProps, selectedFile, selectedMessage) => {
   const { text, messageIdGenerator, user, onSend } = sendProps;
-  if (sendProps.text.trim().length > 0 || selectedFile.length > 0) {
+  if (
+    sendProps.text.trim().length > 0 ||
+    selectedFile.length > 0 ||
+    selectedMessage.length > 0
+  ) {
     return (
       <TouchableOpacity
         onPress={() => {

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-14 10:42:52
- * @LastEditTime: 2021-07-16 15:05:12
+ * @LastEditTime: 2021-07-27 12:24:29
  * @LastEditors: Kenzi
  */
 import appActionTypes from "./app.type";

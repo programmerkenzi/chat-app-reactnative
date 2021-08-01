@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-01 13:20:25
- * @LastEditTime: 2021-07-22 18:58:44
+ * @LastEditTime: 2021-07-27 10:07:56
  * @LastEditors: Kenzi
  */
 
@@ -26,7 +26,7 @@ const MessageBubble = ({ props, selectedMessage }) => {
   );
   useEffect(() => {
     const isSelected = selectedMessage.findIndex(
-      (msg) => msg === props.currentMessage._id
+      (msg) => msg._id === props.currentMessage._id
     );
     if (isSelected === -1) {
       setBackgroundColor(blue.thirdly);
