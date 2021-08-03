@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-01 11:33:03
- * @LastEditTime: 2021-07-21 17:17:38
+ * @LastEditTime: 2021-08-03 13:51:52
  * @LastEditors: Kenzi
  */
 
@@ -11,6 +11,8 @@ import authActionType from "./auth.type";
 const initState = {
   userToken: null,
   refreshToken: null,
+  publicKey: null,
+  privateKey: null,
 };
 
 const authReducer = (state = initState, action) => {
@@ -20,35 +22,21 @@ const authReducer = (state = initState, action) => {
         ...state,
         userToken: action.payload.accessToken,
         refreshToken: action.payload.refreshToken,
+        publicKey: action.payload.publicKey,
+        privateKey: action.payload.privateKey,
       };
     case authActionType.LOGOUT_SUCCESS:
       return {
         ...state,
         userToken: null,
-        expoPushToken: null,
-        userInfo: null,
-        username: null,
-        password: null,
+        refreshToken: null,
+        publicKey: null,
+        privateKey: null,
       };
 
     case authActionType.GET_USER_INFO_SUCCESS:
-    case authActionType.UPDATE_USER_INFO_SUCCESS:
       return {
         ...state,
-        userInfo: action.payload[0],
-      };
-
-    case authActionType.LOGIN_FAILURE:
-      return {
-        ...state,
-        failureLoginMessage: action.payload,
-        isLoginFailure: true,
-      };
-
-    case authActionType.GOT_EXPO_PUSH_TOKEN:
-      return {
-        ...state,
-        expoPushToken: action.payload,
       };
 
     case authActionType.REFRESH_TOKEN_SUCCESS:

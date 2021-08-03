@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-02-28 15:47:34
- * @LastEditTime: 2021-08-02 10:46:53
+ * @LastEditTime: 2021-08-03 13:58:47
  * @LastEditors: Kenzi
  */
 
@@ -28,8 +28,11 @@ function* login({ payload }) {
     const device_id = Device.osBuildFingerprint;
     const res = yield onLogin(username, password, device_id);
     if (res) {
-      const { accessToken, refreshToken, userInfo } = res;
-      yield put(loginSuccess(accessToken, refreshToken, userInfo));
+      const { accessToken, refreshToken, userInfo, publicKey, privateKey } =
+        res;
+      yield put(
+        loginSuccess(accessToken, refreshToken, userInfo, publicKey, privateKey)
+      );
     }
   } catch (error) {
     yield put(loginFailure(error.message));

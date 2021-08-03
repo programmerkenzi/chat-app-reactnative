@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-01 12:32:44
- * @LastEditTime: 2021-07-09 15:11:25
+ * @LastEditTime: 2021-08-03 16:08:22
  * @LastEditors: Kenzi
  */
 import { createSelector } from "reselect";
@@ -12,6 +12,10 @@ const selectAuth = (state) => state.secure.auth;
 export const selectUserToken = createSelector(
   [selectAuth],
   (auth) => auth.userToken
+);
+export const selectPrivateKey = createSelector(
+  [selectAuth],
+  (auth) => auth.privateKey
 );
 
 export const selectIsLoading = createSelector(

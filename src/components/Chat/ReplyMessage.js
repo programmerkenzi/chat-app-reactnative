@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-26 13:47:04
- * @LastEditTime: 2021-07-27 11:28:51
+ * @LastEditTime: 2021-08-03 18:44:46
  * @LastEditors: Kenzi
  */
 
@@ -13,13 +13,15 @@ import { t } from "../../i18n";
 import { Icon } from "react-native-elements";
 
 import FilesRender from "./FilesRender";
+import { decodeMessage } from "./../../library/utils/crypto";
 
 const ReplyMessage = ({ messages, post_by_user, user_id }) => {
   const isPostByCurrentUser = post_by_user === user_id;
 
-  const renderMessage = (msg) => {
+  const renderMessage = async (msg) => {
     const { file, message, post_by_user } = msg;
     const { name } = post_by_user[0];
+
     return (
       <>
         <View style={[tw.flexRow, tw.mB1]}>
@@ -45,7 +47,7 @@ const ReplyMessage = ({ messages, post_by_user, user_id }) => {
             isPostByCurrentUser ? tw.textGray200 : tw.textGray800,
           ]}
         >
-          {message}
+          {decodedMessage}
         </Text>
       </>
     );

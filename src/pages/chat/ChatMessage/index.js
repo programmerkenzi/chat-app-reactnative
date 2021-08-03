@@ -2,10 +2,10 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-07-28 12:20:35
+ * @LastEditTime: 2021-08-03 18:48:27
  * @LastEditors: Kenzi
  */
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { connect } from "react-redux";
 import { FAB, Icon } from "react-native-elements";
@@ -64,6 +64,16 @@ import {
   onRemoveSelectedForwardMessage,
   onClearSelectedForwardMessage,
 } from "./../../../redux/chat/chat.actions";
+import { generateCryptoService } from "../../../library/utils/crypto";
+import { decoder, encoder } from "./../../../library/utils/crypto";
+import { exampleEncryptDecrypt } from "./../../../library/utils/crypto";
+import PinMessage from "../../../components/Chat/PinMessage";
+import {
+  generateShareKey,
+  encodeMessage,
+  decodeMessage,
+} from "./../../../library/utils/crypto";
+import { selectPrivateKey } from "../../../redux/auth/auth.selector";
 
 const ChatMessagePage = ({
   userInfo,
@@ -81,15 +91,19 @@ const ChatMessagePage = ({
   removeSelectedForwardMessage,
   selectedForwardMessage,
   clearSelectedForwardMessage,
+  privateKey,
 }) => {
   //聊天记录
   const chatRoomArray = Object.values(chatRoomList);
+  const params = useRoute().params;
+  const { room_info } = params;
 
-  const roomInfo = useRoute().params
-    ? useRoute().params.room_info
+  const roomInfo = room_info.unread
+    ? room_info
     : chatRoomArray.filter(
         (room) => room._id === useRoute().params.room_info.room_id
       )[0];
+
   const unread = roomInfo.unread.length;
   const room_id = roomInfo._id;
   const user_id = userInfo._id;
@@ -107,12 +121,18 @@ const ChatMessagePage = ({
 
   const [showMessageFunctionBar, setShowMessageFunctionBar] = useState(false);
 
+  //讯息解密
+  const receiverPublicId = roomInfo.receivers[0].public_key;
+  const sharedKey = generateShareKey(receiverPublicId, privateKey);
+
   //讯息array
   const createGiftChatData = () => {
+    const sharedKey = generateShareKey(receiverPublicId, privateKey);
+
     const room_messages = conversations[room_id];
     let giftedChatMessagesData = [];
     if (room_messages) {
-      room_messages.forEach((item) => {
+      room_messages.forEach(async (item) => {
         const {
           _id,
           createdAt,
@@ -129,10 +149,14 @@ const ChatMessagePage = ({
           (user) => user.read_by_user_id !== user_id
         );
         const { name, avatar } = post_by_user[0];
+
+        //讯息解密
+        const decodedMessage = decodeMessage(message, sharedKey);
+
         //gift chat用的obj
         let msg = {
           _id: _id,
-          text: message,
+          text: decodedMessage,
           createdAt: createdAt,
           file: [],
           user: {
@@ -234,6 +258,9 @@ const ChatMessagePage = ({
   }, []);
 
   const onSendMessage = async (theMessage) => {
+    const messageText = theMessage[0].text;
+    const encodedMessage = await encodeMessage(messageText, sharedKey);
+
     let modifiedMessage = theMessage;
     let modifiedFiles = [...selectedFile];
     let filesUploaded = null;
@@ -293,7 +320,7 @@ const ChatMessagePage = ({
         room_id,
         selectedMessage[0]._id,
         filesUploaded,
-        currentMessage
+        encodedMessage
       );
       if (success) {
         gotNewMessage({ data: data.data });
@@ -308,7 +335,7 @@ const ChatMessagePage = ({
         room_id,
         pendingForwardMessageIds,
         filesUploaded,
-        currentMessage
+        encodedMessage
       );
       if (success) {
         gotNewMessage({ data: data.data });
@@ -318,7 +345,7 @@ const ChatMessagePage = ({
       const { success, data } = await postMessage(
         room_id,
         filesUploaded,
-        theMessage[0].text
+        encodedMessage
       );
       if (success) {
         gotNewMessage({ data: data });
@@ -350,13 +377,15 @@ const ChatMessagePage = ({
       pd="none"
       style={{ position: "relative" }}
     >
-      <PrimarySearchBar
+      {/* <PrimarySearchBar
         data={messages}
         searchString={searchString}
         setSearchString={setSearchString}
         setSearchResults={setSearchResults}
         type="message"
-      />
+      /> */}
+
+      <PinMessage />
       <GiftedChat
         messages={searchString.length ? searchResults : messages}
         text={currentMessage}
@@ -369,6 +398,7 @@ const ChatMessagePage = ({
                 messages={props.currentMessage.reply_for}
                 post_by_user={props.currentMessage.user._id}
                 user_id={user_id}
+                sharedKey={sharedKey}
               />
             ) : null}
             {props.currentMessage.forwarded_from ? (
@@ -516,6 +546,7 @@ const mapStateToProp = createStructuredSelector({
   selectedMessage: selectSelectedMessage,
   chatRoomList: selectChatRoomList,
   selectedForwardMessage: selectSelectedForwardMessage,
+  privateKey: selectPrivateKey,
 });
 
 export default connect(mapStateToProp, mapDispatchToProp)(ChatMessagePage);

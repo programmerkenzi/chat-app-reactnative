@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-08 15:40:44
- * @LastEditTime: 2021-08-02 11:25:59
+ * @LastEditTime: 2021-08-03 15:22:13
  * @LastEditors: Kenzi
  */
 /*
@@ -46,9 +46,9 @@ const UserInfoPage = ({ navigation, userInfo, initChatRoom, chatRoomList }) => {
     //确认该房间使否已经在列表
     chatRoomArray.some((room) => {
       if (typeof room === "object") {
-        const users = room.users;
-        let users_id = users.map((user) => user._id);
-        if (checkIsSameArray(roomUserIds, users_id)) {
+        const receiver = room.receivers[0]._id;
+        //let users_id = users.map((user) => user._id);
+        if (receiver === user_id) {
           isExistRoom = room;
           return false;
         }

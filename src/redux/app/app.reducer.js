@@ -2,10 +2,11 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-04-14 10:42:52
- * @LastEditTime: 2021-07-27 12:24:29
+ * @LastEditTime: 2021-08-03 13:53:14
  * @LastEditors: Kenzi
  */
 import appActionTypes from "./app.type";
+import authActionTypes from "../auth/auth.type";
 import zh from "../../i18n/zh";
 import en from "../../i18n/en";
 
@@ -17,6 +18,8 @@ const initialState = {
   appState: "background",
   expoPushToken: null,
   isLoading: false,
+  failureLoginMessage: null,
+  isLoginFailure: false,
 };
 
 const appReducer = (state = initialState, action) => {
@@ -43,6 +46,17 @@ const appReducer = (state = initialState, action) => {
       return {
         ...state,
         appState: action.payload,
+      };
+    case authActionTypes.GOT_EXPO_PUSH_TOKEN:
+      return {
+        ...state,
+        expoPushToken: action.payload,
+      };
+    case authActionTypes.LOGIN_FAILURE:
+      return {
+        ...state,
+        failureLoginMessage: action.payload,
+        isLoginFailure: true,
       };
     case appActionTypes.UPDATE_LOADING_STATUS:
       return {

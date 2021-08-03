@@ -2,7 +2,7 @@
  * @Description: 聊天列表
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:24
- * @LastEditTime: 2021-08-02 11:16:11
+ * @LastEditTime: 2021-08-03 18:27:43
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -63,18 +63,12 @@ const ChatHistoryPage = ({
   const creatListItemData = () => {
     let chatRoomArray = Object.values(chatRoomList);
     //刪除meta data
-
     let data = [];
     chatRoomArray.forEach((props) => {
       if (typeof props === "object") {
-        const users = props.users;
-        const currentUserId = userInfo._id;
-        const avatar =
-          props.avatar ||
-          users.filter((u) => u._id !== currentUserId)[0].avatar ||
-          "http://";
-        const name =
-          props.name || users.filter((u) => u._id !== currentUserId)[0].name; //群組 || 私人
+        const receivers = props.receivers;
+        const avatar = props.avatar || receivers[0].avatar || "http://";
+        const name = props.name || receivers[0].name; //群組 || 私人
         const hasLastMessage = props.last_message;
 
         const lastMessageInfo = hasLastMessage

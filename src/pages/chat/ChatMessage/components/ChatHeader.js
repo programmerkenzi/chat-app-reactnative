@@ -18,8 +18,8 @@ import { selectUserInfo } from "./../../../../redux/user/user.selector";
 const ChatHeader = ({ userInfo }) => {
   const navigation = useNavigation();
   const roomInfo = useRoute().params.room_info;
-  const users = roomInfo.users;
-  const receiver = users.filter((u) => u._id !== userInfo._id)[0];
+  const receivers = roomInfo.receivers;
+  const receiver = receivers[0];
   const avatar =
     roomInfo.type === "private" ? receiver.avatar : roomInfo.avatar; // 私人||群组
   const avatarUrl = avatar.length > 0 ? avatar : "http://";

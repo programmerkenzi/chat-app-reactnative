@@ -2,7 +2,7 @@
  * @Description: 登录操作
  * @Author: Lewis
  * @Date: 2021-01-13 14:55:40
- * @LastEditTime: 2021-07-19 17:31:22
+ * @LastEditTime: 2021-08-03 13:59:02
  * @LastEditors: Kenzi
  */
 import authActionType from "./auth.type";
@@ -12,9 +12,15 @@ export const loginStart = (usernameAndPassword) => ({
   payload: usernameAndPassword,
 });
 
-export const loginSuccess = (accessToken, refreshToken, userInfo) => ({
+export const loginSuccess = (
+  accessToken,
+  refreshToken,
+  userInfo,
+  publicKey,
+  privateKey
+) => ({
   type: authActionType.LOGIN_SUCCESS,
-  payload: { accessToken, refreshToken, userInfo },
+  payload: { accessToken, refreshToken, userInfo, publicKey, privateKey },
 });
 
 export const loginFailure = (error) => ({

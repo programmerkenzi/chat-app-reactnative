@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:57
- * @LastEditTime: 2021-07-28 12:06:04
+ * @LastEditTime: 2021-08-02 18:39:17
  * @LastEditors: Kenzi
  */
 
@@ -82,11 +82,9 @@ function* gotNewMessage({ payload }) {
     //在聊天室里
 
     if (name === "Messages" && appState !== "background") {
-      console.log("in Messages page :>> ");
       const currentRoom = yield params.room_info._id;
       //在同一个聊天室里
       if (chat_room_id === currentRoom) {
-        console.log("in same room :>> ");
         //不是自己发的讯息
         if (posted_by_user !== currentUser) {
           const res = yield markReadByRoomId(chat_room_id);
@@ -127,7 +125,7 @@ function* pushNotification({ payload }) {
   //在聊天室里
   if (appState === "background") {
     yield schedulePushNotification(
-      last_message[0].user[0].name,
+      last_message[0].post_by_user[0].name,
       date.toLocaleString(),
       last_message[0].message,
       "Messages",
@@ -136,7 +134,7 @@ function* pushNotification({ payload }) {
   } else if (params.room_info) {
     if (params.room_info._id !== room_id) {
       yield schedulePushNotification(
-        last_message[0].user[0].name,
+        last_message[0].post_by_user[0].name,
         date.toLocaleString(),
         last_message[0].message,
         "Messages",
@@ -146,7 +144,7 @@ function* pushNotification({ payload }) {
   } else {
     if (name !== "Chats") {
       yield schedulePushNotification(
-        last_message[0].user[0].name,
+        last_message[0].post_by_user[0].name,
         date.toLocaleString(),
         last_message[0].message,
         "Messages",

@@ -28,7 +28,7 @@ const AvatarButton = ({ userInfo, roomList }) => {
         (room) => room._id === useRoute().params.room_info.room_id
       )[0];
 
-  const receiver = roomInfo.users.filter((u) => u._id !== userInfo._id)[0];
+  const receiver = roomInfo.receivers[0];
   const avatar =
     roomInfo.type === "private" ? receiver.avatar : roomInfo.avatar; // 私人||群组
   const avatarUrl = avatar.length > 0 ? avatar : "http://";

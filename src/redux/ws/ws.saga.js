@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:33:46
- * @LastEditTime: 2021-07-21 15:41:27
+ * @LastEditTime: 2021-08-03 18:57:51
  * @LastEditors: Kenzi
  */
 import {
@@ -31,8 +31,6 @@ import {
   networkConnected,
   networkDisconnected,
 } from "../network/network.action";
-import { store } from "../store";
-import { onSocketIoReConnect } from "./ws.action";
 import { onGotNewNotification } from "../notification/notification.action";
 
 function initSocketIo(user_id) {

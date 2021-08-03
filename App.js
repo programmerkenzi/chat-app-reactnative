@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:17:21
- * @LastEditTime: 2021-07-19 14:30:03
+ * @LastEditTime: 2021-08-03 10:03:57
  * @LastEditors: Kenzi
  */
 import React, { useEffect } from "react";
@@ -15,6 +15,7 @@ import { getLanguage } from "./src/i18n/index";
 import Notification from "./src/components/notification/Notification";
 import { NativeBaseProvider } from "native-base";
 import theme from "./src/theme/pirmary";
+import "react-native-gesture-handler";
 import * as TaskManager from "expo-task-manager";
 import {
   BACKGROUND_FETCH_TASK,
@@ -47,11 +48,9 @@ const App = () => {
   return (
     <Provider store={store}>
       <NativeBaseProvider theme={theme}>
-        <MenuProvider>
-          <MainStackNavigation />
-          <Notification />
-          <CustomSpinner />
-        </MenuProvider>
+        <MainStackNavigation />
+        <Notification />
+        <CustomSpinner />
       </NativeBaseProvider>
     </Provider>
   );

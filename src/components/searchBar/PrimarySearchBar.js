@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-09 13:05:04
- * @LastEditTime: 2021-07-22 16:27:38
+ * @LastEditTime: 2021-08-03 15:18:35
  * @LastEditors: Kenzi
  */
 
@@ -30,10 +30,8 @@ const PrimarySearchBar = ({
         if (type === "room") {
           data.forEach((room) => {
             if (room.type === "private") {
-              const users = room.users;
-              const receiver = users.filter(
-                (user) => user._id !== currentUserId
-              )[0];
+              const receiver = room.receivers[0];
+
               if (
                 receiver.name
                   .toLowerCase()

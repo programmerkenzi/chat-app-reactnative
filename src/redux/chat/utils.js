@@ -137,10 +137,10 @@ export const getChatRooms = async (fetchPage) => {
   list.forEach((room) => {
     const room_id = room._id;
     const avatar = room.avatar.length > 0 ? createFileUrl(avatar) : avatar;
-    const users = room.users.map((user) => {
+    const receivers = room.receivers.map((user) => {
       return { ...user, avatar: createFileUrl(user.avatar) };
     });
-    newList[room_id] = { ...room, avatar: avatar, users: users };
+    newList[room_id] = { ...room, avatar: avatar, receivers: receivers };
   });
   const { limit, page, pages, total } = data.meta;
   newList.total = total;
@@ -176,7 +176,7 @@ export const initRoom = async (creator, user_ids, type) => {
   const avatar = room_info.avatar
     ? createFileUrl(room_info.avatar)
     : room_info.avatar;
-  const users = room_info.users.map((user) => {
+  const receivers = room_info.receivers.map((user) => {
     return { ...user, avatar: createFileUrl(user.avatar) };
   });
   const new_room_info = {
@@ -184,7 +184,7 @@ export const initRoom = async (creator, user_ids, type) => {
     last_message: [],
     unread: [],
     avatar: avatar,
-    users: users,
+    receivers: receivers,
   };
 
   return new_room_info;

@@ -2,7 +2,7 @@
  * @Description: 用户在线
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:53
- * @LastEditTime: 2021-08-02 11:26:08
+ * @LastEditTime: 2021-08-03 15:20:48
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -52,9 +52,9 @@ const FriendsPage = ({
     //确认该房间使否已经在列表
     chatRoomArray.some((room) => {
       if (typeof room === "object") {
-        const users = room.users;
-        let users_id = users.map((user) => user._id);
-        if (checkIsSameArray(roomUserIds, users_id)) {
+        const receiver = room.receivers[0]._id;
+        //let users_id = users.map((user) => user._id);
+        if (receiver === user_id) {
           isExistRoom = room;
           return false;
         }

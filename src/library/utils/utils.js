@@ -93,12 +93,9 @@ export const onUpdateObjState = (name, value, setState) => {
 };
 
 export const checkIsSameArray = (array1, array2) => {
-  console.log("array1 :>> ", array1);
-  console.log("array2 :>> ", array2);
   const checkAllIncludes = array2.every((item) => array1.includes(item));
   const checkIsSameLength = array2.length === array1.length;
-  console.log("checkAllIncludes :>> ", checkAllIncludes);
-  console.log("checkIsSameLength :>> ", checkIsSameLength);
+
   if (checkAllIncludes && checkIsSameLength) return true;
   return false;
 };
