@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-21 14:34:35
- * @LastEditTime: 2021-08-02 10:43:15
+ * @LastEditTime: 2021-08-04 11:54:25
  * @LastEditors: Kenzi
  */
 
@@ -14,6 +14,7 @@ import {
   initializeChatRoom,
   fetchChatRoom,
 } from "./../../chat_api/chat";
+import { decodeMessage, generateShareKey } from "./../../library/utils/crypto";
 
 //更新最後訊息
 /**
@@ -188,4 +189,64 @@ export const initRoom = async (creator, user_ids, type) => {
   };
 
   return new_room_info;
+};
+
+export const createGiftChatData = (
+  roomConversations,
+  publicKeyFromReceiver,
+  myPrivateKey
+) => {
+  const sharedKey = generateShareKey(publicKeyFromReceiver, myPrivateKey);
+  const room_messages = [...roomConversations];
+  let giftedChatMessagesData = [];
+  if (room_messages) {
+    room_messages.forEach(async (item) => {
+      const {
+        _id,
+        createdAt,
+        message,
+        type,
+        forwarded_from_messages,
+        reply_for_message,
+        read_by_recipients,
+        post_by_user,
+        file,
+      } = item;
+      const postedByUser = post_by_user[0]._id;
+      const isRead = read_by_recipients.findIndex(
+        (user) => user.read_by_user_id !== user_id
+      );
+      const { name, avatar } = post_by_user[0];
+
+      //讯息解密
+      const decodedMessage = decodeMessage(message, sharedKey);
+
+      //gift chat用的obj
+      let msg = {
+        _id: _id,
+        text: decodedMessage,
+        createdAt: createdAt,
+        file: [],
+        user: {
+          _id: postedByUser,
+          name: name,
+          avatar: avatar.length > 0 ? createFileUrl(avatar) : "",
+        },
+        received: item.received ? item.received : isRead === -1 ? false : true,
+        forwarded_from: createGiftChatData(forwarded_from_messages),
+        reply_for: createGiftChatData([reply_for_message]),
+      };
+      if (file.length > 0) {
+        file.forEach((item) => {
+          msg.file.push({
+            name: item.name,
+            url: createFileUrl(item.filename),
+            mime_type: item.mime_type,
+          });
+        });
+      }
+      giftedChatMessagesData.push(msg);
+    });
+  }
+  return giftedChatMessagesData;
 };

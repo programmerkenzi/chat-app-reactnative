@@ -2,7 +2,7 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-08-03 18:48:27
+ * @LastEditTime: 2021-08-04 12:40:58
  * @LastEditors: Kenzi
  */
 import React, { useState, useCallback, useMemo } from "react";
@@ -122,13 +122,10 @@ const ChatMessagePage = ({
   const [showMessageFunctionBar, setShowMessageFunctionBar] = useState(false);
 
   //讯息解密
-  const receiverPublicId = roomInfo.receivers[0].public_key;
-  const sharedKey = generateShareKey(receiverPublicId, privateKey);
+  const receiverPublicKey = roomInfo.receivers[0].public_key;
 
   //讯息array
   const createGiftChatData = () => {
-    const sharedKey = generateShareKey(receiverPublicId, privateKey);
-
     const room_messages = conversations[room_id];
     let giftedChatMessagesData = [];
     if (room_messages) {
@@ -151,7 +148,7 @@ const ChatMessagePage = ({
         const { name, avatar } = post_by_user[0];
 
         //讯息解密
-        const decodedMessage = decodeMessage(message, sharedKey);
+        const decodedMessage = decodeMessage(message, receiverPublicKey);
 
         //gift chat用的obj
         let msg = {
@@ -259,7 +256,7 @@ const ChatMessagePage = ({
 
   const onSendMessage = async (theMessage) => {
     const messageText = theMessage[0].text;
-    const encodedMessage = await encodeMessage(messageText, sharedKey);
+    const encodedMessage = await encodeMessage(messageText, receiverPublicKey);
 
     let modifiedMessage = theMessage;
     let modifiedFiles = [...selectedFile];
@@ -273,10 +270,10 @@ const ChatMessagePage = ({
         file.url = file.uri;
       });
       modifiedMessage[0].file = modifiedFiles;
-      setSelectedFile([]);
       const res = await handleUploadMultipleFile(selectedFile);
       if (res.success) {
         //储存档案路径
+        setSelectedFile([]);
         filesUploaded = res.file;
       }
     }
@@ -323,8 +320,8 @@ const ChatMessagePage = ({
         encodedMessage
       );
       if (success) {
-        gotNewMessage({ data: data.data });
         clearSelectedMessage();
+        gotNewMessage({ data: data.data });
       }
     } else if (selectedForwardMessage.length > 0) {
       const pendingForwardMessageIds = selectedForwardMessage.map(
@@ -338,8 +335,8 @@ const ChatMessagePage = ({
         encodedMessage
       );
       if (success) {
-        gotNewMessage({ data: data.data });
         clearSelectedForwardMessage();
+        gotNewMessage({ data: data.data });
       }
     } else {
       const { success, data } = await postMessage(
@@ -398,7 +395,7 @@ const ChatMessagePage = ({
                 messages={props.currentMessage.reply_for}
                 post_by_user={props.currentMessage.user._id}
                 user_id={user_id}
-                sharedKey={sharedKey}
+                publicKey={receiverPublicKey}
               />
             ) : null}
             {props.currentMessage.forwarded_from ? (
@@ -406,6 +403,7 @@ const ChatMessagePage = ({
                 messages={props.currentMessage.forwarded_from}
                 post_by_user={props.currentMessage.user._id}
                 user_id={user_id}
+                publicKey={receiverPublicKey}
               />
             ) : null}
 

@@ -2,7 +2,7 @@
  * @Description: 聊天列表
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:24
- * @LastEditTime: 2021-08-03 18:27:43
+ * @LastEditTime: 2021-08-04 12:08:01
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -25,13 +25,17 @@ import {
 } from "../../../redux/chat/chat.actions";
 import { toMessagesPage } from "../utils";
 import * as mime from "react-native-mime-types";
-import { selectUserToken } from "./../../../redux/auth/auth.selector";
+import {
+  selectPrivateKey,
+  selectUserToken,
+} from "./../../../redux/auth/auth.selector";
 import { selectUserInfo } from "./../../../redux/user/user.selector";
 import { useRoute } from "@react-navigation/native";
 import { t } from "../../../i18n";
 import { Button } from "react-native-elements/dist/buttons/Button";
 import { HeaderOptionsWithRightButton } from "../../../navigation/Options";
 import { selectParams } from "./../../../redux/router/router.select";
+import { decodeMessage } from "./../../../library/utils/crypto";
 
 selectUserInfo;
 const ChatHistoryPage = ({
@@ -89,11 +93,19 @@ const ChatHistoryPage = ({
 
         let lastTextMessage = "";
 
-        if (lastMessageInfo.message.length > 0) {
+        if (lastMessageInfo.message) {
+          //讯息解密
+          const receiverPublicKey = receivers[0].public_key;
+          const decodedMessage = decodeMessage(
+            lastMessageInfo.message,
+            receiverPublicKey
+          );
+
+          console.log("decodedMessage :>> ", decodedMessage);
           lastTextMessage =
-            lastMessageInfo.message.length > 20
-              ? lastMessageInfo.message.substring(0, 20) + "..."
-              : lastMessageInfo.message;
+            decodedMessage.length > 20
+              ? decodedMessage.substring(0, 20) + "..."
+              : decodedMessage;
         }
         if (lastMessageInfo.file.length > 0) {
           lastMessageInfo.file.forEach((item) => {

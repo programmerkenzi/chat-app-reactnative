@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-26 13:47:04
- * @LastEditTime: 2021-07-27 10:22:17
+ * @LastEditTime: 2021-08-04 12:35:49
  * @LastEditors: Kenzi
  */
 
@@ -12,13 +12,16 @@ import { Icon } from "react-native-elements";
 import { tw } from "react-native-tailwindcss";
 import { t } from "../../i18n";
 import FilesRender from "./FilesRender";
+import { decodeMessage } from "./../../library/utils/crypto";
 
-const ForwardedMessage = ({ messages, post_by_user, user_id }) => {
+const ForwardedMessage = ({ messages, post_by_user, user_id, publicKey }) => {
   const isPostByCurrentUser = post_by_user === user_id;
 
   const renderMessage = (msg) => {
     const { file, message, post_by_user } = msg;
     const { name } = post_by_user[0];
+    const decodedMessage =
+      typeof message === "string" ? message : decodeMessage(message, publicKey);
     return (
       <>
         <View style={[tw.flexRow, tw.mB1]}>
@@ -44,7 +47,7 @@ const ForwardedMessage = ({ messages, post_by_user, user_id }) => {
             isPostByCurrentUser ? tw.textGray200 : tw.textGray800,
           ]}
         >
-          {message}
+          {decodedMessage}
         </Text>
       </>
     );

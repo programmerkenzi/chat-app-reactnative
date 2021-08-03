@@ -2,10 +2,11 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-08-02 16:00:49
- * @LastEditTime: 2021-08-03 18:48:22
+ * @LastEditTime: 2021-08-04 12:15:07
  * @LastEditors: Kenzi
  */
 import nacl from "tweet-nacl-react-native-expo";
+import { store } from "./../../redux/store";
 
 export const generateShareKey = (publicKeyFromOther, myPrivateKey) => {
   const decodedPublicKeyFromOther = nacl.util.decodeBase64(publicKeyFromOther);
@@ -14,7 +15,10 @@ export const generateShareKey = (publicKeyFromOther, myPrivateKey) => {
   return nacl.box.before(decodedPublicKeyFromOther, decodedMyPrivateKey);
 };
 
-export const encodeMessage = async (message, sharedKey) => {
+export const encodeMessage = async (message, publicKeyFromOther) => {
+  const state = store.getState();
+  const privateKey = state.secure.auth.privateKey;
+  const sharedKey = generateShareKey(publicKeyFromOther, privateKey);
   const messageUtf8Decoded = new Uint8Array(nacl.util.decodeUTF8(message));
   const nonce = await nacl.randomBytes(24);
   const encryptedMessage = nacl.box.after(messageUtf8Decoded, nonce, sharedKey);
@@ -23,7 +27,11 @@ export const encodeMessage = async (message, sharedKey) => {
   return { encodedMessage: encodedBase64Message, withNonce: encodeBase64Nonce };
 };
 
-export const decodeMessage = (encodedMessageInfo, sharedKey) => {
+export const decodeMessage = (encodedMessageInfo, publicKeyFromOther) => {
+  //获取私钥
+  const state = store.getState();
+  const privateKey = state.secure.auth.privateKey;
+  const sharedKey = generateShareKey(publicKeyFromOther, privateKey);
   const { encodedMessage, withNonce } = encodedMessageInfo;
   const nonceDecoded = nacl.util.decodeBase64(withNonce);
   const messageUtf8Decoded = nacl.util.decodeBase64(encodedMessage); // same as bobEncryptedStr
