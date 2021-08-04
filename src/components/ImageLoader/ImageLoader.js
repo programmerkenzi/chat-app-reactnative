@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-02 10:07:25
- * @LastEditTime: 2021-07-14 15:35:40
+ * @LastEditTime: 2021-08-04 14:42:55
  * @LastEditors: Kenzi
  */
 
@@ -19,8 +19,11 @@ import {
 import { Icon } from "react-native-elements";
 import { darkGary, lightGary } from "./../../styles/color";
 import { t } from "../../i18n";
+import { connect } from "react-redux";
+import { selectUserToken } from "./../../redux/auth/auth.selector";
+import { createStructuredSelector } from "reselect";
 
-const ImageLoader = ({ url, index }) => {
+const ImageLoader = ({ url, token }) => {
   const width = Dimensions.get("screen").width / 3;
   const height = width / 1.5;
   const maxWidth = Dimensions.get("screen").width * 0.45;
@@ -35,6 +38,7 @@ const ImageLoader = ({ url, index }) => {
   const onLoad = () => {
     Image.getSize(
       url,
+
       //加载成功
       (width, height) => {
         if (width && height) {
@@ -96,7 +100,7 @@ const ImageLoader = ({ url, index }) => {
     </View>
   ) : (
     <Image
-      source={{ uri: url }}
+      source={{ uri: url, headers: { authorization: "token" } }}
       resizeMethod="resize"
       style={{
         height: imgHeight,
@@ -108,6 +112,12 @@ const ImageLoader = ({ url, index }) => {
   );
 };
 
-export default ImageLoader;
+const mapStateToProps = createStructuredSelector({
+  token: selectUserToken,
+});
+
+const mapDispatchToProps = {};
+
+export default connect(mapStateToProps)(ImageLoader);
 
 const styles = StyleSheet.create({});

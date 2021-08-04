@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-05-21 14:59:28
- * @LastEditTime: 2021-08-02 11:11:21
+ * @LastEditTime: 2021-08-04 14:24:17
  * @LastEditors: Kenzi
  */
 
@@ -167,6 +167,7 @@ export const createFileUrl = (filename) => {
   const filePath = `${baseUrl}${fileBasePath}${filename}/${
     token.split(" ")[1]
   }`;
+  //const filePath = `${baseUrl}${fileBasePath}${filename}`;
 
   return filePath;
 };

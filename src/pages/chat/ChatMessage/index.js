@@ -2,13 +2,12 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-08-04 12:40:58
+ * @LastEditTime: 2021-08-04 16:46:48
  * @LastEditors: Kenzi
  */
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { connect } from "react-redux";
-import { FAB, Icon } from "react-native-elements";
 
 import {
   gotNewMessages,
@@ -27,9 +26,8 @@ import {
 } from "../../../redux/chat/chat.selector";
 import { selectConversations } from "../../../redux/chat/chat.selector";
 import { useRoute } from "@react-navigation/native";
-import PrimarySearchBar from "../../../components/searchBar/PrimarySearchBar";
 import { useEffect } from "react";
-import { GiftedChat, InputToolbar } from "react-native-gifted-chat";
+import { GiftedChat } from "react-native-gifted-chat";
 import FunctionsBar from "./../../../components/Chat/FunctionsBar";
 import EmojiBoard from "react-native-emoji-board";
 import SentButton from "./../../../components/Chat/SentButton";
@@ -46,9 +44,8 @@ import { ContainerWithBgColor } from "./../../../styles/layout";
 import * as mime from "react-native-mime-types";
 import FileContainer from "./../../../components/Chat/FileContainer";
 import FilesRender from "./../../../components/Chat/FilesRender";
-import { handleUploadMultipleFile, toSelectMembersPage } from "./../utils";
+import { handleUploadMultipleFile } from "./../utils";
 import { handleOnSelect } from "../../../library/utils/utils";
-import { darkGary, red } from "../../../styles/color";
 import { deleteMessage } from "./../../../chat_api/chat";
 import { onDeleteConversation } from "./../../../redux/chat/chat.actions";
 import { createFileUrl } from "./../../../library/utils/utils";
@@ -64,15 +61,8 @@ import {
   onRemoveSelectedForwardMessage,
   onClearSelectedForwardMessage,
 } from "./../../../redux/chat/chat.actions";
-import { generateCryptoService } from "../../../library/utils/crypto";
-import { decoder, encoder } from "./../../../library/utils/crypto";
-import { exampleEncryptDecrypt } from "./../../../library/utils/crypto";
 import PinMessage from "../../../components/Chat/PinMessage";
-import {
-  generateShareKey,
-  encodeMessage,
-  decodeMessage,
-} from "./../../../library/utils/crypto";
+import { encodeMessage, decodeMessage } from "./../../../library/utils/crypto";
 import { selectPrivateKey } from "../../../redux/auth/auth.selector";
 
 const ChatMessagePage = ({
@@ -113,6 +103,7 @@ const ChatMessagePage = ({
   const [currentMessage, setCurrentMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [pinMessages, setPinMessages] = useState([]);
 
   const [searchString, setSearchString] = useState("");
   const [searchResults, setSearchResults] = useState("");
@@ -140,6 +131,7 @@ const ChatMessagePage = ({
           read_by_recipients,
           post_by_user,
           file,
+          pin,
         } = item;
         const postedByUser = post_by_user[0]._id;
         const isRead = read_by_recipients.findIndex(
@@ -168,6 +160,7 @@ const ChatMessagePage = ({
             : true,
           forwarded_from: forwarded_from_messages,
           reply_for: reply_for_message,
+          isPin: pin,
         };
         if (file.length > 0) {
           file.forEach((item) => {
@@ -181,6 +174,13 @@ const ChatMessagePage = ({
         giftedChatMessagesData.push(msg);
       });
     }
+    const pinMessages = giftedChatMessagesData.filter(
+      (msg) => msg.isPin === true
+    );
+
+    console.log("pinMessages :>> ", pinMessages);
+
+    setPinMessages(pinMessages);
     setMessages(giftedChatMessagesData);
   };
 
@@ -382,7 +382,10 @@ const ChatMessagePage = ({
         type="message"
       /> */}
 
-      <PinMessage />
+      {/* 讯息至顶 */}
+      {pinMessages.length ? (
+        <PinMessage messages={pinMessages} publicKey={receiverPublicKey} />
+      ) : null}
       <GiftedChat
         messages={searchString.length ? searchResults : messages}
         text={currentMessage}

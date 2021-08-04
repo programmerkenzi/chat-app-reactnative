@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-26 13:47:04
- * @LastEditTime: 2021-08-04 12:35:49
+ * @LastEditTime: 2021-08-04 16:40:28
  * @LastEditors: Kenzi
  */
 
@@ -54,14 +54,7 @@ const ForwardedMessage = ({ messages, post_by_user, user_id, publicKey }) => {
   };
 
   return messages.length ? (
-    <View
-      style={[
-        tw.m2,
-        tw.p2,
-        tw.borderL2,
-        isPostByCurrentUser ? tw.borderGray300 : tw.borderGray600,
-      ]}
-    >
+    <View style={[tw.p2]}>
       {messages.map((message) => renderMessage(message))}
     </View>
   ) : null;

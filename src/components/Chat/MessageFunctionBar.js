@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-26 17:07:38
- * @LastEditTime: 2021-07-27 14:22:50
+ * @LastEditTime: 2021-08-04 15:20:37
  * @LastEditors: Kenzi
  */
 
@@ -48,6 +48,17 @@ const MessageFunctionBar = ({
                   iconStyle={[tw.textGray800, tw.mB1]}
                 />
                 <Text style={[tw.textGray800]}>{t("chat.reply")}</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <View style={[tw.flexCol, tw.p3]}>
+                <Icon
+                  name="thumbtack"
+                  type="font-awesome-5"
+                  size={20}
+                  iconStyle={[tw.textGray800, tw.mB1]}
+                />
+                <Text style={[tw.textGray800]}>{t("chat.pin_f")}</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity>
