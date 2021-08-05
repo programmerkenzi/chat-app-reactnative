@@ -2,7 +2,7 @@
  * @Description: 聊天列表
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:24
- * @LastEditTime: 2021-08-04 12:08:01
+ * @LastEditTime: 2021-08-05 14:08:06
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -96,10 +96,10 @@ const ChatHistoryPage = ({
         if (lastMessageInfo.message) {
           //讯息解密
           const receiverPublicKey = receivers[0].public_key;
-          const decodedMessage = decodeMessage(
-            lastMessageInfo.message,
-            receiverPublicKey
-          );
+          const decodedMessage =
+            typeof lastMessageInfo.message === "string"
+              ? lastMessageInfo.message
+              : decodeMessage(lastMessageInfo.message, receiverPublicKey);
 
           console.log("decodedMessage :>> ", decodedMessage);
           lastTextMessage =

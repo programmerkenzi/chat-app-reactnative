@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:33:46
- * @LastEditTime: 2021-08-03 18:57:51
+ * @LastEditTime: 2021-08-05 15:55:52
  * @LastEditors: Kenzi
  */
 import {
@@ -24,6 +24,8 @@ import {
   onAddFriend,
   onDeleteConversation,
   onRecipientMarkRead,
+  onUnpinnedMessage,
+  onPinnedMessage,
 } from "../chat/chat.actions";
 import wsActionType from "./ws.type";
 import networkActionTypes from "./../network/network.type";
@@ -32,12 +34,16 @@ import {
   networkDisconnected,
 } from "../network/network.action";
 import { onGotNewNotification } from "../notification/notification.action";
+import {
+  REACT_APP_API_URL_DEVELOPMENT,
+  REACT_APP_API_URL_PRODUCTION,
+} from "@env";
 
 function initSocketIo(user_id) {
   return eventChannel((emitter) => {
     const baseUrl = __DEV__
-      ? process.env.REACT_APP_API_URL_DEVELOPMENT
-      : process.env.REACT_APP_API_URL_PRODUCTION;
+      ? REACT_APP_API_URL_DEVELOPMENT
+      : REACT_APP_API_URL_PRODUCTION;
 
     const socket = io(baseUrl);
     socket.on("connect", () => {
@@ -68,6 +74,14 @@ function initSocketIo(user_id) {
     socket.on("delete_message", (data) => {
       const { chat_room_id, message_ids } = data.data;
       emitter(onDeleteConversation(chat_room_id, message_ids));
+    });
+    socket.on("pinned_message", (data) => {
+      const { chat_room_id, message_id } = data.data;
+      emitter(onPinnedMessage(chat_room_id, message_id));
+    });
+    socket.on("unpinned_message", (data) => {
+      const { chat_room_id, message_id } = data.data;
+      emitter(onUnpinnedMessage(chat_room_id, message_id));
     });
 
     socket.on("disconnect", (reason) => {

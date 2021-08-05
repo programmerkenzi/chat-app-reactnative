@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:41
- * @LastEditTime: 2021-07-28 10:17:11
+ * @LastEditTime: 2021-08-05 15:48:41
  * @LastEditors: Kenzi
  */
 
@@ -188,4 +188,21 @@ export const onAddFriend = (friend_info) => ({
 export const onUpdateFriendList = (new_friend_list) => ({
   type: chatActionType.UPDATE_FRIEND_LIST,
   payload: new_friend_list,
+});
+
+export const onPinnedMessage = (chat_room_id, message_id) => ({
+  type: chatActionType.PINNED_MESSAGE,
+  payload: {
+    type: "pinned",
+    chat_room_id: chat_room_id,
+    message_id: message_id,
+  },
+});
+export const onUnpinnedMessage = (chat_room_id, message_id) => ({
+  type: chatActionType.UNPINNED_MESSAGE,
+  payload: {
+    type: "unpinned",
+    chat_room_id: chat_room_id,
+    message_id: message_id,
+  },
 });

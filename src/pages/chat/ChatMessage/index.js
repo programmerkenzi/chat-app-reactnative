@@ -2,7 +2,7 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-08-04 16:46:48
+ * @LastEditTime: 2021-08-05 15:39:41
  * @LastEditors: Kenzi
  */
 import React, { useState, useCallback } from "react";
@@ -64,6 +64,11 @@ import {
 import PinMessage from "../../../components/Chat/PinMessage";
 import { encodeMessage, decodeMessage } from "./../../../library/utils/crypto";
 import { selectPrivateKey } from "../../../redux/auth/auth.selector";
+import { pinMessage, unpinMessage } from "./../../../chat_api/chat";
+import {
+  onPinnedMessage,
+  onUnpinnedMessage,
+} from "./../../../redux/chat/chat.actions";
 
 const ChatMessagePage = ({
   userInfo,
@@ -82,6 +87,8 @@ const ChatMessagePage = ({
   selectedForwardMessage,
   clearSelectedForwardMessage,
   privateKey,
+  pinnedMessage,
+  unpinnedMessage,
 }) => {
   //聊天记录
   const chatRoomArray = Object.values(chatRoomList);
@@ -177,8 +184,6 @@ const ChatMessagePage = ({
     const pinMessages = giftedChatMessagesData.filter(
       (msg) => msg.isPin === true
     );
-
-    console.log("pinMessages :>> ", pinMessages);
 
     setPinMessages(pinMessages);
     setMessages(giftedChatMessagesData);
@@ -350,6 +355,28 @@ const ChatMessagePage = ({
     }
   };
 
+  //訊息至頂
+
+  const handlePinMessage = async () => {
+    const { _id } = selectedMessage[0];
+    const onPin = await pinMessage(room_id, _id);
+
+    if (onPin.success) {
+      setShowMessageFunctionBar(false);
+      clearSelectedMessage();
+      pinnedMessage(room_id, _id);
+    }
+  };
+
+  const handleUnpinMessage = async (theMessage) => {
+    const { _id } = theMessage;
+    const onUnpin = await unpinMessage(room_id, _id);
+    if (onUnpin.success) {
+      console.log("unpin success :>> ;");
+      unpinnedMessage(room_id, _id);
+    }
+  };
+
   //开关已选讯息功能列
 
   useEffect(() => {
@@ -384,7 +411,11 @@ const ChatMessagePage = ({
 
       {/* 讯息至顶 */}
       {pinMessages.length ? (
-        <PinMessage messages={pinMessages} publicKey={receiverPublicKey} />
+        <PinMessage
+          messages={pinMessages}
+          publicKey={receiverPublicKey}
+          handleClose={handleUnpinMessage}
+        />
       ) : null}
       <GiftedChat
         messages={searchString.length ? searchResults : messages}
@@ -471,6 +502,7 @@ const ChatMessagePage = ({
                 handleDeleteMessage={handleDeleteMessage}
                 handleForwardMessages={handleForwardMessages}
                 handleReplyMessage={handleReplyMessage}
+                handlePinMessage={handlePinMessage}
                 numSelected={selectedMessage.length}
                 handleClose={clearSelectedMessage}
               />
@@ -538,6 +570,10 @@ const mapDispatchToProp = (dispatch) => ({
   removeSelectedForwardMessage: (message) =>
     dispatch(onRemoveSelectedForwardMessage(message)),
   clearSelectedForwardMessage: () => dispatch(onClearSelectedForwardMessage()),
+  pinnedMessage: (room_id, message_id) =>
+    dispatch(onPinnedMessage(room_id, message_id)),
+  unpinnedMessage: (room_id, message_id) =>
+    dispatch(onUnpinnedMessage(room_id, message_id)),
 });
 
 const mapStateToProp = createStructuredSelector({

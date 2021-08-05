@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:57
- * @LastEditTime: 2021-08-04 12:12:04
+ * @LastEditTime: 2021-08-05 15:47:20
  * @LastEditors: Kenzi
  */
 
@@ -409,6 +409,55 @@ function* onAddFriend() {
   yield takeLatest(chatActionType.ADD_FRIEND, addFriend);
 }
 
+function* handlePinnedMessage({ payload }) {
+  try {
+    const { type, chat_room_id, message_id } = payload;
+    const chat = (state) => state.main.chat;
+    const { conversations } = yield select(chat);
+    let theRoomConversations = conversations[chat_room_id];
+    console.log("chat_room_id :>> ", chat_room_id);
+
+    if (theRoomConversations) {
+      //在該訊息在房間對話清單中
+      const findMessageIndex = theRoomConversations.findIndex(
+        (msg) => msg._id === message_id
+      );
+      if (findMessageIndex !== -1) {
+        if (type === "pinned") {
+          console.log("pinned :>> ");
+          theRoomConversations[findMessageIndex] = {
+            ...theRoomConversations[findMessageIndex],
+            pin: true,
+          };
+        } else if (type === "unpinned") {
+          console.log("unpinned :>> ");
+          theRoomConversations[findMessageIndex] = {
+            ...theRoomConversations[findMessageIndex],
+            pin: false,
+          };
+        }
+        yield put(updateConversation(theRoomConversations, chat_room_id));
+
+        //在該訊息不在在房間對話清單中
+      } else {
+        if (type === "pinned") {
+          theRoomConversations = yield getConversations(chat_room_id, 0, []);
+          yield put(updateConversation(theRoomConversations, chat_room_id));
+        }
+      }
+    }
+  } catch (e) {
+    console.log("e :>> ", e);
+  }
+}
+
+function* onPinnedMessage() {
+  yield takeEvery(chatActionType.PINNED_MESSAGE, handlePinnedMessage);
+}
+function* onUnpinnedMessage() {
+  yield takeEvery(chatActionType.UNPINNED_MESSAGE, handlePinnedMessage);
+}
+
 export default function* chatSagas() {
   yield all([
     fork(onGotNewMessage),
@@ -421,5 +470,7 @@ export default function* chatSagas() {
     fork(onDeleteMessage),
     fork(onHandlePushNotification),
     fork(onAddFriend),
+    fork(onPinnedMessage),
+    fork(onUnpinnedMessage),
   ]);
 }

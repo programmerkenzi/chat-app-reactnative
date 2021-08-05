@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-08-02 18:07:46
- * @LastEditTime: 2021-08-04 18:20:23
+ * @LastEditTime: 2021-08-05 16:01:10
  * @LastEditors: Kenzi
  */
 
@@ -20,10 +20,11 @@ import { Icon } from "react-native-elements";
 import { decodeMessage } from "./../../library/utils/crypto";
 import { useState } from "react";
 import * as Animatable from "react-native-animatable";
+import { useEffect } from "react";
 
 const PinMessage = ({ messages, handleClose, publicKey }) => {
   const [boxMinHeight, setBoxMinHeight] = useState(
-    messages.length > 1 ? 80 : 60
+    messages.length > 1 ? 85 : 55
   );
   const [animation, setAnimation] = useState("fadeInDown");
   const [extendedBox, setExtendedBox] = useState(false);
@@ -32,9 +33,20 @@ const PinMessage = ({ messages, handleClose, publicKey }) => {
     setExtendedBox(!extendedBox);
   };
 
+  //依訊息數量調整box高度
+  useEffect(() => {
+    if (messages.length > 1) {
+      setBoxMinHeight(85);
+    } else {
+      setBoxMinHeight(55);
+    }
+  }, [messages]);
+
   const renderMessage = (message) => {
     const decodedMessage =
-      typeof message === "string" ? message : decodeMessage(message, publicKey);
+      typeof message.text === "string"
+        ? message.text
+        : decodeMessage(message.text, publicKey);
 
     return (
       <View
@@ -114,7 +126,7 @@ const PinMessage = ({ messages, handleClose, publicKey }) => {
         </View>
       ) : null}
       <ScrollView>
-        {messages.map((message) => renderMessage(message.text))}
+        {messages.map((message) => renderMessage(message))}
       </ScrollView>
     </Animatable.View>
   ) : null;

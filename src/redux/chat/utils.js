@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-21 14:34:35
- * @LastEditTime: 2021-08-04 11:54:25
+ * @LastEditTime: 2021-08-05 11:54:44
  * @LastEditors: Kenzi
  */
 
@@ -172,6 +172,8 @@ export const initRoom = async (creator, user_ids, type) => {
     user_ids,
     type,
   });
+
+  console.log("res initializeChatRoom :>> ", res);
 
   const room_info = await res.data.room_info[0];
   const avatar = room_info.avatar

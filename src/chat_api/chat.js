@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-14 17:57:36
- * @LastEditTime: 2021-07-27 11:50:03
+ * @LastEditTime: 2021-08-05 14:54:57
  * @LastEditors: Kenzi
  */
 
@@ -88,4 +88,15 @@ export const replyMessage = (room_id, message_id, file, message) =>
     url: `/room/${room_id}/reply_message`,
     method: "post",
     data: { message_id, file, message },
+  });
+
+export const pinMessage = (room_id, message_id) =>
+  axiosChatClient({
+    url: `/room/${room_id}/pin-message/${message_id}`,
+    method: "put",
+  });
+export const unpinMessage = (room_id, message_id) =>
+  axiosChatClient({
+    url: `/room/${room_id}/unpin-message/${message_id}`,
+    method: "put",
   });

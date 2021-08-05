@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-05-21 14:59:28
- * @LastEditTime: 2021-08-04 14:24:17
+ * @LastEditTime: 2021-08-05 11:44:19
  * @LastEditors: Kenzi
  */
 
@@ -13,7 +13,10 @@ import { Alert } from "react-native";
 import { t } from "../../i18n";
 import axios from "axios";
 import { store } from "../../redux/store";
-
+import {
+  REACT_APP_API_URL_DEVELOPMENT,
+  REACT_APP_API_URL_PRODUCTION,
+} from "@env";
 //樹狀數據搜索
 export const searchTree = (element, matchingName) => {
   if (element.name.includes(matchingName)) {
@@ -160,8 +163,8 @@ export const createFileUrl = (filename) => {
   const state = store.getState();
   const token = state.secure.auth.userToken;
   const baseUrl = __DEV__
-    ? process.env.REACT_APP_API_URL_DEVELOPMENT
-    : process.env.REACT_APP_API_URL_PRODUCTION;
+    ? REACT_APP_API_URL_DEVELOPMENT
+    : REACT_APP_API_URL_PRODUCTION;
 
   const fileBasePath = "/fs/download/";
   const filePath = `${baseUrl}${fileBasePath}${filename}/${

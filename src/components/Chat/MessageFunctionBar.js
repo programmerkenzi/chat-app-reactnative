@@ -18,6 +18,7 @@ const MessageFunctionBar = ({
   handleDeleteMessage,
   handleForwardMessages,
   handleReplyMessage,
+  handlePinMessage,
   handleClose,
   numSelected,
 }) => {
@@ -50,7 +51,7 @@ const MessageFunctionBar = ({
                 <Text style={[tw.textGray800]}>{t("chat.reply")}</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => handlePinMessage()}>
               <View style={[tw.flexCol, tw.p3]}>
                 <Icon
                   name="thumbtack"

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-14 17:54:54
- * @LastEditTime: 2021-07-22 16:23:27
+ * @LastEditTime: 2021-08-05 15:13:48
  * @LastEditors: Kenzi
  */
 
@@ -16,11 +16,15 @@ import { onRefreshToken } from "./auth";
 import { onRefreshTokenSuccess } from "./../redux/auth/auth.actions";
 import * as Device from "expo-device";
 import { startLoading, stopLoading } from "./../redux/app/app.action";
+import {
+  REACT_APP_API_URL_DEVELOPMENT,
+  REACT_APP_API_URL_PRODUCTION,
+} from "@env";
 
 const axiosChatClient = axios.create({
   baseURL: __DEV__
-    ? process.env.REACT_APP_API_URL_DEVELOPMENT
-    : process.env.REACT_APP_API_URL_PRODUCTION,
+    ? REACT_APP_API_URL_DEVELOPMENT
+    : REACT_APP_API_URL_PRODUCTION,
   paramsSerializer: (params) => queryString.stringify(params),
   timeout: 5000, // request timeout
 });
@@ -53,7 +57,7 @@ axiosChatClient.interceptors.response.use(
   (response) => {
     store.dispatch(stopLoading());
     const res = response.data;
-
+    console.log("res :>> ", res);
     return res;
   },
   async function (error) {

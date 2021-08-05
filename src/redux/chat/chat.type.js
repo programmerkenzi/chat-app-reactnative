@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:34:19
- * @LastEditTime: 2021-07-28 10:28:44
+ * @LastEditTime: 2021-08-05 14:24:21
  * @LastEditors: Kenzi
  */
 
@@ -41,6 +41,8 @@ const chatActionType = {
   ADD_FRIEND: "ADD_FRIEND",
   REMOVE_FRIEND: "REMOVE_FRIEND",
   UPDATE_FRIEND_LIST: "UPDATE_FRIEND_LIST",
+  PINNED_MESSAGE: "PINNED_MESSAGE",
+  UNPINNED_MESSAGE: "UNPINNED_MESSAGE",
 };
 
 export default chatActionType;
