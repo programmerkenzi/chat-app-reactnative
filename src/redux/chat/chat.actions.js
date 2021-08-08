@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:41
- * @LastEditTime: 2021-08-05 15:48:41
+ * @LastEditTime: 2021-08-06 16:47:00
  * @LastEditors: Kenzi
  */
 
@@ -89,9 +89,23 @@ export const updateChatRoomStateFailure = (error) => ({
  * @param {String} type 房间类型: group 或 private
  */
 
-export const initializeChatRoomStart = (navigation, user_ids, type) => ({
+export const initializeChatRoomStart = (
+  navigation,
+  user_ids,
+  type,
+  groupName,
+  description,
+  imageUri
+) => ({
   type: chatActionType.INITIALIZE_CHAT_ROOM_START,
-  payload: { navigation: navigation, user_ids: user_ids, type },
+  payload: {
+    navigation: navigation,
+    user_ids: user_ids,
+    type: type,
+    name: groupName,
+    description: description,
+    avatar: imageUri,
+  },
 });
 
 /**

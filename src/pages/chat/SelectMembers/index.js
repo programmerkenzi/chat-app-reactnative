@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2021-02-10 15:02:13
- * @LastEditTime: 2021-07-27 15:46:04
+ * @LastEditTime: 2021-08-06 18:46:43
  * @LastEditors: Kenzi
  */
 import React, { useState } from "react";
@@ -37,7 +37,7 @@ const SelectMembersPage = ({
   //聯絡人名單
   const [contactListData, setContactListData] = useState([]);
   const [checkedItem, setCheckedItem] = useState(
-    fromRouteName === "GroupInfo" ? useRoute().params.item.users : []
+    fromRouteName === "GroupInfo" ? useRoute().params?.item?.users : []
   ); //來自group info || add new group
 
   //re render trigger of check Item Box

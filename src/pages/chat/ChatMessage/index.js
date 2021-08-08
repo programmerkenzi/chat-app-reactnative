@@ -2,7 +2,7 @@
  * @Description: 聊天 context
  * @Author: Lewis
  * @Date: 2021-01-30 14:35:44
- * @LastEditTime: 2021-08-05 15:39:41
+ * @LastEditTime: 2021-08-07 18:05:57
  * @LastEditors: Kenzi
  */
 import React, { useState, useCallback } from "react";
@@ -62,7 +62,12 @@ import {
   onClearSelectedForwardMessage,
 } from "./../../../redux/chat/chat.actions";
 import PinMessage from "../../../components/Chat/PinMessage";
-import { encodeMessage, decodeMessage } from "./../../../library/utils/crypto";
+import {
+  encodeMessage,
+  decodeMessage,
+  decodeGroupMessage,
+  encodeGroupMessage,
+} from "./../../../library/utils/crypto";
 import { selectPrivateKey } from "../../../redux/auth/auth.selector";
 import { pinMessage, unpinMessage } from "./../../../chat_api/chat";
 import {
@@ -121,6 +126,8 @@ const ChatMessagePage = ({
 
   //讯息解密
   const receiverPublicKey = roomInfo.receivers[0].public_key;
+  const groupKeypair = roomInfo.key;
+  const roomType = roomInfo.type;
 
   //讯息array
   const createGiftChatData = () => {
@@ -147,7 +154,10 @@ const ChatMessagePage = ({
         const { name, avatar } = post_by_user[0];
 
         //讯息解密
-        const decodedMessage = decodeMessage(message, receiverPublicKey);
+        const decodedMessage =
+          roomType === "private"
+            ? decodeMessage(message, receiverPublicKey)
+            : decodeGroupMessage(message, groupKeypair);
 
         //gift chat用的obj
         let msg = {
@@ -261,7 +271,10 @@ const ChatMessagePage = ({
 
   const onSendMessage = async (theMessage) => {
     const messageText = theMessage[0].text;
-    const encodedMessage = await encodeMessage(messageText, receiverPublicKey);
+    const encodedMessage =
+      roomType === "private"
+        ? await encodeMessage(messageText, receiverPublicKey)
+        : await encodeGroupMessage(messageText, groupKeypair);
 
     let modifiedMessage = theMessage;
     let modifiedFiles = [...selectedFile];
@@ -414,6 +427,8 @@ const ChatMessagePage = ({
         <PinMessage
           messages={pinMessages}
           publicKey={receiverPublicKey}
+          groupKeypair={groupKeypair}
+          roomType={roomType}
           handleClose={handleUnpinMessage}
         />
       ) : null}
@@ -430,6 +445,8 @@ const ChatMessagePage = ({
                 post_by_user={props.currentMessage.user._id}
                 user_id={user_id}
                 publicKey={receiverPublicKey}
+                groupKeypair={groupKeypair}
+                roomType={roomType}
               />
             ) : null}
             {props.currentMessage.forwarded_from ? (
@@ -438,6 +455,8 @@ const ChatMessagePage = ({
                 post_by_user={props.currentMessage.user._id}
                 user_id={user_id}
                 publicKey={receiverPublicKey}
+                groupKeypair={groupKeypair}
+                roomType={roomType}
               />
             ) : null}
 

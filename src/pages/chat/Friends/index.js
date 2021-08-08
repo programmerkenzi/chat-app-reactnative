@@ -2,7 +2,7 @@
  * @Description: 用户在线
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:53
- * @LastEditTime: 2021-08-05 11:53:27
+ * @LastEditTime: 2021-08-06 18:38:31
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -49,6 +49,10 @@ const FriendsPage = ({
     const roomUserIds = [userInfo._id, user_id];
     let isExistRoom = null;
     let chatRoomArray = Object.values(chatRoomList);
+    chatRoomArray = chatRoomArray.filter(
+      (chatRoom) => chatRoom.type !== "group"
+    );
+    console.log("chatRoomArray :>> ", chatRoomArray);
     //确认该房间使否已经在列表
     chatRoomArray.some((room) => {
       if (typeof room === "object") {

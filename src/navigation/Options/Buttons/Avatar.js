@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-22 14:38:50
- * @LastEditTime: 2021-07-28 12:18:35
+ * @LastEditTime: 2021-08-06 17:14:45
  * @LastEditors: Kenzi
  */
 
@@ -19,6 +19,7 @@ import { toUserInfoPage } from "./../../../pages/chat/utils";
 import { HeaderBackButton } from "@react-navigation/stack";
 import { tw } from "react-native-tailwindcss";
 import { selectChatRoomList } from "../../../redux/chat/chat.selector";
+import { toGroupInfoPage } from "./../../../pages/chat/utils";
 const AvatarButton = ({ userInfo, roomList }) => {
   const navigation = useNavigation();
   const chatRoomArray = Object.values(roomList);
@@ -29,23 +30,18 @@ const AvatarButton = ({ userInfo, roomList }) => {
       )[0];
 
   const receiver = roomInfo.receivers[0];
+  console.log("roomInfo :>> ", roomInfo);
   const avatar =
-    roomInfo.type === "private" ? receiver.avatar : roomInfo.avatar; // 私人||群组
-  const avatarUrl = avatar.length > 0 ? avatar : "http://";
+    roomInfo?.type === "private" ? receiver.avatar : roomInfo.avatar; // 私人||群组
+  const avatarUrl = avatar ? avatar : "http://";
   const name = roomInfo.type === "private" ? receiver.name : roomInfo.name; //群組 || 私人
 
   const handleOnPress = () => {
-    // //判斷聊天內容是否為group
-    // if (roomInfo.name) {
-    //   return toGroupInfoPage(roomInfo, navigation);
-    // }
+    //判斷聊天內容是否為group
+    if (roomInfo.type === "group") {
+      return toGroupInfoPage(roomInfo, navigation);
+    }
 
-    // //判斷是上個頁面是否為為group
-    // if (routeName === "Groups") {
-    //   return toGroupInfoPage(item, navigation);
-    // } else {
-    //   return toUserInfoPage(receiver, navigation);
-    // }
     return toUserInfoPage(receiver, navigation);
   };
 
