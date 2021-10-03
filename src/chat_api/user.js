@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-20 12:31:35
- * @LastEditTime: 2021-07-20 18:18:21
+ * @LastEditTime: 2021-08-10 07:42:23
  * @LastEditors: Kenzi
  */
 
@@ -33,4 +33,20 @@ export const submitFriendRequestPost = (public_id, notification_id) =>
     url: `/users/add-friend/${public_id}`,
     method: "put",
     data: { notification_id: notification_id },
+  });
+
+//換頭像
+export const updateUserAvatar = (filename) =>
+  axiosChatClient({
+    url: `/users/avatar`,
+    method: "put",
+    data: { filename },
+  });
+
+//換背景
+export const updateUserBackground = (filename) =>
+  axiosChatClient({
+    url: `/users/bg`,
+    method: "put",
+    data: { filename },
   });

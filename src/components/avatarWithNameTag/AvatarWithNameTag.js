@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-20 10:55:50
- * @LastEditTime: 2021-07-14 17:05:03
+ * @LastEditTime: 2021-08-06 16:29:05
  * @LastEditors: Kenzi
  */
 
@@ -16,9 +16,9 @@ const AvatarWithNameTag = ({ item }) => {
       <Avatar
         rounded
         size={"small"}
-        title={item.name.toUpperCase().substring(0, 2)}
+        title={item?.name?.toUpperCase().substring(0, 2)}
         source={{
-          uri: item.avatar.length > 0 ? item.avatar : "http://",
+          uri: item?.avatar.length > 0 ? item.avatar : "http://",
         }}
       />
       <Text style={styles.itemText}>{item.name}</Text>
