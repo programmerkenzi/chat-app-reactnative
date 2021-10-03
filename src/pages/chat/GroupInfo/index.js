@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-12 09:20:53
- * @LastEditTime: 2021-03-21 14:21:06
+ * @LastEditTime: 2021-08-06 17:44:16
  * @LastEditors: Kenzi
  */
 /*
@@ -27,6 +27,7 @@ import { useRoute } from "@react-navigation/native";
 import { ListItem } from "react-native-elements";
 import { Avatar } from "react-native-elements/dist/avatar/Avatar";
 import { toUserInfoPage } from "./../utils";
+import bg from "../../../../assets/bg.jpg";
 const GroupInfoPage = ({ navigation }) => {
   const item = useRoute().params.item;
   const inContact = useRoute().params.inContact;
@@ -34,9 +35,13 @@ const GroupInfoPage = ({ navigation }) => {
   const handleOnPress = (item) => {
     return toUserInfoPage(item, navigation);
   };
+
   return (
     <>
-      <ImageBackground style={styles.bg} source={{ uri: item.avatar }}>
+      <ImageBackground
+        style={styles.bg}
+        source={item.avatar ? { uri: item.avatar } : bg}
+      >
         <View style={styles.headerContainer}>
           <Text style={styles.header}>{item.name}</Text>
         </View>
@@ -50,12 +55,12 @@ const GroupInfoPage = ({ navigation }) => {
               <ListItem.Subtitle>{item.info}</ListItem.Subtitle>
             </ListItem.Content>
           </ListItem>
-          <ListItem key={item.users.length} bottomDivider>
+          <ListItem key={item.receivers.length} bottomDivider>
             <ListItem.Content>
-              <ListItem.Title>{item.users.length} Members</ListItem.Title>
+              <ListItem.Title>{item.receivers.length} Members</ListItem.Title>
             </ListItem.Content>
           </ListItem>
-          {item.users.map((user) => (
+          {item.receivers.map((user) => (
             <TouchableOpacity onPress={() => handleOnPress(user)}>
               <ListItem
                 containerStyle={styles.members}
@@ -65,7 +70,7 @@ const GroupInfoPage = ({ navigation }) => {
                 <Avatar
                   rounded
                   title={user.name.toUpperCase().substring(0, 2)}
-                  source={{ uri: user.avatar}}
+                  source={{ uri: user.avatar }}
                 />
                 <ListItem.Content>
                   <ListItem.Title>{user.name}</ListItem.Title>
@@ -101,6 +106,7 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 1,
+    backgroundColor: "white",
   },
   members: {},
 });

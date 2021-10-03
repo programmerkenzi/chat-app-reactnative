@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-14 09:25:12
- * @LastEditTime: 2021-07-14 17:21:45
+ * @LastEditTime: 2021-08-06 16:45:44
  * @LastEditors: Kenzi
  */
 
@@ -29,12 +29,15 @@ import { handleGetImageLibrary } from "../../../library/utils/resources";
 import { useEffect } from "react";
 import { useRoute } from "@react-navigation/native";
 import AvatarWithNameTag from "../../../components/avatarWithNameTag/AvatarWithNameTag";
+import { connect } from "react-redux";
+import { initializeChatRoomStart } from "../../../redux/chat/chat.actions";
+import { Alert } from "react-native";
 
-const EditGroupInfoPage = ({ navigation }) => {
+const EditGroupInfoPage = ({ navigation, initChatRoom }) => {
   const [groupName, setGroupName] = useState("");
-  const [Description, setDescription] = useState("");
+  const [description, setDescription] = useState("");
 
-  const checkedItem = useRoute().params.item;
+  const checkedItem = useRoute().params?.item;
 
   const [imageUri, setImageUri] = useState(null);
 
@@ -53,14 +56,18 @@ const EditGroupInfoPage = ({ navigation }) => {
   const toast = useToast();
 
   const onPressSubmit = () => {
-    toast.show({
-      title: "测试",
-      description: "新增群组",
-      duration: 2000,
-      isClosable: true,
-      placement: "top",
-      status: "success",
-    });
+    if (!groupName.length) return Alert.alert("", "pls filed group name");
+
+    const roomUserIds = checkedItem.map((user) => user._id);
+    console.log("description :>> ", description);
+    return initChatRoom(
+      navigation,
+      roomUserIds,
+      "group",
+      groupName,
+      description,
+      imageUri
+    );
   };
   return (
     <View style={styles.container}>
@@ -88,7 +95,7 @@ const EditGroupInfoPage = ({ navigation }) => {
           <TextArea
             h={20}
             placeholder="请输入"
-            onChange={(value) => setDescription(value)}
+            onChangeText={(value) => setDescription(value)}
           />
         </Stack>
         <Text style={styles.text}>会员</Text>
@@ -108,7 +115,23 @@ const EditGroupInfoPage = ({ navigation }) => {
   );
 };
 
-export default EditGroupInfoPage;
+const mapStateToProps = (state) => ({});
+
+const mapDispatchToProps = (dispatch) => ({
+  initChatRoom: (navigation, user_ids, type, name, description, avatar) =>
+    dispatch(
+      initializeChatRoomStart(
+        navigation,
+        user_ids,
+        type,
+        name,
+        description,
+        avatar
+      )
+    ),
+});
+
+export default connect(null, mapDispatchToProps)(EditGroupInfoPage);
 
 const styles = StyleSheet.create({
   container: {

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-08-02 18:07:46
- * @LastEditTime: 2021-08-05 16:01:10
+ * @LastEditTime: 2021-08-09 09:30:14
  * @LastEditors: Kenzi
  */
 
@@ -17,12 +17,21 @@ import {
 import { t } from "../../i18n";
 import { tw } from "react-native-tailwindcss";
 import { Icon } from "react-native-elements";
-import { decodeMessage } from "./../../library/utils/crypto";
+import {
+  decodeMessage,
+  decodeGroupMessage,
+} from "./../../library/utils/crypto";
 import { useState } from "react";
 import * as Animatable from "react-native-animatable";
 import { useEffect } from "react";
 
-const PinMessage = ({ messages, handleClose, publicKey }) => {
+const PinMessage = ({
+  messages,
+  handleClose,
+  publicKey,
+  groupKeypair,
+  roomType,
+}) => {
   const [boxMinHeight, setBoxMinHeight] = useState(
     messages.length > 1 ? 85 : 55
   );
@@ -46,8 +55,9 @@ const PinMessage = ({ messages, handleClose, publicKey }) => {
     const decodedMessage =
       typeof message.text === "string"
         ? message.text
-        : decodeMessage(message.text, publicKey);
-
+        : roomType === "private"
+        ? decodeMessage(message.text, publicKey)
+        : decodeGroupMessage(message.text, groupKeypair);
     return (
       <View
         style={[

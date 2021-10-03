@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-21 14:34:35
- * @LastEditTime: 2021-08-05 11:54:44
+ * @LastEditTime: 2021-08-06 17:09:51
  * @LastEditors: Kenzi
  */
 
@@ -166,17 +166,27 @@ export const getFriendList = async () => {
   return list;
 };
 
-export const initRoom = async (creator, user_ids, type) => {
+export const initRoom = async (
+  creator,
+  user_ids,
+  type,
+  name,
+  description,
+  avatar
+) => {
   const res = await initializeChatRoom({
     creator,
     user_ids,
     type,
+    name,
+    description,
+    avatar,
   });
 
   console.log("res initializeChatRoom :>> ", res);
 
   const room_info = await res.data.room_info[0];
-  const avatar = room_info.avatar
+  const roomAvatar = room_info.avatar
     ? createFileUrl(room_info.avatar)
     : room_info.avatar;
   const receivers = room_info.receivers.map((user) => {
@@ -186,7 +196,7 @@ export const initRoom = async (creator, user_ids, type) => {
     ...room_info,
     last_message: [],
     unread: [],
-    avatar: avatar,
+    avatar: roomAvatar,
     receivers: receivers,
   };
 

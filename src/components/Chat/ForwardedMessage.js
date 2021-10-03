@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-26 13:47:04
- * @LastEditTime: 2021-08-04 16:40:28
+ * @LastEditTime: 2021-08-07 18:10:54
  * @LastEditors: Kenzi
  */
 
@@ -12,16 +12,30 @@ import { Icon } from "react-native-elements";
 import { tw } from "react-native-tailwindcss";
 import { t } from "../../i18n";
 import FilesRender from "./FilesRender";
-import { decodeMessage } from "./../../library/utils/crypto";
+import {
+  decodeMessage,
+  decodeGroupMessage,
+} from "./../../library/utils/crypto";
 
-const ForwardedMessage = ({ messages, post_by_user, user_id, publicKey }) => {
+const ForwardedMessage = ({
+  messages,
+  post_by_user,
+  user_id,
+  publicKey,
+  roomType,
+  groupKeypair,
+}) => {
   const isPostByCurrentUser = post_by_user === user_id;
 
   const renderMessage = (msg) => {
     const { file, message, post_by_user } = msg;
     const { name } = post_by_user[0];
     const decodedMessage =
-      typeof message === "string" ? message : decodeMessage(message, publicKey);
+      typeof message === "string"
+        ? message
+        : roomType === "private"
+        ? decodeMessage(message, publicKey)
+        : decodeGroupMessage(message, groupKeypair);
     return (
       <>
         <View style={[tw.flexRow, tw.mB1]}>
@@ -54,7 +68,14 @@ const ForwardedMessage = ({ messages, post_by_user, user_id, publicKey }) => {
   };
 
   return messages.length ? (
-    <View style={[tw.p2]}>
+    <View
+      style={[
+        tw.m2,
+        tw.p2,
+        tw.borderL2,
+        isPostByCurrentUser ? tw.borderGray300 : tw.borderGray600,
+      ]}
+    >
       {messages.map((message) => renderMessage(message))}
     </View>
   ) : null;

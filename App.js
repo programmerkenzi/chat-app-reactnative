@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-07-05 18:17:21
- * @LastEditTime: 2021-08-03 10:03:57
+ * @LastEditTime: 2021-08-06 17:19:19
  * @LastEditors: Kenzi
  */
 import React, { useEffect } from "react";
@@ -25,6 +25,7 @@ import {
   clearAllTimers,
   refreshTokenInBackground,
 } from "./src/redux/auth/utils";
+
 const App = () => {
   useEffect(() => {
     //背景任务注册
@@ -48,9 +49,11 @@ const App = () => {
   return (
     <Provider store={store}>
       <NativeBaseProvider theme={theme}>
-        <MainStackNavigation />
-        <Notification />
-        <CustomSpinner />
+        <MenuProvider>
+          <MainStackNavigation />
+          <Notification />
+          <CustomSpinner />
+        </MenuProvider>
       </NativeBaseProvider>
     </Provider>
   );

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-02 16:33:57
- * @LastEditTime: 2021-08-05 15:47:20
+ * @LastEditTime: 2021-08-06 16:48:17
  * @LastEditors: Kenzi
  */
 
@@ -277,12 +277,21 @@ function* onGetUserFriendList() {
 function* initChatRoom({ payload }) {
   const user = (state) => state.main.user;
   const { userInfo } = yield select(user);
-  const { navigation, user_ids, type } = payload;
+  const { navigation, user_ids, type, name, description, avatar } = payload;
   let room_user_ids = user_ids;
   try {
     // insert current user id
     yield room_user_ids.push(userInfo._id);
-    const newRoomInfo = yield initRoom(userInfo._id, room_user_ids, type);
+    const newRoomInfo = yield initRoom(
+      userInfo._id,
+      room_user_ids,
+      type,
+      name,
+      description,
+      avatar
+    );
+
+    console.log("newRoomInfo :>> ", newRoomInfo);
     if (newRoomInfo) {
       yield put(initializeChatRoomSuccess(newRoomInfo, newRoomInfo._id));
     }

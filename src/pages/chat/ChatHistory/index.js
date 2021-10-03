@@ -2,7 +2,7 @@
  * @Description: 聊天列表
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:24
- * @LastEditTime: 2021-08-05 14:08:06
+ * @LastEditTime: 2021-08-10 09:06:54
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -35,7 +35,10 @@ import { t } from "../../../i18n";
 import { Button } from "react-native-elements/dist/buttons/Button";
 import { HeaderOptionsWithRightButton } from "../../../navigation/Options";
 import { selectParams } from "./../../../redux/router/router.select";
-import { decodeMessage } from "./../../../library/utils/crypto";
+import {
+  decodeMessage,
+  decodeGroupMessage,
+} from "./../../../library/utils/crypto";
 
 selectUserInfo;
 const ChatHistoryPage = ({
@@ -66,93 +69,90 @@ const ChatHistoryPage = ({
 
   const creatListItemData = () => {
     let chatRoomArray = Object.values(chatRoomList);
-    //刪除meta data
-    let data = [];
-    chatRoomArray.forEach((props) => {
-      if (typeof props === "object") {
-        const receivers = props.receivers;
-        const avatar = props.avatar || receivers[0].avatar || "http://";
-        const name = props.name || receivers[0].name; //群組 || 私人
-        const hasLastMessage = props.last_message;
+    if (chatRoomArray.length > 0) {
+      //刪除meta data
+      let data = [];
+      chatRoomArray.forEach((props) => {
+        if (typeof props === "object") {
+          const receivers = props.receivers;
+          const avatar = props.background || receivers[0].avatar || "http://";
+          const name = props.name || receivers[0].name; //群組 || 私人
+          const hasLastMessage = props?.last_message[0];
+          const roomType = props.type;
+          const receiverPublicKey = receivers[0].public_key;
+          const groupKeypair = props.key;
 
-        const lastMessageInfo = hasLastMessage
-          ? hasLastMessage.length > 0
-            ? hasLastMessage[0]
+          const lastMessageInfo = hasLastMessage
+            ? hasLastMessage
             : {
                 type: "null",
                 createdAt: props.createdAt,
                 message: "",
                 file: [],
-              }
-          : {
-              type: "null",
-              createdAt: props.createdAt,
-              message: "",
-              file: [],
-            };
+              };
 
-        let lastTextMessage = "";
+          let lastTextMessage = "";
 
-        if (lastMessageInfo.message) {
-          //讯息解密
-          const receiverPublicKey = receivers[0].public_key;
-          const decodedMessage =
-            typeof lastMessageInfo.message === "string"
-              ? lastMessageInfo.message
-              : decodeMessage(lastMessageInfo.message, receiverPublicKey);
+          const message = lastMessageInfo.message;
+          if (message) {
+            //讯息解密;
 
-          console.log("decodedMessage :>> ", decodedMessage);
-          lastTextMessage =
+            const decodedMessage =
+              roomType === "private"
+                ? decodeMessage(message, receiverPublicKey)
+                : decodeGroupMessage(message, groupKeypair);
+
+            lastTextMessage = decodedMessage;
             decodedMessage.length > 20
               ? decodedMessage.substring(0, 20) + "..."
               : decodedMessage;
-        }
-        if (lastMessageInfo.file.length > 0) {
-          lastMessageInfo.file.forEach((item) => {
-            const mime_type = item.mime_type
-              ? item.mime_type
-              : mime.lookup(item);
-            if (mime_type) {
-              const fileEmoji = mime_type.includes("image")
-                ? "🖼️"
-                : mime_type.includes("video")
-                ? "🎥"
-                : mime_type.includes("audio")
-                ? "🎙️"
-                : "📁";
+          }
+          if (lastMessageInfo.file?.length > 0) {
+            lastMessageInfo.file.forEach((item) => {
+              const mime_type = item.mime_type
+                ? item.mime_type
+                : mime.lookup(item);
+              if (mime_type) {
+                const fileEmoji = mime_type.includes("image")
+                  ? "🖼️"
+                  : mime_type.includes("video")
+                  ? "🎥"
+                  : mime_type.includes("audio")
+                  ? "🎙️"
+                  : "📁";
+                lastTextMessage = `${lastTextMessage} ${fileEmoji} `;
+              }
+            });
+          }
 
-              lastTextMessage = `${lastTextMessage} ${fileEmoji} `;
-            }
+          //时间显示;
+          const dateTime = new Date(lastMessageInfo.createdAt);
+          const localeDate = dateTime.toLocaleDateString();
+          const localeTime = dateTime.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+          });
+
+          //未读讯息数量
+          const unread = props.unread.length;
+
+          data.push({
+            _id: props._id,
+            avatar: avatar.length > 0 ? avatar : "http://",
+            name: name,
+            lastMessage: lastTextMessage,
+            dateTime: dateTime,
+            date: localeDate,
+            time: localeTime,
+            unread: unread,
           });
         }
-
-        //时间显示
-        const dateTime = new Date(lastMessageInfo.createdAt);
-        const localeDate = dateTime.toLocaleDateString();
-        const localeTime = dateTime.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          hour12: true,
-        });
-
-        //未读讯息数量
-        const unread = props.unread.length;
-
-        data.push({
-          _id: props._id,
-          avatar: avatar.length > 0 ? avatar : "http://",
-          name: name,
-          lastMessage: lastTextMessage,
-          dateTime: dateTime,
-          date: localeDate,
-          time: localeTime,
-          unread: unread,
-        });
-      }
-    });
-    //按照日期由新到舊排序
-    data.sort((a, b) => b.dateTime - a.dateTime);
-    setListItemData(data);
+      });
+      //按照日期由新到舊排序
+      data.sort((a, b) => b.dateTime - a.dateTime);
+      setListItemData(data);
+    }
   };
 
   useEffect(() => {
