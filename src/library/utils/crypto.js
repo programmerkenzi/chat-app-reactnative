@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-08-02 16:00:49
- * @LastEditTime: 2021-08-04 12:15:07
+ * @LastEditTime: 2021-08-07 17:59:52
  * @LastEditors: Kenzi
  */
 import nacl from "tweet-nacl-react-native-expo";
@@ -40,7 +40,24 @@ export const decodeMessage = (encodedMessageInfo, publicKeyFromOther) => {
     nonceDecoded,
     sharedKey
   ); // same as strDecoded
-
   const messageEncoded = nacl.util.encodeUTF8(messageDecrypted);
+  return messageEncoded;
+};
+
+export const encodeGroupMessage = async (message, keyPairForGroup) => {
+  const privateKey = nacl.util.decodeBase64(keyPairForGroup.key2);
+  const decodedUtf8Message = new Uint8Array(nacl.util.decodeUTF8(message));
+  const signature = nacl.sign(decodedUtf8Message, privateKey);
+  const signatureB64 = nacl.util.encodeBase64(signature);
+
+  return { encodedMessage: signatureB64 };
+};
+
+export const decodeGroupMessage = (encodedMessageInfo, keyPairForGroup) => {
+  const publicKey = nacl.util.decodeBase64(keyPairForGroup.key1);
+  const { encodedMessage } = encodedMessageInfo;
+  const decodedSignature = nacl.util.decodeBase64(encodedMessage);
+  const verifiedMsg = nacl.sign.open(decodedSignature, publicKey);
+  const messageEncoded = nacl.util.encodeUTF8(verifiedMsg);
   return messageEncoded;
 };

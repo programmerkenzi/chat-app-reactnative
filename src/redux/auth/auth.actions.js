@@ -17,10 +17,20 @@ export const loginSuccess = (
   refreshToken,
   userInfo,
   publicKey,
-  privateKey
+  privateKey,
+  privateKeyGroup,
+  publicKeyGroup
 ) => ({
   type: authActionType.LOGIN_SUCCESS,
-  payload: { accessToken, refreshToken, userInfo, publicKey, privateKey },
+  payload: {
+    accessToken,
+    refreshToken,
+    userInfo,
+    publicKey,
+    privateKey,
+    privateKeyGroup,
+    publicKeyGroup,
+  },
 });
 
 export const loginFailure = (error) => ({

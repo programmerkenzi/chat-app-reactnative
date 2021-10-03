@@ -28,10 +28,25 @@ function* login({ payload }) {
     const device_id = Device.osBuildFingerprint;
     const res = yield onLogin(username, password, device_id);
     if (res) {
-      const { accessToken, refreshToken, userInfo, publicKey, privateKey } =
-        res;
+      const {
+        accessToken,
+        refreshToken,
+        userInfo,
+        publicKey,
+        publicKeyGroup,
+        privateKey,
+        privateKeyGroup,
+      } = res;
       yield put(
-        loginSuccess(accessToken, refreshToken, userInfo, publicKey, privateKey)
+        loginSuccess(
+          accessToken,
+          refreshToken,
+          userInfo,
+          publicKey,
+          privateKey,
+          privateKeyGroup,
+          publicKeyGroup
+        )
       );
     }
   } catch (error) {

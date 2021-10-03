@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-01 11:33:03
- * @LastEditTime: 2021-08-03 13:51:52
+ * @LastEditTime: 2021-08-07 09:09:31
  * @LastEditors: Kenzi
  */
 
@@ -13,6 +13,8 @@ const initState = {
   refreshToken: null,
   publicKey: null,
   privateKey: null,
+  privateKeyGroup: null,
+  publicKeyGroup: null,
 };
 
 const authReducer = (state = initState, action) => {
@@ -24,6 +26,8 @@ const authReducer = (state = initState, action) => {
         refreshToken: action.payload.refreshToken,
         publicKey: action.payload.publicKey,
         privateKey: action.payload.privateKey,
+        privateKeyGroup: action.payload.privateKeyGroup,
+        publicKeyGroup: action.payload.publicKeyGroup,
       };
     case authActionType.LOGOUT_SUCCESS:
       return {
@@ -32,6 +36,8 @@ const authReducer = (state = initState, action) => {
         refreshToken: null,
         publicKey: null,
         privateKey: null,
+        privateKeyGroup: null,
+        publicKeyGroup: null,
       };
 
     case authActionType.GET_USER_INFO_SUCCESS:
