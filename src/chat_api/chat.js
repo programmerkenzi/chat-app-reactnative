@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-14 17:57:36
- * @LastEditTime: 2021-08-05 14:54:57
+ * @LastEditTime: 2021-08-10 07:42:12
  * @LastEditors: Kenzi
  */
 
@@ -99,4 +99,12 @@ export const unpinMessage = (room_id, message_id) =>
   axiosChatClient({
     url: `/room/${room_id}/unpin-message/${message_id}`,
     method: "put",
+  });
+
+//換群組背景
+export const updateGroupBackground = (room_id, filename) =>
+  axiosChatClient({
+    url: `/room/${room_id}/bg`,
+    method: "put",
+    data: { filename },
   });

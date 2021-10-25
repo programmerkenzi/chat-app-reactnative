@@ -2,7 +2,7 @@
  * @Description: 聊天列表
  * @Author: Lewis
  * @Date: 2021-01-18 17:51:24
- * @LastEditTime: 2021-08-07 18:04:06
+ * @LastEditTime: 2021-08-10 09:06:54
  * @LastEditors: Kenzi
  */
 import React, { useState, useEffect } from "react";
@@ -75,7 +75,7 @@ const ChatHistoryPage = ({
       chatRoomArray.forEach((props) => {
         if (typeof props === "object") {
           const receivers = props.receivers;
-          const avatar = props.avatar || receivers[0].avatar || "http://";
+          const avatar = props.background || receivers[0].avatar || "http://";
           const name = props.name || receivers[0].name; //群組 || 私人
           const hasLastMessage = props?.last_message[0];
           const roomType = props.type;
