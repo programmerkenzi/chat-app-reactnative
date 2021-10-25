@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-06-28 17:53:28
- * @LastEditTime: 2021-07-27 10:01:54
+ * @LastEditTime: 2021-08-23 12:36:13
  * @LastEditors: Kenzi
  */
 
@@ -14,10 +14,10 @@ import {
   FlatList,
   Image,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import * as mime from "react-native-mime-types";
 import { Icon } from "react-native-elements";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { darkGary, lightGary, red } from "../../styles/color";
 import { BackgroundImage } from "react-native-elements/dist/config";
 

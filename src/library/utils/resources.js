@@ -2,7 +2,7 @@
  * @Description: 公用使用函数
  * @Author: Lewis
  * @Date: 2021-01-19 09:45:36
- * @LastEditTime: 2021-07-09 18:49:33
+ * @LastEditTime: 2021-08-10 09:13:54
  * @LastEditors: Kenzi
  */
 import * as ImagePicker from "expo-image-picker";
@@ -13,6 +13,8 @@ import * as DocumentPicker from "expo-document-picker";
 import { handleCheckMediaLibraryPermission } from "./permissions";
 import * as IntentLauncher from "expo-intent-launcher";
 import { checkCameraPermission } from "./permissions";
+import { uploadFile } from "./../../chat_api/file";
+import * as mime from "react-native-mime-types";
 
 //获取档案
 export const filePicker = async () => {
@@ -208,4 +210,18 @@ export const loadResources = (path) => {
   const file_url = `${baseUrl}/${path}`;
 
   return file_url;
+};
+
+export const handleUploadMultipleFile = async (files) => {
+  //判断资源类型
+  const formData = new FormData();
+  files.forEach((file) => {
+    let modifiedFile = { ...file };
+    const mine_type = mime.lookup(modifiedFile.uri);
+    modifiedFile.type = mine_type;
+    formData.append("files", modifiedFile);
+  });
+  console.log("formData :>> ", formData);
+  const res = await uploadFile(formData);
+  return res;
 };

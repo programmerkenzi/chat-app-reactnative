@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Kenzi
  * @Date: 2021-03-08 15:40:44
- * @LastEditTime: 2021-08-06 18:38:37
+ * @LastEditTime: 2021-08-10 08:01:55
  * @LastEditors: Kenzi
  */
 /*
@@ -46,7 +46,6 @@ const UserInfoPage = ({ navigation, userInfo, initChatRoom, chatRoomList }) => {
     chatRoomArray = chatRoomArray.filter(
       (chatRoom) => chatRoom.type !== "group"
     );
-    console.log("chatRoomArray :>> ", chatRoomArray);
     //确认该房间使否已经在列表
     chatRoomArray.some((room) => {
       if (typeof room === "object") {
