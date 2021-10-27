@@ -22,9 +22,10 @@ import {
 } from "@env";
 
 const axiosChatClient = axios.create({
-  baseURL: __DEV__
-    ? REACT_APP_API_URL_DEVELOPMENT
-    : REACT_APP_API_URL_PRODUCTION,
+  // baseURL: __DEV__
+  //   ? REACT_APP_API_URL_DEVELOPMENT
+  //   : REACT_APP_API_URL_PRODUCTION,
+  baseURL: "http://192.168.1.107:3000",
   paramsSerializer: (params) => queryString.stringify(params),
   timeout: 5000, // request timeout
 });
@@ -64,7 +65,7 @@ axiosChatClient.interceptors.response.use(
     store.dispatch(stopLoading());
     const originalRequest = error.config;
     if (
-      error.response.status === 401 &&
+      error?.response?.status === 401 &&
       originalRequest.url.includes("/refresh-token")
     ) {
       store.dispatch(startLoading());
