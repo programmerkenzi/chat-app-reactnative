@@ -103,12 +103,13 @@ const ChatMessagePage = ({
   const roomInfo = room_info.unread
     ? room_info
     : chatRoomArray.filter(
-        (room) => room._id === useRoute().params.room_info.room_id
-      )[0];
+      (room) => room._id === useRoute().params.room_info.room_id
+    )[0];
 
   const unread = roomInfo.unread.length;
   const room_id = roomInfo._id;
   const user_id = userInfo._id;
+  const room_type = roomInfo.type
 
   const [showEmojiBoard, setShowEmojiBoard] = useState(false);
 
@@ -128,6 +129,7 @@ const ChatMessagePage = ({
   const receiverPublicKey = roomInfo.receivers[0].public_key;
   const groupKeypair = roomInfo.key;
   const roomType = roomInfo.type;
+
 
   //讯息array
   const createGiftChatData = () => {
@@ -173,8 +175,8 @@ const ChatMessagePage = ({
           received: item.received
             ? item.received
             : isRead === -1
-            ? false
-            : true,
+              ? false
+              : true,
           forwarded_from: forwarded_from_messages,
           reply_for: reply_for_message,
           isPin: pin,
@@ -275,6 +277,7 @@ const ChatMessagePage = ({
       roomType === "private"
         ? await encodeMessage(messageText, receiverPublicKey)
         : await encodeGroupMessage(messageText, groupKeypair);
+
 
     let modifiedMessage = theMessage;
     let modifiedFiles = [...selectedFile];
@@ -502,7 +505,7 @@ const ChatMessagePage = ({
           _id: user_id,
         }}
         renderBubble={(props) => <MessageBubble props={props} />}
-        renderUsernameOnMessage={false}
+        renderUsernameOnMessage={room_type === 'group' ? true : false}
         infiniteScroll={true}
         scrollToBottom={true}
         onLongPress={(props, context) => onLongPress(props, context)}
