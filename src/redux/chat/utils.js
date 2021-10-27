@@ -137,7 +137,7 @@ export const getChatRooms = async (fetchPage) => {
   const list = data.data;
   list.forEach((room) => {
     const room_id = room._id;
-    const avatar = room.avatar.length > 0 ? createFileUrl(avatar) : avatar;
+    const avatar = room?.avatar?.length > 0 ? createFileUrl(avatar) : avatar;
     const receivers = room.receivers.map((user) => {
       return { ...user, avatar: createFileUrl(user.avatar) };
     });
@@ -156,10 +156,10 @@ export const getFriendList = async () => {
   const data = await res.data;
   const list = [];
   data.forEach((contact) => {
-    const avatar = contact.avatar;
+    const avatar = contact?.avatar;
     list.push({
       ...contact,
-      avatar: avatar.length > 0 ? createFileUrl(avatar) : "http://",
+      avatar: avatar?.length > 0 ? createFileUrl(avatar) : "http://",
     });
   });
 
